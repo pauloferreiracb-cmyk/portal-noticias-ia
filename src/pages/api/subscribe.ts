@@ -1,8 +1,7 @@
 import type { APIRoute } from 'astro';
+import { Resend } from 'resend';
 
 // Este endpoint roda como serverless function (não é prerenderizado).
-// Por enquanto só valida e loga — troque o bloco "TODO" pela chamada
-// real ao seu provedor de e-mail (Resend, Mailchimp, ConvertKit, Beehiiv...).
 export const prerender = false;
 
 export const POST: APIRoute = async ({ request }) => {
@@ -14,8 +13,26 @@ export const POST: APIRoute = async ({ request }) => {
       return new Response(JSON.stringify({ erro: 'e-mail inválido' }), { status: 400 });
     }
 
-    // TODO: chamar API do provedor de e-mail escolhido, ex:
-    // await fetch('https://api.resend.com/...', { ... })
+    const apiKey = import.meta.env.RESEND_API_KEY;
+    const audienceId = import.meta.env.RESEND_AUDIENCE_ID;
+
+    if (!apiKey || !audienceId) {
+      console.error('RESEND_API_KEY / RESEND_AUDIENCE_ID não configuradas');
+      return new Response(JSON.stringify({ erro: 'inscrição indisponível no momento' }), { status: 500 });
+    }
+
+    const resend = new Resend(apiKey);
+    const { error } = await resend.contacts.create({
+      email,
+      audienceId,
+      unsubscribed: false,
+    });
+
+    if (error) {
+      console.error('erro Resend:', error);
+      return new Response(JSON.stringify({ erro: 'não foi possível concluir a inscrição' }), { status: 502 });
+    }
+
     console.log('nova inscrição:', { email, utm_source, utm_medium, utm_campaign });
 
     return new Response(JSON.stringify({ ok: true }), { status: 200 });
