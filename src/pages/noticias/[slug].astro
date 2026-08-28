@@ -1,0 +1,50 @@
+---
+import { getCollection, type CollectionEntry } from 'astro:content';
+import Layout from '../../layouts/Layout.astro';
+import EmailCapture from '../../components/EmailCapture.astro';
+import AdSlot from '../../components/AdSlot.astro';
+
+export const prerender = true;
+
+export async function getStaticPaths() {
+  const artigos = await getCollection('noticias');
+  return artigos.map((artigo) => ({
+    params: { slug: artigo.slug },
+    props: { artigo },
+  }));
+}
+
+interface Props {
+  artigo: CollectionEntry<'noticias'>;
+}
+const { artigo } = Astro.props;
+const { Content } = await artigo.render();
+const { titulo, resumo, data, tags, fonte_url, fonte_nome } = artigo.data;
+const dataFormatada = new Intl.DateTimeFormat('pt-BR', {
+  day: '2-digit',
+  month: 'long',
+  year: 'numeric',
+}).format(data);
+---
+<Layout titulo={`${titulo} — Portal IA`} descricao={resumo}>
+  <article>
+    <h1>{titulo}</h1>
+    <div class="meta">
+      {tags.map((t: string) => <span class="tag">{t}</span>)}
+      {dataFormatada}
+    </div>
+
+    <AdSlot id="artigo-topo" />
+
+    <Content />
+
+    <p>
+      Fonte original: <a href={fonte_url} target="_blank" rel="noopener">{fonte_nome}</a>
+    </p>
+
+    <AdSlot id="artigo-fim" />
+
+    <!-- captura de e-mail no fim do artigo -->
+    <EmailCapture />
+  </article>
+</Layout>

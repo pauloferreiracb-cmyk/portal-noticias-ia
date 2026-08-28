@@ -1,0 +1,27 @@
+---
+import { getCollection } from 'astro:content';
+import Layout from '../layouts/Layout.astro';
+import NewsCard from '../components/NewsCard.astro';
+import EmailCapture from '../components/EmailCapture.astro';
+import AdSlot from '../components/AdSlot.astro';
+
+export const prerender = true;
+
+const todas = await getCollection('noticias');
+const ultimas12 = todas.sort((a, b) => b.data.data.valueOf() - a.data.data.valueOf()).slice(0, 12);
+---
+<Layout titulo="Portal IA — Notícias de IA, direto ao ponto">
+  <!-- captura de e-mail ACIMA da dobra, antes de qualquer notícia -->
+  <EmailCapture
+    titulo="As notícias de IA que importam, sem enrolação"
+    texto="Um resumo por semana, direto na sua caixa de entrada."
+  />
+
+  <AdSlot id="home-topo" />
+
+  {ultimas12.map((artigo) => <NewsCard artigo={artigo} />)}
+
+  {todas.length === 0 && (
+    <p>Nenhuma notícia publicada ainda. Adicione um .md em src/content/noticias/ e dê push.</p>
+  )}
+</Layout>

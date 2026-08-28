@@ -1,0 +1,49 @@
+---
+import '../styles/global.css';
+
+interface Props {
+  titulo: string;
+  descricao?: string;
+}
+const { titulo, descricao = 'Notícias de IA, direto ao ponto.' } = Astro.props;
+---
+<!doctype html>
+<html lang="pt-BR" data-theme="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="dark" />
+    <title>{titulo}</title>
+    <meta name="description" content={descricao} />
+    <!-- preconnect não é necessário: zero fontes/scripts externos, LCP fica só com o CSS/HTML inline -->
+  </head>
+  <body>
+    <header class="cabecalho">
+      <a href="/" class="logo">📡 Portal IA</a>
+      <nav>
+        <a href="/links">Links</a>
+      </nav>
+    </header>
+
+    <main>
+      <slot />
+    </main>
+
+    <footer class="rodape">
+      <span>© {new Date().getFullYear()} Portal IA</span>
+      <a href="/links">todos os links</a>
+    </footer>
+
+    <script>
+      import { capturarUTM, propagarUTMEmLinksInternos } from '../lib/utm';
+      capturarUTM();
+      propagarUTMEmLinksInternos();
+    </script>
+
+    <!-- Vercel Web Analytics -->
+    <script type="module">
+      import { inject } from '@vercel/analytics';
+      inject();
+    </script>
+  </body>
+</html>

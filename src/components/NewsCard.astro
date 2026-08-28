@@ -1,0 +1,21 @@
+---
+import type { CollectionEntry } from 'astro:content';
+
+interface Props {
+  artigo: CollectionEntry<'noticias'>;
+}
+const { artigo } = Astro.props;
+const { titulo, resumo, data, tags, fonte_nome } = artigo.data;
+const dataFormatada = new Intl.DateTimeFormat('pt-BR', {
+  day: '2-digit',
+  month: 'short',
+}).format(data);
+---
+<a class="card-noticia" href={`/noticias/${artigo.slug}`}>
+  <h2>{titulo}</h2>
+  <p>{resumo}</p>
+  <div class="meta">
+    {tags.slice(0, 3).map((t: string) => <span class="tag">{t}</span>)}
+    {dataFormatada} · {fonte_nome}
+  </div>
+</a>

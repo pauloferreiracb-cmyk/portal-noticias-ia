@@ -1,0 +1,57 @@
+---
+interface Props {
+  titulo?: string;
+  texto?: string;
+}
+const {
+  titulo = 'Receba as notícias de IA direto no e-mail',
+  texto = 'Sem spam. Um resumo por semana das notícias que importam.',
+} = Astro.props;
+---
+<div class="captura-email">
+  <h3>{titulo}</h3>
+  <p>{texto}</p>
+  <form class="form-email" data-form-email>
+    <input type="email" name="email" placeholder="seu@email.com" required />
+    <button type="submit">Quero receber</button>
+  </form>
+  <p class="mensagem-form" data-mensagem style="display:none; margin-top:8px; font-size:0.85rem;"></p>
+</div>
+
+<script>
+  import { obterUTM } from '../lib/utm';
+
+  document.querySelectorAll<HTMLFormElement>('[data-form-email]').forEach((form) => {
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = (form.querySelector('input[name="email"]') as HTMLInputElement).value;
+      const msg = form.parentElement?.querySelector('[data-mensagem]') as HTMLElement;
+
+      try {
+        const resp = await fetch('/api/subscribe', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, ...obterUTM() }),
+        });
+
+        if (!resp.ok) throw new Error('falha no envio');
+
+        // Evento de conversão pro Vercel Analytics
+        // (@vercel/analytics precisa estar carregado no Layout)
+        // @ts-ignore
+        window.va?.('event', { name: 'email_signup' });
+
+        form.reset();
+        if (msg) {
+          msg.textContent = 'Inscrito! Confira sua caixa de entrada.';
+          msg.style.display = 'block';
+        }
+      } catch {
+        if (msg) {
+          msg.textContent = 'Não deu pra inscrever agora, tenta de novo em instantes.';
+          msg.style.display = 'block';
+        }
+      }
+    });
+  });
+</script>

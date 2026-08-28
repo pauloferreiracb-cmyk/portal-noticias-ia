@@ -1,0 +1,7 @@
+node_modules/
+dist/
+.vercel/
+.astro/
+.env
+output/carrossel/
+.DS_Store

@@ -1,0 +1,27 @@
+---
+import { getCollection } from 'astro:content';
+import Layout from '../layouts/Layout.astro';
+
+export const prerender = true;
+
+const todas = await getCollection('noticias');
+const ultimas8 = todas.sort((a, b) => b.data.data.valueOf() - a.data.data.valueOf()).slice(0, 8);
+---
+<Layout titulo="Links — Portal IA" descricao="Todos os links: últimas notícias e redes sociais.">
+  <h1>🔗 Links</h1>
+
+  <section>
+    <h2>Últimas notícias</h2>
+    {ultimas8.map((artigo) => (
+      <a class="card-noticia" href={`/noticias/${artigo.slug}`}>
+        <h2>{artigo.data.titulo}</h2>
+      </a>
+    ))}
+  </section>
+
+  <section>
+    <h2>Redes</h2>
+    <a class="card-noticia" href="https://instagram.com/SEU_PERFIL" target="_blank">📸 Instagram</a>
+    <a class="card-noticia" href="https://tiktok.com/@SEU_PERFIL" target="_blank">🎵 TikTok</a>
+  </section>
+</Layout>

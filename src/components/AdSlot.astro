@@ -1,0 +1,13 @@
+---
+// Slot reservado pro Google AdSense. Vazio até a aprovação — depois,
+// troca o conteúdo por <ins class="adsbygoogle" ...> e o script do AdSense
+// no <head> do Layout.astro. Mantém o espaço reservado desde já pra não
+// mudar o layout (CLS) quando o anúncio entrar.
+interface Props {
+  id?: string;
+}
+const { id = 'ad-slot' } = Astro.props;
+---
+<div class="slot-anuncio" data-ad-slot={id}>
+  espaço reservado para anúncio
+</div>
