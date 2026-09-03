@@ -1,0 +1,56 @@
+name: Pipeline diário de notícias de IA
+
+on:
+  schedule:
+    # 09:00 no horário de Brasília (12:00 UTC)
+    - cron: "0 12 * * *"
+  workflow_dispatch: {} # permite rodar manualmente pelo botão "Run workflow" no GitHub
+
+permissions:
+  contents: write
+
+jobs:
+  gerar-conteudo:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Instalar dependências
+        run: npm ci
+
+      - name: Baixar fontes do carrossel (se ainda não existirem)
+        run: |
+          mkdir -p scripts/fonts
+          # Coloque manualmente Inter-Regular.ttf e Inter-Bold.ttf em scripts/fonts/
+          # e comite no repo uma única vez — o CI não baixa fontes do Google Fonts.
+
+      - name: Gerar artigo(s) novo(s)
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: npm run gerar-noticias
+
+      - name: Gerar carrossel dos artigos novos
+        env:
+          SITE_DOMINIO: ${{ vars.SITE_DOMINIO }}
+        run: npm run gerar-carrossel
+
+      - name: Commitar e subir artigos + carrossel + fila social
+        run: |
+          git config user.name "portal-ia-bot"
+          git config user.email "bot@portal-ia.local"
+          git add src/content/noticias public/carrossel content/fila-social.json
+          git diff --cached --quiet || git commit -m "auto: novas notícias de IA $(date +%F)"
+          git push
+
+      - name: Disponibilizar carrossel pra download (backup manual)
+        uses: actions/upload-artifact@v4
+        with:
+          name: carrossel-${{ github.run_id }}
+          path: public/carrossel/
+          retention-days: 7

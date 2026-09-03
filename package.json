@@ -3,13 +3,14 @@
   "private": true,
   "type": "module",
   "engines": {
-    "node": "20.x"
+    "node": ">=20"
   },
   "scripts": {
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "gerar-carrossel": "node scripts/generate-carousel.mjs"
+    "gerar-carrossel": "node scripts/generate-carousel.mjs",
+    "gerar-noticias": "node scripts/gerar-noticias-ia.mjs"
   },
   "dependencies": {
     "astro": "^4.15.0",

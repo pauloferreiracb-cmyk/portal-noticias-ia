@@ -2,16 +2,25 @@
 /**
  * Gera imagens de carrossel (Instagram/TikTok, 1080x1350) pra cada
  * artigo em src/content/noticias/*.md que ainda não tenha imagens
- * geradas em output/carrossel/<slug>/.
+ * geradas em public/carrossel/<slug>/.
  *
  * 3 slides por artigo:
  *   1. Capa (título + tag)
  *   2. Resumo (o "gatilho de curiosidade")
  *   3. CTA (print estilizado do site + "link nos comentários / bio")
  *
+ * NOVO: depois de gerar as imagens, registra o artigo em
+ * content/fila-social.json (status "pendente") com as URLs públicas
+ * das imagens — é esse arquivo que o Cowork lê pra postar no
+ * Instagram/TikTok via Buffer.
+ *
  * Uso:
  *   node scripts/generate-carousel.mjs            -> gera só o que falta
  *   node scripts/generate-carousel.mjs --forcar    -> regenera tudo
+ *
+ * Variáveis de ambiente:
+ *   SITE_DOMINIO   domínio real do site, ex: portal-ia.com.br
+ *                  (sem https://, sem barra no final)
  *
  * Dependências (já no package.json): gray-matter, satori, @resvg/resvg-js
  */
@@ -26,12 +35,25 @@ import { Resvg } from '@resvg/resvg-js';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const RAIZ = path.resolve(__dirname, '..');
 const DIR_NOTICIAS = path.join(RAIZ, 'src/content/noticias');
-const DIR_SAIDA = path.join(RAIZ, 'output/carrossel');
+
+// MUDANÇA: antes era 'output/carrossel' (não público). Agora fica em
+// 'public/carrossel', que a Vercel serve como arquivo estático em
+// https://SEU-DOMINIO/carrossel/<slug>/<arquivo>.png
+const DIR_SAIDA = path.join(RAIZ, 'public/carrossel');
+
+const CAMINHO_FILA_SOCIAL = path.join(RAIZ, 'content/fila-social.json');
+
 const FORCAR = process.argv.includes('--forcar');
 
 const LARGURA = 1080;
 const ALTURA = 1350;
-const SITE_URL = 'seudominio.com.br'; // ajuste pro seu domínio real
+
+// ATENÇÃO: troque isso pelo domínio real antes de ativar a automação
+// de postagem — enquanto for placeholder, as URLs no fila-social.json
+// vão apontar pra um domínio que não existe e o Buffer não vai
+// conseguir baixar as imagens.
+const SITE_DOMINIO = process.env.SITE_DOMINIO ?? 'SEU-DOMINIO.com.br';
+const SITE_URL_PUBLICO = `https://${SITE_DOMINIO}`;
 
 // Fonte: baixe uma Inter .ttf (Regular e Bold) e coloque em scripts/fonts/
 // (satori precisa dos bytes da fonte, não referencia fontes do sistema)
@@ -62,6 +84,42 @@ function lerArtigos() {
       const { data } = matter(raw);
       return { slug, ...data };
     });
+}
+
+// --- fila-social.json: o que o Cowork vai ler pra postar depois ---
+
+function carregarFilaSocial() {
+  if (!fs.existsSync(CAMINHO_FILA_SOCIAL)) return [];
+  try {
+    return JSON.parse(fs.readFileSync(CAMINHO_FILA_SOCIAL, 'utf-8'));
+  } catch {
+    console.warn('[aviso] fila-social.json existente não é um JSON válido — começando do zero.');
+    return [];
+  }
+}
+
+function salvarFilaSocial(fila) {
+  fs.mkdirSync(path.dirname(CAMINHO_FILA_SOCIAL), { recursive: true });
+  fs.writeFileSync(CAMINHO_FILA_SOCIAL, JSON.stringify(fila, null, 2), 'utf-8');
+}
+
+function adicionarNaFila(fila, artigo, nomesDosArquivos) {
+  if (fila.some((item) => item.slug === artigo.slug)) return fila; // já está na fila, não duplica
+
+  const imagens = nomesDosArquivos.map(
+    (nome) => `${SITE_URL_PUBLICO}/carrossel/${artigo.slug}/${nome}`
+  );
+
+  fila.push({
+    slug: artigo.slug,
+    titulo: artigo.titulo,
+    resumo: artigo.resumo,
+    imagens,
+    status: 'pendente',
+    criado_em: new Date().toISOString(),
+  });
+
+  return fila;
 }
 
 // --- Templates de cada slide, em sintaxe JSX-like exigida pelo satori ---
@@ -171,7 +229,7 @@ function slideCTA() {
               fontSize: 32,
               fontWeight: 700,
             },
-            children: SITE_URL,
+            children: SITE_DOMINIO,
           },
         },
       ],
@@ -186,6 +244,15 @@ async function renderizarPNG(elemento, fontes) {
 }
 
 async function main() {
+  if (SITE_DOMINIO === 'SEU-DOMINIO.com.br') {
+    console.warn(
+      '[aviso] SITE_DOMINIO ainda não foi configurado — as URLs no fila-social.json ' +
+        'vão apontar pra um domínio que não existe. Defina a variável de ambiente ' +
+        'SITE_DOMINIO (ou edite a constante no topo do arquivo) antes de ativar a ' +
+        'postagem automática.'
+    );
+  }
+
   const fontes = carregarFontes();
   const artigos = lerArtigos();
 
@@ -194,10 +261,13 @@ async function main() {
     return;
   }
 
+  let fila = carregarFilaSocial();
+
   for (const artigo of artigos) {
     const dirArtigo = path.join(DIR_SAIDA, artigo.slug);
+    const jaExiste = fs.existsSync(dirArtigo);
 
-    if (fs.existsSync(dirArtigo) && !FORCAR) {
+    if (jaExiste && !FORCAR) {
       console.log(`[pular] ${artigo.slug} já tem carrossel gerado (use --forcar pra refazer)`);
       continue;
     }
@@ -214,8 +284,13 @@ async function main() {
       fs.writeFileSync(path.join(dirArtigo, slide.nome), png);
     }
 
-    console.log(`[ok] carrossel gerado em output/carrossel/${artigo.slug}/`);
+    fila = adicionarNaFila(fila, artigo, slides.map((s) => s.nome));
+
+    console.log(`[ok] carrossel gerado em public/carrossel/${artigo.slug}/`);
   }
+
+  salvarFilaSocial(fila);
+  console.log(`Fila social atualizada em content/fila-social.json (${fila.length} item(ns) no total).`);
 }
 
 main().catch((err) => {

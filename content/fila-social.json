@@ -1,0 +1,74 @@
+[
+  {
+    "slug": "apple-processa-openai-segredos-comerciais",
+    "titulo": "Apple pede rejeição de defesa da OpenAI em processo por segredos comerciais",
+    "resumo": "Disputa judicial sobre suposto roubo de propriedade intelectual da Apple pra hardware da OpenAI avança: Apple contesta pedido de arquivamento, audiência marcada pra outubro.",
+    "imagens": [
+      "https://promptmidia.com.br /carrossel/apple-processa-openai-segredos-comerciais/slide-1-capa.png",
+      "https://promptmidia.com.br /carrossel/apple-processa-openai-segredos-comerciais/slide-2-resumo.png",
+      "https://promptmidia.com.br /carrossel/apple-processa-openai-segredos-comerciais/slide-3-cta.png"
+    ],
+    "status": "pendente",
+    "criado_em": "2026-09-03T10:23:51.300Z"
+  },
+  {
+    "slug": "efeito-das-tarifas-nos-precos-ao-consumidor-finalmente-aparece-segundo-fed-de-mi",
+    "titulo": "Efeito das tarifas nos preços ao consumidor finalmente aparece, segundo Fed de Minneapolis",
+    "resumo": "Estudo do banco central regional americano mostra que o repasse das tarifas comerciais para os preços, que demorou a se manifestar, agora começa a pressionar o bolso do consumidor.",
+    "imagens": [
+      "https://promptmidia.com.br /carrossel/efeito-das-tarifas-nos-precos-ao-consumidor-finalmente-aparece-segundo-fed-de-mi/slide-1-capa.png",
+      "https://promptmidia.com.br /carrossel/efeito-das-tarifas-nos-precos-ao-consumidor-finalmente-aparece-segundo-fed-de-mi/slide-2-resumo.png",
+      "https://promptmidia.com.br /carrossel/efeito-das-tarifas-nos-precos-ao-consumidor-finalmente-aparece-segundo-fed-de-mi/slide-3-cta.png"
+    ],
+    "status": "pendente",
+    "criado_em": "2026-09-03T10:23:51.716Z"
+  },
+  {
+    "slug": "google-pixel-11-tensor-g6-gemini",
+    "titulo": "Pixel 11 chega com Tensor G6 e Gemini executando tarefas em mais de 40 apps",
+    "resumo": "No Made by Google 2026, empresa apresenta linha Pixel 11 com novo chip Tensor G6 e Gemini capaz de reservar corridas, pedir mercado e ligar pra estabelecimentos sozinho.",
+    "imagens": [
+      "https://promptmidia.com.br /carrossel/google-pixel-11-tensor-g6-gemini/slide-1-capa.png",
+      "https://promptmidia.com.br /carrossel/google-pixel-11-tensor-g6-gemini/slide-2-resumo.png",
+      "https://promptmidia.com.br /carrossel/google-pixel-11-tensor-g6-gemini/slide-3-cta.png"
+    ],
+    "status": "pendente",
+    "criado_em": "2026-09-03T10:23:52.128Z"
+  },
+  {
+    "slug": "handbook-gratuito-reune-boas-praticas-para-usar-ia-em-analise-de-dados",
+    "titulo": "Handbook gratuito reúne boas práticas para usar IA em análise de dados",
+    "resumo": "Guia publicado pela Sutro promete organizar conceitos e práticas para quem quer aplicar modelos de IA em tarefas analíticas do dia a dia.",
+    "imagens": [
+      "https://promptmidia.com.br /carrossel/handbook-gratuito-reune-boas-praticas-para-usar-ia-em-analise-de-dados/slide-1-capa.png",
+      "https://promptmidia.com.br /carrossel/handbook-gratuito-reune-boas-praticas-para-usar-ia-em-analise-de-dados/slide-2-resumo.png",
+      "https://promptmidia.com.br /carrossel/handbook-gratuito-reune-boas-praticas-para-usar-ia-em-analise-de-dados/slide-3-cta.png"
+    ],
+    "status": "pendente",
+    "criado_em": "2026-09-03T10:23:52.538Z"
+  },
+  {
+    "slug": "openai-ultrafast-cerebras-gpt56-sol",
+    "titulo": "OpenAI lança modo Ultrafast: GPT-5.6 Sol roda até 14x mais rápido",
+    "resumo": "Em parceria com a Cerebras, OpenAI estreia camada Ultrafast do GPT-5.6 Sol, atingindo até 750 tokens por segundo sem perda de qualidade nas respostas.",
+    "imagens": [
+      "https://promptmidia.com.br /carrossel/openai-ultrafast-cerebras-gpt56-sol/slide-1-capa.png",
+      "https://promptmidia.com.br /carrossel/openai-ultrafast-cerebras-gpt56-sol/slide-2-resumo.png",
+      "https://promptmidia.com.br /carrossel/openai-ultrafast-cerebras-gpt56-sol/slide-3-cta.png"
+    ],
+    "status": "pendente",
+    "criado_em": "2026-09-03T10:23:52.952Z"
+  },
+  {
+    "slug": "projeto-open-source-promete-colocar-freios-de-seguranca-em-agentes-de-ia-que-usa",
+    "titulo": "Projeto open-source promete colocar freios de segurança em agentes de IA que usam ferramentas via MCP",
+    "resumo": "Chamado de Conduct, o projeto busca impedir que modelos de linguagem executem ações perigosas ao acessar ferramentas externas através do protocolo MCP.",
+    "imagens": [
+      "https://promptmidia.com.br /carrossel/projeto-open-source-promete-colocar-freios-de-seguranca-em-agentes-de-ia-que-usa/slide-1-capa.png",
+      "https://promptmidia.com.br /carrossel/projeto-open-source-promete-colocar-freios-de-seguranca-em-agentes-de-ia-que-usa/slide-2-resumo.png",
+      "https://promptmidia.com.br /carrossel/projeto-open-source-promete-colocar-freios-de-seguranca-em-agentes-de-ia-que-usa/slide-3-cta.png"
+    ],
+    "status": "pendente",
+    "criado_em": "2026-09-03T10:23:53.356Z"
+  }
+]
