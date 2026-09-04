@@ -40,11 +40,16 @@ jobs:
           SITE_DOMINIO: ${{ vars.SITE_DOMINIO }}
         run: npm run gerar-carrossel
 
-      - name: Commitar e subir artigos + carrossel + fila social
+      - name: Gerar capas com IA (Gemini / Nano Banana)
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: npm run gerar-capas-ia
+
+      - name: Commitar e subir artigos + carrossel + capas de IA + fila social
         run: |
           git config user.name "portal-ia-bot"
           git config user.email "bot@portal-ia.local"
-          git add src/content/noticias public/carrossel content/fila-social.json
+          git add src/content/noticias public/carrossel public/capas-ia content/fila-social.json
           git diff --cached --quiet || git commit -m "auto: novas notícias de IA $(date +%F)"
           git push
 
@@ -54,3 +59,4 @@ jobs:
           name: carrossel-${{ github.run_id }}
           path: public/carrossel/
           retention-days: 7
+

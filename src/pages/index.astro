@@ -15,9 +15,14 @@ const grid = resto.slice(0, 11);
 
 function capaDe(artigo: (typeof ordenadas)[number]) {
   if (artigo.data.capa) return artigo.data.capa;
-  const candidato = `/carrossel/${artigo.slug}/slide-1-capa.png`;
-  const caminhoCompleto = path.join(process.cwd(), 'public', candidato);
-  return fs.existsSync(caminhoCompleto) ? candidato : null;
+
+  const capaIA = `/capas-ia/${artigo.slug}.png`;
+  if (fs.existsSync(path.join(process.cwd(), 'public', capaIA))) return capaIA;
+
+  const capaCarrossel = `/carrossel/${artigo.slug}/slide-1-capa.png`;
+  if (fs.existsSync(path.join(process.cwd(), 'public', capaCarrossel))) return capaCarrossel;
+
+  return null;
 }
 
 function formatarData(d: Date) {

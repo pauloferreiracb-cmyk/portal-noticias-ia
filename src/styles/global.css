@@ -176,6 +176,13 @@ img { max-width: 100%; height: auto; border-radius: var(--raio); }
 .card-img { width: 100%; aspect-ratio: 16/10; object-fit: cover; display: block; border-radius: 0; }
 .card-corpo { padding: 16px; }
 
+.capa-artigo {
+  width: 100%;
+  aspect-ratio: 16/9;
+  object-fit: cover;
+  margin: 4px 0 20px;
+}
+
 @media (max-width: 760px) {
   .lead { grid-template-columns: 1fr; }
   .lead-img { order: 1; }

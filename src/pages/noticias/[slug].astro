@@ -1,4 +1,6 @@
 ---
+import fs from 'node:fs';
+import path from 'node:path';
 import { getCollection, type CollectionEntry } from 'astro:content';
 import Layout from '../../layouts/Layout.astro';
 import EmailCapture from '../../components/EmailCapture.astro';
@@ -19,15 +21,26 @@ interface Props {
 }
 const { artigo } = Astro.props;
 const { Content } = await artigo.render();
-const { titulo, resumo, data, tags, fonte_url, fonte_nome } = artigo.data;
+const { titulo, resumo, data, tags, fonte_url, fonte_nome, capa } = artigo.data;
 const dataFormatada = new Intl.DateTimeFormat('pt-BR', {
   day: '2-digit',
   month: 'long',
   year: 'numeric',
 }).format(data);
+
+function capaDoArtigo() {
+  if (capa) return capa;
+  const capaIA = `/capas-ia/${artigo.slug}.png`;
+  if (fs.existsSync(path.join(process.cwd(), 'public', capaIA))) return capaIA;
+  const capaCarrossel = `/carrossel/${artigo.slug}/slide-1-capa.png`;
+  if (fs.existsSync(path.join(process.cwd(), 'public', capaCarrossel))) return capaCarrossel;
+  return null;
+}
+const imagemCapa = capaDoArtigo();
 ---
 <Layout titulo={`${titulo} — Prompt Mídia`} descricao={resumo}>
   <article>
+    {imagemCapa && <img src={imagemCapa} alt="" class="capa-artigo" />}
     <h1>{titulo}</h1>
     <div class="meta">
       {tags.map((t: string) => <span class="tag">{t}</span>)}
@@ -48,3 +61,4 @@ const dataFormatada = new Intl.DateTimeFormat('pt-BR', {
     <EmailCapture />
   </article>
 </Layout>
+
