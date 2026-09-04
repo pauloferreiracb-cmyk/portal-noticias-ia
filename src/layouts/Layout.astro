@@ -4,8 +4,9 @@ import '../styles/global.css';
 interface Props {
   titulo: string;
   descricao?: string;
+  largura?: 'normal' | 'larga';
 }
-const { titulo, descricao = 'Notícias de IA, direto ao ponto.' } = Astro.props;
+const { titulo, descricao = 'Notícias de IA, direto ao ponto.', largura = 'normal' } = Astro.props;
 ---
 <!doctype html>
 <html lang="pt-BR" data-theme="dark">
@@ -19,21 +20,23 @@ const { titulo, descricao = 'Notícias de IA, direto ao ponto.' } = Astro.props;
     <!-- preconnect não é necessário: zero fontes/scripts externos, LCP fica só com o CSS/HTML inline -->
   </head>
   <body>
-    <header class="cabecalho">
-      <a href="/" class="logo"><span class="cursor">&gt;_</span>PROMPT<span class="midia"> MÍDIA</span></a>
-      <nav>
-        <a href="/links">Links</a>
-      </nav>
-    </header>
+    <div class={`container ${largura === 'larga' ? 'largo' : ''}`}>
+      <header class="cabecalho">
+        <a href="/" class="logo"><span class="cursor">&gt;_</span>PROMPT<span class="midia"> MÍDIA</span></a>
+        <nav>
+          <a href="/links">Links</a>
+        </nav>
+      </header>
 
-    <main>
-      <slot />
-    </main>
+      <main>
+        <slot />
+      </main>
 
-    <footer class="rodape">
-      <span>© {new Date().getFullYear()} Prompt Mídia</span>
-      <a href="/links">todos os links</a>
-    </footer>
+      <footer class="rodape">
+        <span>© {new Date().getFullYear()} Prompt Mídia</span>
+        <a href="/links">todos os links</a>
+      </footer>
+    </div>
 
     <script>
       import { capturarUTM, propagarUTMEmLinksInternos } from '../lib/utm';
