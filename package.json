@@ -13,15 +13,15 @@
     "gerar-noticias": "node scripts/gerar-noticias-ia.mjs"
   },
   "dependencies": {
-    "astro": "^4.15.0",
-    "@astrojs/vercel": "^7.7.2",
+    "@astrojs/vercel": "^7.8.2",
     "@vercel/analytics": "^1.3.1",
+    "astro": "^4.15.0",
     "resend": "^4.0.1"
   },
   "devDependencies": {
+    "@resvg/resvg-js": "^2.6.2",
     "gray-matter": "^4.0.3",
     "satori": "^0.10.13",
-    "@resvg/resvg-js": "^2.6.2",
     "sharp": "^0.33.4"
   }
 }
