@@ -70,5 +70,41 @@
     ],
     "status": "pendente",
     "criado_em": "2026-09-03T10:23:53.356Z"
+  },
+  {
+    "slug": "boom-de-empregos-em-ia-desafia-previsoes-de-apocalipse-no-mercado-de-trabalho",
+    "titulo": "Boom de empregos em IA desafia previsões de apocalipse no mercado de trabalho",
+    "resumo": "Enquanto especialistas alertavam para uma onda de demissões causadas pela inteligência artificial, o que se vê é o oposto: contratações em massa ligadas ao setor. Entenda o que está acontecendo.",
+    "imagens": [
+      "https://promptmidia.com.br/carrossel/boom-de-empregos-em-ia-desafia-previsoes-de-apocalipse-no-mercado-de-trabalho/slide-1-capa.png",
+      "https://promptmidia.com.br/carrossel/boom-de-empregos-em-ia-desafia-previsoes-de-apocalipse-no-mercado-de-trabalho/slide-2-resumo.png",
+      "https://promptmidia.com.br/carrossel/boom-de-empregos-em-ia-desafia-previsoes-de-apocalipse-no-mercado-de-trabalho/slide-3-cta.png"
+    ],
+    "status": "pendente",
+    "criado_em": "2026-09-04T20:08:48.347Z"
+  },
+  {
+    "slug": "inteligencia-artificial-ja-e-capaz-de-projetar-placas-de-circuito",
+    "titulo": "Inteligência artificial já é capaz de projetar placas de circuito?",
+    "resumo": "Um novo benchmark tenta medir se modelos de IA conseguem, de fato, projetar circuitos eletrônicos funcionais — e os resultados mostram que o caminho ainda é longo.",
+    "imagens": [
+      "https://promptmidia.com.br/carrossel/inteligencia-artificial-ja-e-capaz-de-projetar-placas-de-circuito/slide-1-capa.png",
+      "https://promptmidia.com.br/carrossel/inteligencia-artificial-ja-e-capaz-de-projetar-placas-de-circuito/slide-2-resumo.png",
+      "https://promptmidia.com.br/carrossel/inteligencia-artificial-ja-e-capaz-de-projetar-placas-de-circuito/slide-3-cta.png"
+    ],
+    "status": "pendente",
+    "criado_em": "2026-09-04T20:08:48.502Z"
+  },
+  {
+    "slug": "por-que-os-chatbots-de-ia-ainda-sao-pessimos-professores",
+    "titulo": "Por que os chatbots de IA ainda são péssimos professores",
+    "resumo": "Um debate no Hacker News reacende a discussão sobre a diferença entre dar respostas e ensinar de verdade — e por que os LLMs tendem a fazer só a primeira coisa.",
+    "imagens": [
+      "https://promptmidia.com.br/carrossel/por-que-os-chatbots-de-ia-ainda-sao-pessimos-professores/slide-1-capa.png",
+      "https://promptmidia.com.br/carrossel/por-que-os-chatbots-de-ia-ainda-sao-pessimos-professores/slide-2-resumo.png",
+      "https://promptmidia.com.br/carrossel/por-que-os-chatbots-de-ia-ainda-sao-pessimos-professores/slide-3-cta.png"
+    ],
+    "status": "pendente",
+    "criado_em": "2026-09-04T20:08:48.639Z"
   }
 ]
