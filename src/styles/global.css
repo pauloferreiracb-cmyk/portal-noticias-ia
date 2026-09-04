@@ -1,12 +1,13 @@
 :root {
-  --bg: #0b0d10;
-  --bg-elevado: #14171c;
-  --texto: #e8eaed;
-  --texto-suave: #9aa2ad;
-  --acento: #5ee6b0;
-  --borda: #23272e;
+  --bg: #0A0E17;
+  --bg-elevado: #141A28;
+  --texto: #F4F6F9;
+  --texto-suave: #8B95A5;
+  --acento: #00F0FF;
+  --acento-2: #7000FF;
+  --borda: #232B3D;
   --fonte: Inter, ui-sans-serif, system-ui, -apple-system, sans-serif;
-  --fonte-mono: 'DM Mono', 'SFMono-Regular', Consolas, monospace;
+  --fonte-mono: 'JetBrains Mono', 'DM Mono', 'SFMono-Regular', Consolas, monospace;
   --raio: 12px;
 }
 
@@ -41,7 +42,17 @@ img { max-width: 100%; height: auto; border-radius: var(--raio); }
   border-bottom: 1px solid var(--borda);
 }
 
-.logo { font-weight: 700; font-size: 1.1rem; }
+.logo {
+  font-weight: 800;
+  font-size: 1.1rem;
+  font-family: var(--fonte-mono), var(--fonte);
+  letter-spacing: -0.01em;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.logo .cursor { color: var(--acento); }
+.logo .midia { font-weight: 300; opacity: .68; margin-left: 2px; }
 
 .card-noticia {
   display: block;
@@ -61,7 +72,7 @@ img { max-width: 100%; height: auto; border-radius: var(--raio); }
   font-size: 0.7rem;
   padding: 2px 8px;
   border-radius: 999px;
-  background: rgba(94, 230, 176, 0.12);
+  background: rgba(0, 240, 255, 0.12);
   color: var(--acento);
   margin-right: 6px;
 }
@@ -91,7 +102,7 @@ img { max-width: 100%; height: auto; border-radius: var(--raio); }
   border-radius: 8px;
   border: none;
   background: var(--acento);
-  color: #06110d;
+  color: #0A0E17;
   font-weight: 600;
   cursor: pointer;
 }

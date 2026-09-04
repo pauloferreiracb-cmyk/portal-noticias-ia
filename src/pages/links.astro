@@ -7,7 +7,7 @@ export const prerender = true;
 const todas = await getCollection('noticias');
 const ultimas8 = todas.sort((a, b) => b.data.data.valueOf() - a.data.data.valueOf()).slice(0, 8);
 ---
-<Layout titulo="Links — Portal IA" descricao="Todos os links: últimas notícias e redes sociais.">
+<Layout titulo="Links — Prompt Mídia" descricao="Todos os links: últimas notícias e redes sociais.">
   <h1>🔗 Links</h1>
 
   <section>
@@ -25,3 +25,4 @@ const ultimas8 = todas.sort((a, b) => b.data.data.valueOf() - a.data.data.valueO
     <a class="card-noticia" href="https://tiktok.com/@SEU_PERFIL" target="_blank">🎵 TikTok</a>
   </section>
 </Layout>
+

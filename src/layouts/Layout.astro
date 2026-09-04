@@ -15,11 +15,12 @@ const { titulo, descricao = 'Notícias de IA, direto ao ponto.' } = Astro.props;
     <meta name="color-scheme" content="dark" />
     <title>{titulo}</title>
     <meta name="description" content={descricao} />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <!-- preconnect não é necessário: zero fontes/scripts externos, LCP fica só com o CSS/HTML inline -->
   </head>
   <body>
     <header class="cabecalho">
-      <a href="/" class="logo">📡 Portal IA</a>
+      <a href="/" class="logo"><span class="cursor">&gt;_</span>PROMPT<span class="midia"> MÍDIA</span></a>
       <nav>
         <a href="/links">Links</a>
       </nav>
@@ -30,7 +31,7 @@ const { titulo, descricao = 'Notícias de IA, direto ao ponto.' } = Astro.props;
     </main>
 
     <footer class="rodape">
-      <span>© {new Date().getFullYear()} Portal IA</span>
+      <span>© {new Date().getFullYear()} Prompt Mídia</span>
       <a href="/links">todos os links</a>
     </footer>
 
