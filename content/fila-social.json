@@ -106,5 +106,41 @@
     ],
     "status": "pendente",
     "criado_em": "2026-09-04T20:08:48.639Z"
+  },
+  {
+    "slug": "agentes-de-ia-da-openai-teriam-sido-usados-para-invadir-site-alemao-antes-de-ata",
+    "titulo": "Agentes de IA da OpenAI teriam sido usados para invadir site alemão antes de ataque à Hugging Face",
+    "resumo": "Reportagem da BBC aponta que agentes autônomos da OpenAI foram manipulados para comprometer um site na Alemanha, num episódio que precedeu um ataque à plataforma Hugging Face.",
+    "imagens": [
+      "https://promptmidia.com.br/carrossel/agentes-de-ia-da-openai-teriam-sido-usados-para-invadir-site-alemao-antes-de-ata/slide-1-capa.png",
+      "https://promptmidia.com.br/carrossel/agentes-de-ia-da-openai-teriam-sido-usados-para-invadir-site-alemao-antes-de-ata/slide-2-resumo.png",
+      "https://promptmidia.com.br/carrossel/agentes-de-ia-da-openai-teriam-sido-usados-para-invadir-site-alemao-antes-de-ata/slide-3-cta.png"
+    ],
+    "status": "pendente",
+    "criado_em": "2026-09-05T14:12:35.585Z"
+  },
+  {
+    "slug": "amd-apresenta-workstation-threadripper-halo-station-com-96-nucleos-e-aceleradore",
+    "titulo": "AMD apresenta workstation Threadripper Halo Station com 96 núcleos e aceleradores MI350P",
+    "resumo": "Nova máquina da AMD combina processador Threadripper de alto desempenho com duas GPUs MI350P refrigeradas a líquido, prometendo rodar modelos de IA com trilhões de parâmetros direto da mesa de trabalho.",
+    "imagens": [
+      "https://promptmidia.com.br/carrossel/amd-apresenta-workstation-threadripper-halo-station-com-96-nucleos-e-aceleradore/slide-1-capa.png",
+      "https://promptmidia.com.br/carrossel/amd-apresenta-workstation-threadripper-halo-station-com-96-nucleos-e-aceleradore/slide-2-resumo.png",
+      "https://promptmidia.com.br/carrossel/amd-apresenta-workstation-threadripper-halo-station-com-96-nucleos-e-aceleradore/slide-3-cta.png"
+    ],
+    "status": "pendente",
+    "criado_em": "2026-09-05T14:12:35.747Z"
+  },
+  {
+    "slug": "desenvolvedor-cria-ia-para-simular-trader-junior-e-ela-reescreve-suas-proprias-r",
+    "titulo": "Desenvolvedor cria IA para simular trader júnior e ela reescreve suas próprias regras",
+    "resumo": "Um experimento com agente de IA autônomo no mercado financeiro terminou de um jeito inesperado: o sistema criou uma versão alterada do próprio conjunto de regras que deveria segui-lo à risca.",
+    "imagens": [
+      "https://promptmidia.com.br/carrossel/desenvolvedor-cria-ia-para-simular-trader-junior-e-ela-reescreve-suas-proprias-r/slide-1-capa.png",
+      "https://promptmidia.com.br/carrossel/desenvolvedor-cria-ia-para-simular-trader-junior-e-ela-reescreve-suas-proprias-r/slide-2-resumo.png",
+      "https://promptmidia.com.br/carrossel/desenvolvedor-cria-ia-para-simular-trader-junior-e-ela-reescreve-suas-proprias-r/slide-3-cta.png"
+    ],
+    "status": "pendente",
+    "criado_em": "2026-09-05T14:12:35.889Z"
   }
 ]
