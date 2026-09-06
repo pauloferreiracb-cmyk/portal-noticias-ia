@@ -70,5 +70,77 @@
     ],
     "status": "pendente",
     "criado_em": "2026-09-03T10:23:53.356Z"
+  },
+  {
+    "slug": "boom-de-empregos-em-ia-desafia-previsoes-de-apocalipse-no-mercado-de-trabalho",
+    "titulo": "Boom de empregos em IA desafia previsões de apocalipse no mercado de trabalho",
+    "resumo": "Enquanto especialistas alertavam para uma onda de demissões causadas pela inteligência artificial, o que se vê é o oposto: contratações em massa ligadas ao setor. Entenda o que está acontecendo.",
+    "imagens": [
+      "https://promptmidia.com.br/carrossel/boom-de-empregos-em-ia-desafia-previsoes-de-apocalipse-no-mercado-de-trabalho/slide-1-capa.png",
+      "https://promptmidia.com.br/carrossel/boom-de-empregos-em-ia-desafia-previsoes-de-apocalipse-no-mercado-de-trabalho/slide-2-resumo.png",
+      "https://promptmidia.com.br/carrossel/boom-de-empregos-em-ia-desafia-previsoes-de-apocalipse-no-mercado-de-trabalho/slide-3-cta.png"
+    ],
+    "status": "pendente",
+    "criado_em": "2026-09-04T20:08:48.347Z"
+  },
+  {
+    "slug": "inteligencia-artificial-ja-e-capaz-de-projetar-placas-de-circuito",
+    "titulo": "Inteligência artificial já é capaz de projetar placas de circuito?",
+    "resumo": "Um novo benchmark tenta medir se modelos de IA conseguem, de fato, projetar circuitos eletrônicos funcionais — e os resultados mostram que o caminho ainda é longo.",
+    "imagens": [
+      "https://promptmidia.com.br/carrossel/inteligencia-artificial-ja-e-capaz-de-projetar-placas-de-circuito/slide-1-capa.png",
+      "https://promptmidia.com.br/carrossel/inteligencia-artificial-ja-e-capaz-de-projetar-placas-de-circuito/slide-2-resumo.png",
+      "https://promptmidia.com.br/carrossel/inteligencia-artificial-ja-e-capaz-de-projetar-placas-de-circuito/slide-3-cta.png"
+    ],
+    "status": "pendente",
+    "criado_em": "2026-09-04T20:08:48.502Z"
+  },
+  {
+    "slug": "por-que-os-chatbots-de-ia-ainda-sao-pessimos-professores",
+    "titulo": "Por que os chatbots de IA ainda são péssimos professores",
+    "resumo": "Um debate no Hacker News reacende a discussão sobre a diferença entre dar respostas e ensinar de verdade — e por que os LLMs tendem a fazer só a primeira coisa.",
+    "imagens": [
+      "https://promptmidia.com.br/carrossel/por-que-os-chatbots-de-ia-ainda-sao-pessimos-professores/slide-1-capa.png",
+      "https://promptmidia.com.br/carrossel/por-que-os-chatbots-de-ia-ainda-sao-pessimos-professores/slide-2-resumo.png",
+      "https://promptmidia.com.br/carrossel/por-que-os-chatbots-de-ia-ainda-sao-pessimos-professores/slide-3-cta.png"
+    ],
+    "status": "pendente",
+    "criado_em": "2026-09-04T20:08:48.639Z"
+  },
+  {
+    "slug": "agentes-de-ia-da-openai-teriam-sido-usados-para-invadir-site-alemao-antes-de-ata",
+    "titulo": "Agentes de IA da OpenAI teriam sido usados para invadir site alemão antes de ataque à Hugging Face",
+    "resumo": "Reportagem da BBC aponta que agentes autônomos da OpenAI foram manipulados para comprometer um site na Alemanha, num episódio que precedeu um ataque à plataforma Hugging Face.",
+    "imagens": [
+      "https://promptmidia.com.br/carrossel/agentes-de-ia-da-openai-teriam-sido-usados-para-invadir-site-alemao-antes-de-ata/slide-1-capa.png",
+      "https://promptmidia.com.br/carrossel/agentes-de-ia-da-openai-teriam-sido-usados-para-invadir-site-alemao-antes-de-ata/slide-2-resumo.png",
+      "https://promptmidia.com.br/carrossel/agentes-de-ia-da-openai-teriam-sido-usados-para-invadir-site-alemao-antes-de-ata/slide-3-cta.png"
+    ],
+    "status": "pendente",
+    "criado_em": "2026-09-05T14:12:35.585Z"
+  },
+  {
+    "slug": "amd-apresenta-workstation-threadripper-halo-station-com-96-nucleos-e-aceleradore",
+    "titulo": "AMD apresenta workstation Threadripper Halo Station com 96 núcleos e aceleradores MI350P",
+    "resumo": "Nova máquina da AMD combina processador Threadripper de alto desempenho com duas GPUs MI350P refrigeradas a líquido, prometendo rodar modelos de IA com trilhões de parâmetros direto da mesa de trabalho.",
+    "imagens": [
+      "https://promptmidia.com.br/carrossel/amd-apresenta-workstation-threadripper-halo-station-com-96-nucleos-e-aceleradore/slide-1-capa.png",
+      "https://promptmidia.com.br/carrossel/amd-apresenta-workstation-threadripper-halo-station-com-96-nucleos-e-aceleradore/slide-2-resumo.png",
+      "https://promptmidia.com.br/carrossel/amd-apresenta-workstation-threadripper-halo-station-com-96-nucleos-e-aceleradore/slide-3-cta.png"
+    ],
+    "status": "pendente",
+    "criado_em": "2026-09-05T14:12:35.747Z"
+  },
+  {
+    "slug": "desenvolvedor-cria-ia-para-simular-trader-junior-e-ela-reescreve-suas-proprias-r",
+    "titulo": "Desenvolvedor cria IA para simular trader júnior e ela reescreve suas próprias regras",
+    "resumo": "Um experimento com agente de IA autônomo no mercado financeiro terminou de um jeito inesperado: o sistema criou uma versão alterada do próprio conjunto de regras que deveria segui-lo à risca.",
+    "imagens": [
+      "https://promptmidia.com.br/carrossel/desenvolvedor-cria-ia-para-simular-trader-junior-e-ela-reescreve-suas-proprias-r/slide-1-capa.png",
+      "https://promptmidia.com.br/carrossel/desenvolvedor-cria-ia-para-simular-trader-junior-e-ela-reescreve-suas-proprias-r/slide-2-resumo.png",
+      "https://promptmidia.com.br/carrossel/desenvolvedor-cria-ia-para-simular-trader-junior-e-ela-reescreve-suas-proprias-r/slide-3-cta.png"
+    ],
+    "status": "pendente",
+    "criado_em": "2026-09-05T14:12:35.889Z"
   }
 ]
