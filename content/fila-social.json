@@ -142,5 +142,41 @@
     ],
     "status": "pendente",
     "criado_em": "2026-09-05T14:12:35.889Z"
+  },
+  {
+    "slug": "ai-slop-pesquisadores-analisam-a-enxurrada-de-conteudo-generico-gerado-por-intel",
+    "titulo": "'AI Slop': pesquisadores analisam a enxurrada de conteúdo genérico gerado por inteligência artificial",
+    "resumo": "Um estudo acadêmico se debruça sobre o fenômeno do 'AI slop', o excesso de textos, imagens e vídeos de baixa qualidade produzidos em massa por IA generativa. Entenda o que está em jogo.",
+    "imagens": [
+      "https://promptmidia.com.br/carrossel/ai-slop-pesquisadores-analisam-a-enxurrada-de-conteudo-generico-gerado-por-intel/slide-1-capa.png",
+      "https://promptmidia.com.br/carrossel/ai-slop-pesquisadores-analisam-a-enxurrada-de-conteudo-generico-gerado-por-intel/slide-2-resumo.png",
+      "https://promptmidia.com.br/carrossel/ai-slop-pesquisadores-analisam-a-enxurrada-de-conteudo-generico-gerado-por-intel/slide-3-cta.png"
+    ],
+    "status": "pendente",
+    "criado_em": "2026-09-06T14:36:28.155Z"
+  },
+  {
+    "slug": "o-problema-da-memoria-curta-dos-agentes-de-ia-que-programam-codigo",
+    "titulo": "O problema da memória curta dos agentes de IA que programam código",
+    "resumo": "Um projeto discutido no Hacker News expõe uma limitação conhecida das ferramentas de codificação com IA: elas perdem o contexto do projeto assim que a sessão termina.",
+    "imagens": [
+      "https://promptmidia.com.br/carrossel/o-problema-da-memoria-curta-dos-agentes-de-ia-que-programam-codigo/slide-1-capa.png",
+      "https://promptmidia.com.br/carrossel/o-problema-da-memoria-curta-dos-agentes-de-ia-que-programam-codigo/slide-2-resumo.png",
+      "https://promptmidia.com.br/carrossel/o-problema-da-memoria-curta-dos-agentes-de-ia-que-programam-codigo/slide-3-cta.png"
+    ],
+    "status": "pendente",
+    "criado_em": "2026-09-06T14:36:28.319Z"
+  },
+  {
+    "slug": "pesquisa-aponta-que-llms-desenvolvem-estruturas-simbolicas-ocultas-em-suas-repre",
+    "titulo": "Pesquisa aponta que LLMs desenvolvem estruturas simbólicas ocultas em suas representações internas",
+    "resumo": "Estudo compartilhado nas redes sociais reacende o debate entre conexionismo e simbolismo: modelos de linguagem, mesmo treinados apenas com estatística, pareceriam organizar informação de forma parecida a regras simbólicas explícitas.",
+    "imagens": [
+      "https://promptmidia.com.br/carrossel/pesquisa-aponta-que-llms-desenvolvem-estruturas-simbolicas-ocultas-em-suas-repre/slide-1-capa.png",
+      "https://promptmidia.com.br/carrossel/pesquisa-aponta-que-llms-desenvolvem-estruturas-simbolicas-ocultas-em-suas-repre/slide-2-resumo.png",
+      "https://promptmidia.com.br/carrossel/pesquisa-aponta-que-llms-desenvolvem-estruturas-simbolicas-ocultas-em-suas-repre/slide-3-cta.png"
+    ],
+    "status": "pendente",
+    "criado_em": "2026-09-06T14:36:28.466Z"
   }
 ]
