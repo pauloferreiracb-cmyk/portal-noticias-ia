@@ -202,5 +202,29 @@
     ],
     "status": "pendente",
     "criado_em": "2026-09-07T16:51:00.879Z"
+  },
+  {
+    "slug": "grith-propoe-monitorar-agentes-de-ia-no-nivel-de-chamadas-de-sistema",
+    "titulo": "Grith propõe monitorar agentes de IA no nível de chamadas de sistema",
+    "resumo": "Novo projeto open source promete supervisionar o que agentes de IA realmente fazem no sistema operacional, indo além dos logs tradicionais de aplicação.",
+    "imagens": [
+      "https://promptmidia.com.br/carrossel/grith-propoe-monitorar-agentes-de-ia-no-nivel-de-chamadas-de-sistema/slide-1-capa.png",
+      "https://promptmidia.com.br/carrossel/grith-propoe-monitorar-agentes-de-ia-no-nivel-de-chamadas-de-sistema/slide-2-resumo.png",
+      "https://promptmidia.com.br/carrossel/grith-propoe-monitorar-agentes-de-ia-no-nivel-de-chamadas-de-sistema/slide-3-cta.png"
+    ],
+    "status": "pendente",
+    "criado_em": "2026-09-08T13:52:41.543Z"
+  },
+  {
+    "slug": "o-que-e-slopaganda-e-por-que-essa-propaganda-barata-feita-por-ia-continua-funcio",
+    "titulo": "O que é 'slopaganda' e por que essa propaganda barata feita por IA continua funcionando",
+    "resumo": "Conteúdo gerado por inteligência artificial, muitas vezes tosco e repetitivo, está se tornando uma ferramenta eficaz de manipulação em massa — e os motivos vão além da simples enganação.",
+    "imagens": [
+      "https://promptmidia.com.br/carrossel/o-que-e-slopaganda-e-por-que-essa-propaganda-barata-feita-por-ia-continua-funcio/slide-1-capa.png",
+      "https://promptmidia.com.br/carrossel/o-que-e-slopaganda-e-por-que-essa-propaganda-barata-feita-por-ia-continua-funcio/slide-2-resumo.png",
+      "https://promptmidia.com.br/carrossel/o-que-e-slopaganda-e-por-que-essa-propaganda-barata-feita-por-ia-continua-funcio/slide-3-cta.png"
+    ],
+    "status": "pendente",
+    "criado_em": "2026-09-08T13:52:41.681Z"
   }
 ]
