@@ -14,13 +14,19 @@ const [lead, ...resto] = ordenadas;
 const grid = resto.slice(0, 11);
 
 function capaDe(artigo: (typeof ordenadas)[number]) {
-  if (artigo.data.capa) return artigo.data.capa;
+  if (artigo.data.capa) return { src: artigo.data.capa, credito: null };
 
   const capaIA = `/capas-ia/${artigo.slug}.png`;
-  if (fs.existsSync(path.join(process.cwd(), 'public', capaIA))) return capaIA;
+  if (fs.existsSync(path.join(process.cwd(), 'public', capaIA))) {
+    const jsonCredito = path.join(process.cwd(), 'public', 'capas-ia', `${artigo.slug}.json`);
+    const credito = fs.existsSync(jsonCredito) ? JSON.parse(fs.readFileSync(jsonCredito, 'utf-8')) : null;
+    return { src: capaIA, credito };
+  }
 
   const capaCarrossel = `/carrossel/${artigo.slug}/slide-1-capa.png`;
-  if (fs.existsSync(path.join(process.cwd(), 'public', capaCarrossel))) return capaCarrossel;
+  if (fs.existsSync(path.join(process.cwd(), 'public', capaCarrossel))) {
+    return { src: capaCarrossel, credito: null };
+  }
 
   return null;
 }
@@ -48,7 +54,16 @@ const categorias = [...new Set(ordenadas.flatMap((a) => a.data.tags))].slice(0, 
         <h1>{lead.data.titulo}</h1>
         <p>{lead.data.resumo}</p>
       </div>
-      {capaDe(lead) && <img src={capaDe(lead)!} alt="" class="lead-img" />}
+      {capaDe(lead) && (
+        <div class="lead-img-wrap">
+          <img src={capaDe(lead)!.src} alt="" class="lead-img" />
+          {capaDe(lead)!.credito && (
+            <span class="credito-foto">
+              Foto: <a href={capaDe(lead)!.credito.fotografoUrl} target="_blank" rel="noopener">{capaDe(lead)!.credito.fotografo}</a> / Unsplash
+            </span>
+          )}
+        </div>
+      )}
     </a>
   )}
 
@@ -62,7 +77,16 @@ const categorias = [...new Set(ordenadas.flatMap((a) => a.data.tags))].slice(0, 
   <div class="grid">
     {grid.map((artigo) => (
       <a class="card-noticia" href={`/noticias/${artigo.slug}`}>
-        {capaDe(artigo) && <img src={capaDe(artigo)!} alt="" class="card-img" />}
+        {capaDe(artigo) && (
+          <div class="card-img-wrap">
+            <img src={capaDe(artigo)!.src} alt="" class="card-img" />
+            {capaDe(artigo)!.credito && (
+              <span class="credito-foto">
+                Foto: <a href={capaDe(artigo)!.credito.fotografoUrl} target="_blank" rel="noopener">{capaDe(artigo)!.credito.fotografo}</a> / Unsplash
+              </span>
+            )}
+          </div>
+        )}
         <div class="card-corpo">
           <h2>{artigo.data.titulo}</h2>
           <p>{artigo.data.resumo}</p>
@@ -79,4 +103,5 @@ const categorias = [...new Set(ordenadas.flatMap((a) => a.data.tags))].slice(0, 
     <p>Nenhuma notícia publicada ainda. Adicione um .md em src/content/noticias/ e dê push.</p>
   )}
 </Layout>
+
 

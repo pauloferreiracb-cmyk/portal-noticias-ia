@@ -40,9 +40,9 @@ jobs:
           SITE_DOMINIO: ${{ vars.SITE_DOMINIO }}
         run: npm run gerar-carrossel
 
-      - name: Gerar capas com IA (Gemini / Nano Banana)
+      - name: Gerar capas com IA (Pollinations, com fallback Unsplash)
         env:
-          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          UNSPLASH_ACCESS_KEY: ${{ secrets.UNSPLASH_ACCESS_KEY }}
         run: npm run gerar-capas-ia
 
       - name: Commitar e subir artigos + carrossel + capas de IA + fila social
@@ -59,4 +59,5 @@ jobs:
           name: carrossel-${{ github.run_id }}
           path: public/carrossel/
           retention-days: 7
+
 

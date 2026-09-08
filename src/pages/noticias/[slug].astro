@@ -29,18 +29,33 @@ const dataFormatada = new Intl.DateTimeFormat('pt-BR', {
 }).format(data);
 
 function capaDoArtigo() {
-  if (capa) return capa;
+  if (capa) return { src: capa, credito: null };
   const capaIA = `/capas-ia/${artigo.slug}.png`;
-  if (fs.existsSync(path.join(process.cwd(), 'public', capaIA))) return capaIA;
+  if (fs.existsSync(path.join(process.cwd(), 'public', capaIA))) {
+    const jsonCredito = path.join(process.cwd(), 'public', 'capas-ia', `${artigo.slug}.json`);
+    const credito = fs.existsSync(jsonCredito) ? JSON.parse(fs.readFileSync(jsonCredito, 'utf-8')) : null;
+    return { src: capaIA, credito };
+  }
   const capaCarrossel = `/carrossel/${artigo.slug}/slide-1-capa.png`;
-  if (fs.existsSync(path.join(process.cwd(), 'public', capaCarrossel))) return capaCarrossel;
+  if (fs.existsSync(path.join(process.cwd(), 'public', capaCarrossel))) {
+    return { src: capaCarrossel, credito: null };
+  }
   return null;
 }
 const imagemCapa = capaDoArtigo();
 ---
 <Layout titulo={`${titulo} — Prompt Mídia`} descricao={resumo}>
   <article>
-    {imagemCapa && <img src={imagemCapa} alt="" class="capa-artigo" />}
+    {imagemCapa && (
+      <div class="capa-artigo-wrap">
+        <img src={imagemCapa.src} alt="" class="capa-artigo" />
+        {imagemCapa.credito && (
+          <span class="credito-foto">
+            Foto: <a href={imagemCapa.credito.fotografoUrl} target="_blank" rel="noopener">{imagemCapa.credito.fotografo}</a> / Unsplash
+          </span>
+        )}
+      </div>
+    )}
     <h1>{titulo}</h1>
     <div class="meta">
       {tags.map((t: string) => <span class="tag">{t}</span>)}
@@ -61,4 +76,5 @@ const imagemCapa = capaDoArtigo();
     <EmailCapture />
   </article>
 </Layout>
+
 

@@ -1,20 +1,26 @@
 #!/usr/bin/env node
 /**
- * Gera uma imagem de capa por artigo usando o Gemini (modelo "Nano Banana"
- * de geração de imagem), no estilo visual PROMPT MÍDIA (dark obsidiana,
- * ciano elétrico + violeta neural, editorial tech minimalista).
+ * Gera uma imagem de capa por artigo, no estilo visual PROMPT MÍDIA
+ * (dark obsidiana, ciano elétrico + violeta neural, editorial tech
+ * minimalista).
+ *
+ * Estratégia em 2 camadas:
+ *   1. Pollinations (Flux) — imagem gerada por IA, grátis, sem chave,
+ *      já no estilo da marca.
+ *   2. Se falhar, cai pro Unsplash (foto real, grátis, precisa de
+ *      UNSPLASH_ACCESS_KEY) — e grava o crédito do fotógrafo em
+ *      public/capas-ia/<slug>.json pra exibir no site.
  *
  * Fica em public/capas-ia/<slug>.png — separado do carrossel do Satori
  * (public/carrossel/), que continua existindo pra postagem no Instagram/TikTok.
- * A homepage prioriza essa capa de IA; se não existir, cai pro slide-1 do
- * carrossel como hoje.
  *
  * Uso:
  *   node scripts/gerar-capa-ia.mjs            -> gera só o que falta
  *   node scripts/gerar-capa-ia.mjs --forcar   -> regenera tudo
  *
- * Variável de ambiente obrigatória:
- *   GEMINI_API_KEY  chave grátis criada em https://aistudio.google.com/apikey
+ * Variáveis de ambiente:
+ *   UNSPLASH_ACCESS_KEY  opcional, mas necessária pro fallback funcionar.
+ *                        Grátis em https://unsplash.com/developers
  */
 
 import fs from 'node:fs';
@@ -28,18 +34,7 @@ const DIR_NOTICIAS = path.join(RAIZ, 'src/content/noticias');
 const DIR_SAIDA = path.join(RAIZ, 'public/capas-ia');
 
 const FORCAR = process.argv.includes('--forcar');
-
-// Modelo "Nano Banana" — gemini-2.5-flash-image é o estável (GA) com tier
-// grátis. Se quiser testar o mais novo/rápido, troque por
-// "gemini-3.1-flash-lite-image" (confira disponibilidade no tier grátis
-// em https://ai.google.dev/pricing antes de trocar em produção).
-const MODELO = process.env.GEMINI_IMAGE_MODEL ?? 'gemini-2.5-flash-image';
-const API_KEY = process.env.GEMINI_API_KEY;
-
-if (!API_KEY) {
-  console.error('[erro] Defina a variável de ambiente GEMINI_API_KEY (chave grátis em https://aistudio.google.com/apikey).');
-  process.exit(1);
-}
+const UNSPLASH_ACCESS_KEY = process.env.UNSPLASH_ACCESS_KEY;
 
 function lerArtigos() {
   return fs
@@ -53,7 +48,9 @@ function lerArtigos() {
     });
 }
 
-function montarPrompt(artigo) {
+// --- Camada 1: Pollinations (Flux), gerado no estilo da marca ---
+
+function montarPromptIA(artigo) {
   const tema = [artigo.titulo, ...(artigo.tags ?? [])].join(', ');
   return (
     `Editorial tech illustration for a Brazilian AI news article about: ${tema}. ` +
@@ -61,36 +58,82 @@ function montarPrompt(artigo) {
     `(#7000FF) accent lighting, glowing gradient light beams, subtle geometric tech ` +
     `grid, minimalist and abstract composition, high contrast, moody cinematic lighting, ` +
     `wide 16:9 landscape crop. ` +
-    `IMPORTANT: no text, no words, no letters, no logos, no watermarks anywhere in the image.`
+    `No text, no words, no letters, no logos, no watermarks anywhere in the image.`
   );
 }
 
-async function gerarImagem(prompt) {
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/${MODELO}:generateContent?key=${API_KEY}`;
-  const resp = await fetch(url, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      contents: [{ parts: [{ text: prompt }] }],
-      generationConfig: { responseModalities: ['IMAGE'] },
-    }),
+// hash simples e determinístico só pra dar uma seed estável por artigo
+function seedDoSlug(slug) {
+  let h = 0;
+  for (const c of slug) h = (h * 31 + c.charCodeAt(0)) >>> 0;
+  return h % 100000;
+}
+
+async function gerarViaPollinations(artigo) {
+  const prompt = montarPromptIA(artigo);
+  const seed = seedDoSlug(artigo.slug);
+  const url =
+    `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}` +
+    `?width=1280&height=720&nologo=true&seed=${seed}`;
+
+  const resp = await fetch(url);
+  if (!resp.ok) throw new Error(`Pollinations respondeu ${resp.status}`);
+
+  const buffer = Buffer.from(await resp.arrayBuffer());
+  if (buffer.length < 2000) throw new Error('Pollinations retornou um arquivo suspeito de pequeno');
+
+  return { buffer, credito: null }; // Pollinations não exige crédito
+}
+
+// --- Camada 2 (fallback): Unsplash, foto real ---
+
+async function buscarViaUnsplash(artigo) {
+  if (!UNSPLASH_ACCESS_KEY) {
+    throw new Error('UNSPLASH_ACCESS_KEY não configurada — sem fallback disponível');
+  }
+
+  const query = (artigo.tags?.[0] ?? artigo.titulo).slice(0, 60);
+  const urlBusca =
+    `https://api.unsplash.com/search/photos?query=${encodeURIComponent(query)}` +
+    `&orientation=landscape&per_page=1&content_filter=high`;
+
+  const respBusca = await fetch(urlBusca, {
+    headers: { Authorization: `Client-ID ${UNSPLASH_ACCESS_KEY}` },
   });
+  if (!respBusca.ok) throw new Error(`Unsplash (busca) respondeu ${respBusca.status}`);
 
-  if (!resp.ok) {
-    const corpo = await resp.text();
-    throw new Error(`Gemini respondeu ${resp.status}: ${corpo}`);
+  const jsonBusca = await respBusca.json();
+  const foto = jsonBusca.results?.[0];
+  if (!foto) throw new Error(`Unsplash não retornou nenhuma foto pra "${query}"`);
+
+  // Baixa a imagem em si
+  const respImagem = await fetch(foto.urls.regular);
+  if (!respImagem.ok) throw new Error(`Unsplash (download da imagem) respondeu ${respImagem.status}`);
+  const buffer = Buffer.from(await respImagem.arrayBuffer());
+
+  // Exigência do Unsplash: registrar o "download" via download_location
+  // (não bloqueia o resto se falhar, é só telemetria deles)
+  fetch(`${foto.links.download_location}&client_id=${UNSPLASH_ACCESS_KEY}`).catch(() => {});
+
+  return {
+    buffer,
+    credito: {
+      fonte: 'unsplash',
+      fotografo: foto.user.name,
+      fotografoUrl: `${foto.user.links.html}?utm_source=prompt_midia&utm_medium=referral`,
+      fotoUrl: `${foto.links.html}?utm_source=prompt_midia&utm_medium=referral`,
+    },
+  };
+}
+
+async function gerarCapa(artigo) {
+  try {
+    console.log(`[tentando pollinations] ${artigo.slug}...`);
+    return await gerarViaPollinations(artigo);
+  } catch (err) {
+    console.warn(`[pollinations falhou] ${artigo.slug}: ${err.message} — tentando Unsplash...`);
+    return await buscarViaUnsplash(artigo);
   }
-
-  const json = await resp.json();
-  const partes = json?.candidates?.[0]?.content?.parts ?? [];
-  const imagem = partes.find((p) => p.inlineData || p.inline_data);
-  const dados = imagem?.inlineData?.data ?? imagem?.inline_data?.data;
-
-  if (!dados) {
-    throw new Error('Nenhuma imagem retornada pelo Gemini. Resposta completa: ' + JSON.stringify(json).slice(0, 500));
-  }
-
-  return Buffer.from(dados, 'base64');
 }
 
 async function main() {
@@ -103,25 +146,30 @@ async function main() {
   }
 
   for (const artigo of artigos) {
-    const destino = path.join(DIR_SAIDA, `${artigo.slug}.png`);
+    const destinoImagem = path.join(DIR_SAIDA, `${artigo.slug}.png`);
+    const destinoCredito = path.join(DIR_SAIDA, `${artigo.slug}.json`);
 
-    if (fs.existsSync(destino) && !FORCAR) {
-      console.log(`[pular] ${artigo.slug} já tem capa de IA (use --forcar pra refazer)`);
+    if (fs.existsSync(destinoImagem) && !FORCAR) {
+      console.log(`[pular] ${artigo.slug} já tem capa (use --forcar pra refazer)`);
       continue;
     }
 
     try {
-      console.log(`[gerando] ${artigo.slug}...`);
-      const prompt = montarPrompt(artigo);
-      const png = await gerarImagem(prompt);
-      fs.writeFileSync(destino, png);
-      console.log(`[ok] public/capas-ia/${artigo.slug}.png`);
+      const { buffer, credito } = await gerarCapa(artigo);
+      fs.writeFileSync(destinoImagem, buffer);
+
+      if (credito) {
+        fs.writeFileSync(destinoCredito, JSON.stringify(credito, null, 2), 'utf-8');
+      } else if (fs.existsSync(destinoCredito)) {
+        fs.unlinkSync(destinoCredito); // era Unsplash antes, agora é IA — remove crédito velho
+      }
+
+      console.log(`[ok] public/capas-ia/${artigo.slug}.png ${credito ? '(Unsplash, com crédito)' : '(Pollinations/IA)'}`);
     } catch (err) {
-      console.error(`[falhou] ${artigo.slug}: ${err.message}`);
+      console.error(`[falhou nas duas fontes] ${artigo.slug}: ${err.message}`);
     }
 
-    // Respeita o rate limit do tier grátis (evita rajada de chamadas)
-    await new Promise((r) => setTimeout(r, 4000));
+    await new Promise((r) => setTimeout(r, 1500));
   }
 }
 
