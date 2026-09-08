@@ -226,5 +226,41 @@
     ],
     "status": "pendente",
     "criado_em": "2026-09-08T13:52:41.681Z"
+  },
+  {
+    "slug": "experimento-com-ia-que-imita-murakami-por-menos-de-us-2-provoca-debate-literario",
+    "titulo": "Experimento com IA que imita Murakami por menos de US$ 2 provoca debate literário na China",
+    "resumo": "Um estudante usou inteligência artificial para reproduzir o estilo de Haruki Murakami gastando apenas alguns dólares — e o resultado dividiu opiniões entre escritores e críticos chineses.",
+    "imagens": [
+      "https://promptmidia.com.br/carrossel/experimento-com-ia-que-imita-murakami-por-menos-de-us-2-provoca-debate-literario/slide-1-capa.png",
+      "https://promptmidia.com.br/carrossel/experimento-com-ia-que-imita-murakami-por-menos-de-us-2-provoca-debate-literario/slide-2-resumo.png",
+      "https://promptmidia.com.br/carrossel/experimento-com-ia-que-imita-murakami-por-menos-de-us-2-provoca-debate-literario/slide-3-cta.png"
+    ],
+    "status": "pendente",
+    "criado_em": "2026-09-08T15:39:00.208Z"
+  },
+  {
+    "slug": "matematicos-acusam-openai-de-usar-pesquisas-privadas-feitas-em-chats-do-codex",
+    "titulo": "Matemáticos acusam OpenAI de usar pesquisas privadas feitas em chats do Codex",
+    "resumo": "Denúncias apontam que conversas confidenciais com a ferramenta de codificação da OpenAI teriam vazado para treinar novos modelos, levantando dúvidas sobre privacidade e propriedade intelectual.",
+    "imagens": [
+      "https://promptmidia.com.br/carrossel/matematicos-acusam-openai-de-usar-pesquisas-privadas-feitas-em-chats-do-codex/slide-1-capa.png",
+      "https://promptmidia.com.br/carrossel/matematicos-acusam-openai-de-usar-pesquisas-privadas-feitas-em-chats-do-codex/slide-2-resumo.png",
+      "https://promptmidia.com.br/carrossel/matematicos-acusam-openai-de-usar-pesquisas-privadas-feitas-em-chats-do-codex/slide-3-cta.png"
+    ],
+    "status": "pendente",
+    "criado_em": "2026-09-08T15:39:00.359Z"
+  },
+  {
+    "slug": "modelo-da-openai-teria-resolvido-problema-de-navier-stokes-matematicos-pedem-cau",
+    "titulo": "Modelo da OpenAI teria resolvido problema de Navier-Stokes? Matemáticos pedem cautela",
+    "resumo": "Uma suposta solução gerada por IA para um dos problemas mais desafiadores da matemática, ligado ao comportamento de fluidos, gerou empolgação e desconfiança ao mesmo tempo.",
+    "imagens": [
+      "https://promptmidia.com.br/carrossel/modelo-da-openai-teria-resolvido-problema-de-navier-stokes-matematicos-pedem-cau/slide-1-capa.png",
+      "https://promptmidia.com.br/carrossel/modelo-da-openai-teria-resolvido-problema-de-navier-stokes-matematicos-pedem-cau/slide-2-resumo.png",
+      "https://promptmidia.com.br/carrossel/modelo-da-openai-teria-resolvido-problema-de-navier-stokes-matematicos-pedem-cau/slide-3-cta.png"
+    ],
+    "status": "pendente",
+    "criado_em": "2026-09-08T15:39:00.500Z"
   }
 ]
