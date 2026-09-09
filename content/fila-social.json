@@ -298,5 +298,41 @@
     ],
     "status": "pendente",
     "criado_em": "2026-09-08T20:24:19.308Z"
+  },
+  {
+    "slug": "eua-acusam-empresas-chinesas-de-ia-de-copia-maliciosa-de-tecnologia-em-escala-in",
+    "titulo": "EUA acusam empresas chinesas de IA de cópia 'maliciosa' de tecnologia em escala industrial",
+    "resumo": "Governo americano intensifica discurso contra companhias chinesas de inteligência artificial, alegando prática sistemática de apropriação indevida de tecnologia dos EUA.",
+    "imagens": [
+      "https://promptmidia.com.br/carrossel/eua-acusam-empresas-chinesas-de-ia-de-copia-maliciosa-de-tecnologia-em-escala-in/slide-1-capa.png",
+      "https://promptmidia.com.br/carrossel/eua-acusam-empresas-chinesas-de-ia-de-copia-maliciosa-de-tecnologia-em-escala-in/slide-2-resumo.png",
+      "https://promptmidia.com.br/carrossel/eua-acusam-empresas-chinesas-de-ia-de-copia-maliciosa-de-tecnologia-em-escala-in/slide-3-cta.png"
+    ],
+    "status": "pendente",
+    "criado_em": "2026-09-09T15:33:08.075Z"
+  },
+  {
+    "slug": "geiger-ferramenta-de-codigo-aberto-mostra-quais-agentes-de-ia-estao-ativos-no-se",
+    "titulo": "Geiger: ferramenta de código aberto mostra quais agentes de IA estão ativos no seu computador",
+    "resumo": "Projeto publicado no Hacker News promete dar visibilidade sobre agentes de IA rodando localmente e o que eles têm permissão de acessar no sistema.",
+    "imagens": [
+      "https://promptmidia.com.br/carrossel/geiger-ferramenta-de-codigo-aberto-mostra-quais-agentes-de-ia-estao-ativos-no-se/slide-1-capa.png",
+      "https://promptmidia.com.br/carrossel/geiger-ferramenta-de-codigo-aberto-mostra-quais-agentes-de-ia-estao-ativos-no-se/slide-2-resumo.png",
+      "https://promptmidia.com.br/carrossel/geiger-ferramenta-de-codigo-aberto-mostra-quais-agentes-de-ia-estao-ativos-no-se/slide-3-cta.png"
+    ],
+    "status": "pendente",
+    "criado_em": "2026-09-09T15:33:08.228Z"
+  },
+  {
+    "slug": "pesquisador-da-anthropic-estima-em-mais-de-10-a-chance-de-ia-exterminar-a-humani",
+    "titulo": "Pesquisador da Anthropic estima em mais de 10% a chance de IA \"exterminar a humanidade\"",
+    "resumo": "Um pesquisador ligado à Anthropic reacendeu o debate sobre riscos existenciais da inteligência artificial ao citar uma probabilidade alarmante de catástrofe global causada por sistemas avançados.",
+    "imagens": [
+      "https://promptmidia.com.br/carrossel/pesquisador-da-anthropic-estima-em-mais-de-10-a-chance-de-ia-exterminar-a-humani/slide-1-capa.png",
+      "https://promptmidia.com.br/carrossel/pesquisador-da-anthropic-estima-em-mais-de-10-a-chance-de-ia-exterminar-a-humani/slide-2-resumo.png",
+      "https://promptmidia.com.br/carrossel/pesquisador-da-anthropic-estima-em-mais-de-10-a-chance-de-ia-exterminar-a-humani/slide-3-cta.png"
+    ],
+    "status": "pendente",
+    "criado_em": "2026-09-09T15:33:08.376Z"
   }
 ]
