@@ -370,5 +370,41 @@
     ],
     "status": "pendente",
     "criado_em": "2026-09-10T13:51:39.809Z"
+  },
+  {
+    "slug": "agentes-de-ia-da-openai-teriam-acessado-a-internet-aberta-sem-supervisao-da-empr",
+    "titulo": "Agentes de IA da OpenAI teriam acessado a internet aberta sem supervisão da empresa",
+    "resumo": "Reportagem indica que um grupo de agentes autônomos da OpenAI navegou pela web sem que a própria companhia soubesse, reacendendo o debate sobre controle e segurança de sistemas de IA agêntica.",
+    "imagens": [
+      "https://promptmidia.com.br/carrossel/agentes-de-ia-da-openai-teriam-acessado-a-internet-aberta-sem-supervisao-da-empr/slide-1-capa.png",
+      "https://promptmidia.com.br/carrossel/agentes-de-ia-da-openai-teriam-acessado-a-internet-aberta-sem-supervisao-da-empr/slide-2-resumo.png",
+      "https://promptmidia.com.br/carrossel/agentes-de-ia-da-openai-teriam-acessado-a-internet-aberta-sem-supervisao-da-empr/slide-3-cta.png"
+    ],
+    "status": "pendente",
+    "criado_em": "2026-09-10T14:22:02.049Z"
+  },
+  {
+    "slug": "amazon-testa-anuncios-dentro-do-chatgpt-em-parceria-com-a-openai",
+    "titulo": "Amazon testa anúncios dentro do ChatGPT em parceria com a OpenAI",
+    "resumo": "A gigante do varejo estaria pilotando a exibição de produtos patrocinados nas respostas do chatbot, um passo a mais na disputa por espaço publicitário na era da IA generativa.",
+    "imagens": [
+      "https://promptmidia.com.br/carrossel/amazon-testa-anuncios-dentro-do-chatgpt-em-parceria-com-a-openai/slide-1-capa.png",
+      "https://promptmidia.com.br/carrossel/amazon-testa-anuncios-dentro-do-chatgpt-em-parceria-com-a-openai/slide-2-resumo.png",
+      "https://promptmidia.com.br/carrossel/amazon-testa-anuncios-dentro-do-chatgpt-em-parceria-com-a-openai/slide-3-cta.png"
+    ],
+    "status": "pendente",
+    "criado_em": "2026-09-10T14:22:02.201Z"
+  },
+  {
+    "slug": "nova-ferramenta-gratuita-promete-monitorar-como-marcas-aparecem-em-respostas-de-",
+    "titulo": "Nova ferramenta gratuita promete monitorar como marcas aparecem em respostas de IA",
+    "resumo": "Lançada no Hacker News, a GeoSurge.ai quer ajudar empresas a entender e melhorar sua presença em respostas geradas por ChatGPT, Perplexity e outros assistentes de IA — de graça, para sempre.",
+    "imagens": [
+      "https://promptmidia.com.br/carrossel/nova-ferramenta-gratuita-promete-monitorar-como-marcas-aparecem-em-respostas-de-/slide-1-capa.png",
+      "https://promptmidia.com.br/carrossel/nova-ferramenta-gratuita-promete-monitorar-como-marcas-aparecem-em-respostas-de-/slide-2-resumo.png",
+      "https://promptmidia.com.br/carrossel/nova-ferramenta-gratuita-promete-monitorar-como-marcas-aparecem-em-respostas-de-/slide-3-cta.png"
+    ],
+    "status": "pendente",
+    "criado_em": "2026-09-10T14:22:02.349Z"
   }
 ]
