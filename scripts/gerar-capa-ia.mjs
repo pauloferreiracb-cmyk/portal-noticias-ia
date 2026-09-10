@@ -5,7 +5,7 @@
  * minimalista).
  *
  * Estratégia em 2 camadas:
- *   1. Cloudflare Workers AI (FLUX.1 [schnell]) — imagem gerada por IA,
+ *   1. Cloudflare Workers AI (Stable Diffusion XL) — imagem gerada por IA,
  *      grátis (10 mil "neurons"/dia), já no estilo da marca.
  *   2. Se falhar, cai pro Unsplash (foto real, grátis, precisa de
  *      UNSPLASH_ACCESS_KEY) — e grava o crédito do fotógrafo em
@@ -55,7 +55,7 @@ function lerArtigos() {
 
 const CF_ACCOUNT_ID = process.env.CLOUDFLARE_ACCOUNT_ID;
 const CF_API_TOKEN = process.env.CLOUDFLARE_API_TOKEN;
-const CF_MODELO = process.env.CLOUDFLARE_IMAGE_MODEL ?? '@cf/black-forest-labs/flux-1-schnell';
+const CF_MODELO = process.env.CLOUDFLARE_IMAGE_MODEL ?? '@cf/stabilityai/stable-diffusion-xl-base-1.0';
 
 function montarPromptIA(artigo) {
   return (
@@ -203,5 +203,6 @@ main().catch((err) => {
   console.error(err);
   process.exit(1);
 });
+
 
 
