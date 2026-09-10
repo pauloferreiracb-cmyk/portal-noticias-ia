@@ -406,5 +406,29 @@
     ],
     "status": "pendente",
     "criado_em": "2026-09-10T14:22:02.349Z"
+  },
+  {
+    "slug": "como-a-inteligencia-artificial-esta-corroendo-a-confianca-digital",
+    "titulo": "Como a inteligência artificial está corroendo a confiança digital",
+    "resumo": "Um artigo do Hacker News levanta um alerta: a IA generativa está minando os alicerces da confiança que sustentam a internet, o trabalho e as relações humanas.",
+    "imagens": [
+      "https://promptmidia.com.br/carrossel/como-a-inteligencia-artificial-esta-corroendo-a-confianca-digital/slide-1-capa.png",
+      "https://promptmidia.com.br/carrossel/como-a-inteligencia-artificial-esta-corroendo-a-confianca-digital/slide-2-resumo.png",
+      "https://promptmidia.com.br/carrossel/como-a-inteligencia-artificial-esta-corroendo-a-confianca-digital/slide-3-cta.png"
+    ],
+    "status": "pendente",
+    "criado_em": "2026-09-10T15:28:23.318Z"
+  },
+  {
+    "slug": "projeto-usa-a-linguagem-lean-para-criar-guardrails-matematicamente-verificaveis-",
+    "titulo": "Projeto usa a linguagem Lean para criar 'guardrails' matematicamente verificáveis em agentes de IA",
+    "resumo": "Ferramenta open source promete ir além de prompts e filtros: usa prova formal para garantir que agentes de IA respeitem regras de segurança de forma verificável.",
+    "imagens": [
+      "https://promptmidia.com.br/carrossel/projeto-usa-a-linguagem-lean-para-criar-guardrails-matematicamente-verificaveis-/slide-1-capa.png",
+      "https://promptmidia.com.br/carrossel/projeto-usa-a-linguagem-lean-para-criar-guardrails-matematicamente-verificaveis-/slide-2-resumo.png",
+      "https://promptmidia.com.br/carrossel/projeto-usa-a-linguagem-lean-para-criar-guardrails-matematicamente-verificaveis-/slide-3-cta.png"
+    ],
+    "status": "pendente",
+    "criado_em": "2026-09-10T15:28:23.480Z"
   }
 ]
