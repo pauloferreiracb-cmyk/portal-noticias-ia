@@ -334,5 +334,41 @@
     ],
     "status": "pendente",
     "criado_em": "2026-09-09T15:33:08.376Z"
+  },
+  {
+    "slug": "cory-doctorow-diz-que-e-preciso-desconfiar-do-discurso-de-vendas-da-ia",
+    "titulo": "Cory Doctorow diz que é preciso desconfiar do discurso de vendas da IA",
+    "resumo": "Escritor e ativista alerta que grande parte do entusiasmo em torno da inteligência artificial é, na verdade, estratégia de marketing das big techs — e não reflexo real de capacidade tecnológica.",
+    "imagens": [
+      "https://promptmidia.com.br/carrossel/cory-doctorow-diz-que-e-preciso-desconfiar-do-discurso-de-vendas-da-ia/slide-1-capa.png",
+      "https://promptmidia.com.br/carrossel/cory-doctorow-diz-que-e-preciso-desconfiar-do-discurso-de-vendas-da-ia/slide-2-resumo.png",
+      "https://promptmidia.com.br/carrossel/cory-doctorow-diz-que-e-preciso-desconfiar-do-discurso-de-vendas-da-ia/slide-3-cta.png"
+    ],
+    "status": "pendente",
+    "criado_em": "2026-09-10T13:51:39.514Z"
+  },
+  {
+    "slug": "pesquisador-acusa-openai-de-treinar-modelo-com-conversas-de-usuarios-antes-de-an",
+    "titulo": "Pesquisador acusa OpenAI de treinar modelo com conversas de usuários antes de anunciar 'avanço'",
+    "resumo": "Novo relato reaviva debate sobre contaminação de dados: seria o 'salto' de desempenho da OpenAI apenas resultado de treinar com informações que depois apareceram nos testes?",
+    "imagens": [
+      "https://promptmidia.com.br/carrossel/pesquisador-acusa-openai-de-treinar-modelo-com-conversas-de-usuarios-antes-de-an/slide-1-capa.png",
+      "https://promptmidia.com.br/carrossel/pesquisador-acusa-openai-de-treinar-modelo-com-conversas-de-usuarios-antes-de-an/slide-2-resumo.png",
+      "https://promptmidia.com.br/carrossel/pesquisador-acusa-openai-de-treinar-modelo-com-conversas-de-usuarios-antes-de-an/slide-3-cta.png"
+    ],
+    "status": "pendente",
+    "criado_em": "2026-09-10T13:51:39.665Z"
+  },
+  {
+    "slug": "quem-e-jacob-coxon-o-novo-profeta-do-apocalipse-da-ia-que-virou-pauta-na-midia",
+    "titulo": "Quem é Jacob Coxon, o novo 'profeta do apocalipse da IA' que virou pauta na mídia",
+    "resumo": "Um nome pouco conhecido até então começou a circular por veículos de tecnologia como voz de alerta sobre os riscos existenciais da inteligência artificial. Entenda o fenômeno.",
+    "imagens": [
+      "https://promptmidia.com.br/carrossel/quem-e-jacob-coxon-o-novo-profeta-do-apocalipse-da-ia-que-virou-pauta-na-midia/slide-1-capa.png",
+      "https://promptmidia.com.br/carrossel/quem-e-jacob-coxon-o-novo-profeta-do-apocalipse-da-ia-que-virou-pauta-na-midia/slide-2-resumo.png",
+      "https://promptmidia.com.br/carrossel/quem-e-jacob-coxon-o-novo-profeta-do-apocalipse-da-ia-que-virou-pauta-na-midia/slide-3-cta.png"
+    ],
+    "status": "pendente",
+    "criado_em": "2026-09-10T13:51:39.809Z"
   }
 ]
