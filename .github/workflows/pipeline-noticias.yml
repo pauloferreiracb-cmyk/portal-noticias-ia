@@ -1,10 +1,10 @@
-﻿name: Pipeline diÃ¡rio de notÃ­cias de IA
+name: Pipeline diário de notícias de IA
 
 on:
   schedule:
-    # 09:00 no horÃ¡rio de BrasÃ­lia (12:00 UTC)
+    # 09:00 no horário de Brasília (12:00 UTC)
     - cron: "0 12 * * *"
-  workflow_dispatch: {} # permite rodar manualmente pelo botÃ£o "Run workflow" no GitHub
+  workflow_dispatch: {} # permite rodar manualmente pelo botão "Run workflow" no GitHub
 
 permissions:
   contents: write
@@ -21,14 +21,14 @@ jobs:
         with:
           node-version: "20"
 
-      - name: Instalar dependÃªncias
+      - name: Instalar dependências
         run: npm ci
 
-      - name: Baixar fontes do carrossel (se ainda nÃ£o existirem)
+      - name: Baixar fontes do carrossel (se ainda não existirem)
         run: |
           mkdir -p scripts/fonts
           # Coloque manualmente Inter-Regular.ttf e Inter-Bold.ttf em scripts/fonts/
-          # e comite no repo uma Ãºnica vez â€” o CI nÃ£o baixa fontes do Google Fonts.
+          # e comite no repo uma única vez — o CI não baixa fontes do Google Fonts.
 
       - name: Gerar artigo(s) novo(s)
         env:
@@ -52,7 +52,7 @@ jobs:
           git config user.name "portal-ia-bot"
           git config user.email "bot@portal-ia.local"
           git add src/content/noticias public/carrossel public/capas-ia content/fila-social.json
-          git diff --cached --quiet || git commit -m "auto: novas notÃ­cias de IA $(date +%F)"
+          git diff --cached --quiet || git commit -m "auto: novas notícias de IA $(date +%F)"
           git push
 
       - name: Disponibilizar carrossel pra download (backup manual)
