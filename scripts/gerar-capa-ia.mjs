@@ -1,26 +1,29 @@
-#!/usr/bin/env node
+﻿#!/usr/bin/env node
 /**
- * Gera uma imagem de capa por artigo, no estilo visual PROMPT MÍDIA
- * (dark obsidiana, ciano elétrico + violeta neural, editorial tech
+ * Gera uma imagem de capa por artigo, no estilo visual PROMPT MÃDIA
+ * (dark obsidiana, ciano elÃ©trico + violeta neural, editorial tech
  * minimalista).
  *
- * Estratégia em 2 camadas:
- *   1. Pollinations (Flux) — imagem gerada por IA, grátis, sem chave,
- *      já no estilo da marca.
- *   2. Se falhar, cai pro Unsplash (foto real, grátis, precisa de
- *      UNSPLASH_ACCESS_KEY) — e grava o crédito do fotógrafo em
+ * EstratÃ©gia em 2 camadas:
+ *   1. Cloudflare Workers AI (FLUX.1 [schnell]) â€” imagem gerada por IA,
+ *      grÃ¡tis (10 mil "neurons"/dia), jÃ¡ no estilo da marca.
+ *   2. Se falhar, cai pro Unsplash (foto real, grÃ¡tis, precisa de
+ *      UNSPLASH_ACCESS_KEY) â€” e grava o crÃ©dito do fotÃ³grafo em
  *      public/capas-ia/<slug>.json pra exibir no site.
  *
- * Fica em public/capas-ia/<slug>.png — separado do carrossel do Satori
+ * Fica em public/capas-ia/<slug>.png â€” separado do carrossel do Satori
  * (public/carrossel/), que continua existindo pra postagem no Instagram/TikTok.
  *
  * Uso:
- *   node scripts/gerar-capa-ia.mjs            -> gera só o que falta
+ *   node scripts/gerar-capa-ia.mjs            -> gera sÃ³ o que falta
  *   node scripts/gerar-capa-ia.mjs --forcar   -> regenera tudo
  *
- * Variáveis de ambiente:
- *   UNSPLASH_ACCESS_KEY  opcional, mas necessária pro fallback funcionar.
- *                        Grátis em https://unsplash.com/developers
+ * VariÃ¡veis de ambiente:
+ *   CLOUDFLARE_ACCOUNT_ID  obrigatÃ³ria pra IA funcionar.
+ *   CLOUDFLARE_API_TOKEN   obrigatÃ³ria pra IA funcionar.
+ *                          GrÃ¡tis em https://dash.cloudflare.com -> Workers AI
+ *   UNSPLASH_ACCESS_KEY    opcional, mas necessÃ¡ria pro fallback funcionar.
+ *                          GrÃ¡tis em https://unsplash.com/developers
  */
 
 import fs from 'node:fs';
@@ -48,48 +51,71 @@ function lerArtigos() {
     });
 }
 
-// --- Camada 1: Pollinations (Flux), gerado no estilo da marca ---
+// --- Camada 1: Cloudflare Workers AI (FLUX.1 schnell), no estilo da marca ---
+
+const CF_ACCOUNT_ID = process.env.CLOUDFLARE_ACCOUNT_ID;
+const CF_API_TOKEN = process.env.CLOUDFLARE_API_TOKEN;
+const CF_MODELO = process.env.CLOUDFLARE_IMAGE_MODEL ?? '@cf/black-forest-labs/flux-1-schnell';
 
 function montarPromptIA(artigo) {
-  const tema = [artigo.titulo, ...(artigo.tags ?? [])].join(', ');
   return (
-    `Editorial tech illustration for a Brazilian AI news article about: ${tema}. ` +
-    `Dark obsidian background (#0A0E17), electric cyan (#00F0FF) and neural violet ` +
-    `(#7000FF) accent lighting, glowing gradient light beams, subtle geometric tech ` +
-    `grid, minimalist and abstract composition, high contrast, moody cinematic lighting, ` +
+    `Realistic editorial photograph/illustration that literally depicts the scene, ` +
+    `people, objects or action described in this Brazilian news article â€” the image ` +
+    `must be clearly and concretely about this specific subject, not an abstract concept: ` +
+    `"${artigo.titulo}". Contexto: ${artigo.resumo ?? ''}. ` +
+    `Visual treatment: moody cinematic lighting, dark background, electric cyan ` +
+    `(#00F0FF) and neural violet (#7000FF) accent lighting/rim light, high contrast, ` +
     `wide 16:9 landscape crop. ` +
     `No text, no words, no letters, no logos, no watermarks anywhere in the image.`
   );
 }
 
-// hash simples e determinístico só pra dar uma seed estável por artigo
-function seedDoSlug(slug) {
-  let h = 0;
-  for (const c of slug) h = (h * 31 + c.charCodeAt(0)) >>> 0;
-  return h % 100000;
-}
+async function gerarViaCloudflare(artigo) {
+  if (!CF_ACCOUNT_ID || !CF_API_TOKEN) {
+    throw new Error('CLOUDFLARE_ACCOUNT_ID / CLOUDFLARE_API_TOKEN nÃ£o configuradas');
+  }
 
-async function gerarViaPollinations(artigo) {
   const prompt = montarPromptIA(artigo);
-  const seed = seedDoSlug(artigo.slug);
-  const url =
-    `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}` +
-    `?width=1280&height=720&nologo=true&seed=${seed}`;
+  const url = `https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/ai/run/${CF_MODELO}`;
 
-  const resp = await fetch(url);
-  if (!resp.ok) throw new Error(`Pollinations respondeu ${resp.status}`);
+  const resp = await fetch(url, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${CF_API_TOKEN}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ prompt, width: 1280, height: 720 }),
+  });
 
-  const buffer = Buffer.from(await resp.arrayBuffer());
-  if (buffer.length < 2000) throw new Error('Pollinations retornou um arquivo suspeito de pequeno');
+  if (!resp.ok) {
+    const corpo = await resp.text();
+    throw new Error(`Cloudflare respondeu ${resp.status}: ${corpo.slice(0, 300)}`);
+  }
 
-  return { buffer, credito: null }; // Pollinations não exige crédito
+  const tipo = resp.headers.get('content-type') ?? '';
+  let buffer;
+
+  if (tipo.startsWith('image/')) {
+    // alguns modelos (ex: Stable Diffusion) devolvem os bytes da imagem direto
+    buffer = Buffer.from(await resp.arrayBuffer());
+  } else {
+    // FLUX devolve JSON com a imagem em base64
+    const json = await resp.json();
+    const base64 = json?.result?.image;
+    if (!base64) throw new Error('Cloudflare nÃ£o retornou imagem. Resposta: ' + JSON.stringify(json).slice(0, 300));
+    buffer = Buffer.from(base64, 'base64');
+  }
+
+  if (buffer.length < 2000) throw new Error('Cloudflare retornou um arquivo suspeito de pequeno');
+
+  return { buffer, credito: null }; // IA nÃ£o exige crÃ©dito
 }
 
 // --- Camada 2 (fallback): Unsplash, foto real ---
 
 async function buscarViaUnsplash(artigo) {
   if (!UNSPLASH_ACCESS_KEY) {
-    throw new Error('UNSPLASH_ACCESS_KEY não configurada — sem fallback disponível');
+    throw new Error('UNSPLASH_ACCESS_KEY nÃ£o configurada â€” sem fallback disponÃ­vel');
   }
 
   const query = (artigo.tags?.[0] ?? artigo.titulo).slice(0, 60);
@@ -104,15 +130,15 @@ async function buscarViaUnsplash(artigo) {
 
   const jsonBusca = await respBusca.json();
   const foto = jsonBusca.results?.[0];
-  if (!foto) throw new Error(`Unsplash não retornou nenhuma foto pra "${query}"`);
+  if (!foto) throw new Error(`Unsplash nÃ£o retornou nenhuma foto pra "${query}"`);
 
   // Baixa a imagem em si
   const respImagem = await fetch(foto.urls.regular);
   if (!respImagem.ok) throw new Error(`Unsplash (download da imagem) respondeu ${respImagem.status}`);
   const buffer = Buffer.from(await respImagem.arrayBuffer());
 
-  // Exigência do Unsplash: registrar o "download" via download_location
-  // (não bloqueia o resto se falhar, é só telemetria deles)
+  // ExigÃªncia do Unsplash: registrar o "download" via download_location
+  // (nÃ£o bloqueia o resto se falhar, Ã© sÃ³ telemetria deles)
   fetch(`${foto.links.download_location}&client_id=${UNSPLASH_ACCESS_KEY}`).catch(() => {});
 
   return {
@@ -128,10 +154,10 @@ async function buscarViaUnsplash(artigo) {
 
 async function gerarCapa(artigo) {
   try {
-    console.log(`[tentando pollinations] ${artigo.slug}...`);
-    return await gerarViaPollinations(artigo);
+    console.log(`[tentando cloudflare] ${artigo.slug}...`);
+    return await gerarViaCloudflare(artigo);
   } catch (err) {
-    console.warn(`[pollinations falhou] ${artigo.slug}: ${err.message} — tentando Unsplash...`);
+    console.warn(`[cloudflare falhou] ${artigo.slug}: ${err.message} â€” tentando Unsplash...`);
     return await buscarViaUnsplash(artigo);
   }
 }
@@ -150,7 +176,7 @@ async function main() {
     const destinoCredito = path.join(DIR_SAIDA, `${artigo.slug}.json`);
 
     if (fs.existsSync(destinoImagem) && !FORCAR) {
-      console.log(`[pular] ${artigo.slug} já tem capa (use --forcar pra refazer)`);
+      console.log(`[pular] ${artigo.slug} jÃ¡ tem capa (use --forcar pra refazer)`);
       continue;
     }
 
@@ -161,10 +187,10 @@ async function main() {
       if (credito) {
         fs.writeFileSync(destinoCredito, JSON.stringify(credito, null, 2), 'utf-8');
       } else if (fs.existsSync(destinoCredito)) {
-        fs.unlinkSync(destinoCredito); // era Unsplash antes, agora é IA — remove crédito velho
+        fs.unlinkSync(destinoCredito); // era Unsplash antes, agora Ã© IA â€” remove crÃ©dito velho
       }
 
-      console.log(`[ok] public/capas-ia/${artigo.slug}.png ${credito ? '(Unsplash, com crédito)' : '(Pollinations/IA)'}`);
+      console.log(`[ok] public/capas-ia/${artigo.slug}.png ${credito ? '(Unsplash, com crÃ©dito)' : '(Cloudflare/IA)'}`);
     } catch (err) {
       console.error(`[falhou nas duas fontes] ${artigo.slug}: ${err.message}`);
     }
@@ -177,4 +203,5 @@ main().catch((err) => {
   console.error(err);
   process.exit(1);
 });
+
 
