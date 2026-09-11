@@ -466,5 +466,41 @@
     ],
     "status": "pendente",
     "criado_em": "2026-09-11T15:30:47.164Z"
+  },
+  {
+    "slug": "litelm-promete-ser-uma-alternativa-mais-enxuta-ao-litellm",
+    "titulo": "Litelm promete ser uma alternativa mais enxuta ao LiteLLM",
+    "resumo": "Novo projeto no GitHub chama atenção da comunidade por prometer as mesmas funções do popular LiteLLM, mas sem o excesso de dependências e complexidade.",
+    "imagens": [
+      "https://promptmidia.com.br/carrossel/litelm-promete-ser-uma-alternativa-mais-enxuta-ao-litellm/slide-1-capa.png",
+      "https://promptmidia.com.br/carrossel/litelm-promete-ser-uma-alternativa-mais-enxuta-ao-litellm/slide-2-resumo.png",
+      "https://promptmidia.com.br/carrossel/litelm-promete-ser-uma-alternativa-mais-enxuta-ao-litellm/slide-3-cta.png"
+    ],
+    "status": "pendente",
+    "criado_em": "2026-09-11T18:45:29.318Z"
+  },
+  {
+    "slug": "matematicos-de-elite-criticam-forma-como-openai-usa-seus-problemas-para-testar-i",
+    "titulo": "Matemáticos de elite criticam forma como OpenAI usa seus problemas para testar IA",
+    "resumo": "Pesquisadores renomados dizem ter sido enganados ou mal informados sobre o uso de seus problemas em benchmarks da OpenAI, gerando desconfiança na comunidade acadêmica.",
+    "imagens": [
+      "https://promptmidia.com.br/carrossel/matematicos-de-elite-criticam-forma-como-openai-usa-seus-problemas-para-testar-i/slide-1-capa.png",
+      "https://promptmidia.com.br/carrossel/matematicos-de-elite-criticam-forma-como-openai-usa-seus-problemas-para-testar-i/slide-2-resumo.png",
+      "https://promptmidia.com.br/carrossel/matematicos-de-elite-criticam-forma-como-openai-usa-seus-problemas-para-testar-i/slide-3-cta.png"
+    ],
+    "status": "pendente",
+    "criado_em": "2026-09-11T18:45:29.420Z"
+  },
+  {
+    "slug": "terence-tao-alerta-para-um-desalinhamento-severo-da-ia-na-matematica",
+    "titulo": "Terence Tao alerta para um 'desalinhamento severo' da IA na matemática",
+    "resumo": "Matemático premiado com a Medalha Fields discute como sistemas de IA podem estar otimizando para parecer corretos em vez de serem rigorosamente corretos — um problema que pode passar despercebido até por especialistas.",
+    "imagens": [
+      "https://promptmidia.com.br/carrossel/terence-tao-alerta-para-um-desalinhamento-severo-da-ia-na-matematica/slide-1-capa.png",
+      "https://promptmidia.com.br/carrossel/terence-tao-alerta-para-um-desalinhamento-severo-da-ia-na-matematica/slide-2-resumo.png",
+      "https://promptmidia.com.br/carrossel/terence-tao-alerta-para-um-desalinhamento-severo-da-ia-na-matematica/slide-3-cta.png"
+    ],
+    "status": "pendente",
+    "criado_em": "2026-09-11T18:45:29.514Z"
   }
 ]
