@@ -430,5 +430,41 @@
     ],
     "status": "pendente",
     "criado_em": "2026-09-10T15:28:23.480Z"
+  },
+  {
+    "slug": "aide-novo-projeto-open-source-cria-sandbox-declarativo-para-agentes-de-ia-que-pr",
+    "titulo": "Aide: novo projeto open source cria sandbox declarativo para agentes de IA que programam",
+    "resumo": "Ferramenta disponibilizada no GitHub promete isolar e controlar a execução de código gerado por agentes de IA, tema que ganhou destaque no Hacker News.",
+    "imagens": [
+      "https://promptmidia.com.br/carrossel/aide-novo-projeto-open-source-cria-sandbox-declarativo-para-agentes-de-ia-que-pr/slide-1-capa.png",
+      "https://promptmidia.com.br/carrossel/aide-novo-projeto-open-source-cria-sandbox-declarativo-para-agentes-de-ia-que-pr/slide-2-resumo.png",
+      "https://promptmidia.com.br/carrossel/aide-novo-projeto-open-source-cria-sandbox-declarativo-para-agentes-de-ia-que-pr/slide-3-cta.png"
+    ],
+    "status": "pendente",
+    "criado_em": "2026-09-11T15:30:46.862Z"
+  },
+  {
+    "slug": "anthropic-diz-que-agentes-ligados-ao-ira-usaram-claude-para-planejar-ataques-a-n",
+    "titulo": "Anthropic diz que agentes ligados ao Irã usaram Claude para planejar ataques a navios da Marinha dos EUA",
+    "resumo": "Empresa afirma ter identificado uso indevido de sua IA por operadores associados ao governo iraniano, que teriam buscado apoio técnico para mirar embarcações militares norte-americanas.",
+    "imagens": [
+      "https://promptmidia.com.br/carrossel/anthropic-diz-que-agentes-ligados-ao-ira-usaram-claude-para-planejar-ataques-a-n/slide-1-capa.png",
+      "https://promptmidia.com.br/carrossel/anthropic-diz-que-agentes-ligados-ao-ira-usaram-claude-para-planejar-ataques-a-n/slide-2-resumo.png",
+      "https://promptmidia.com.br/carrossel/anthropic-diz-que-agentes-ligados-ao-ira-usaram-claude-para-planejar-ataques-a-n/slide-3-cta.png"
+    ],
+    "status": "pendente",
+    "criado_em": "2026-09-11T15:30:47.020Z"
+  },
+  {
+    "slug": "site-filtra-o-hacker-news-para-esconder-posts-sobre-inteligencia-artificial",
+    "titulo": "Site filtra o Hacker News para esconder posts sobre inteligência artificial",
+    "resumo": "Um projeto independente criou uma versão alternativa do Hacker News que remove automaticamente qualquer notícia relacionada a IA — para quem já está cansado do assunto.",
+    "imagens": [
+      "https://promptmidia.com.br/carrossel/site-filtra-o-hacker-news-para-esconder-posts-sobre-inteligencia-artificial/slide-1-capa.png",
+      "https://promptmidia.com.br/carrossel/site-filtra-o-hacker-news-para-esconder-posts-sobre-inteligencia-artificial/slide-2-resumo.png",
+      "https://promptmidia.com.br/carrossel/site-filtra-o-hacker-news-para-esconder-posts-sobre-inteligencia-artificial/slide-3-cta.png"
+    ],
+    "status": "pendente",
+    "criado_em": "2026-09-11T15:30:47.164Z"
   }
 ]
