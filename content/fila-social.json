@@ -514,5 +514,41 @@
     ],
     "status": "pendente",
     "criado_em": "2026-09-12T14:37:47.596Z"
+  },
+  {
+    "slug": "anthropic-diz-que-houthis-usaram-claude-code-para-desenvolver-software-de-missei",
+    "titulo": "Anthropic diz que houthis usaram Claude Code para desenvolver software de mísseis guiados",
+    "resumo": "Empresa afirma ter identificado uso indevido de sua IA por grupo apoiado pelo Irã para criar sistemas de orientação de mísseis, reacendendo o debate sobre segurança em IAs generativas.",
+    "imagens": [
+      "https://promptmidia.com.br/carrossel/anthropic-diz-que-houthis-usaram-claude-code-para-desenvolver-software-de-missei/slide-1-capa.png",
+      "https://promptmidia.com.br/carrossel/anthropic-diz-que-houthis-usaram-claude-code-para-desenvolver-software-de-missei/slide-2-resumo.png",
+      "https://promptmidia.com.br/carrossel/anthropic-diz-que-houthis-usaram-claude-code-para-desenvolver-software-de-missei/slide-3-cta.png"
+    ],
+    "status": "pendente",
+    "criado_em": "2026-09-13T15:17:26.220Z"
+  },
+  {
+    "slug": "pesquisadores-militares-chineses-teriam-usado-claude-para-desenvolver-armas-e-si",
+    "titulo": "Pesquisadores militares chineses teriam usado Claude para desenvolver armas e sistemas de defesa aérea",
+    "resumo": "Relatório aponta uso do modelo de IA da Anthropic por institutos ligados às Forças Armadas da China para projetos que vão de supressão de defesa aérea a especificações anti-torpedo com foco em Taiwan.",
+    "imagens": [
+      "https://promptmidia.com.br/carrossel/pesquisadores-militares-chineses-teriam-usado-claude-para-desenvolver-armas-e-si/slide-1-capa.png",
+      "https://promptmidia.com.br/carrossel/pesquisadores-militares-chineses-teriam-usado-claude-para-desenvolver-armas-e-si/slide-2-resumo.png",
+      "https://promptmidia.com.br/carrossel/pesquisadores-militares-chineses-teriam-usado-claude-para-desenvolver-armas-e-si/slide-3-cta.png"
+    ],
+    "status": "pendente",
+    "criado_em": "2026-09-13T15:17:26.384Z"
+  },
+  {
+    "slug": "quem-e-o-culpado-quando-uma-ia-causa-dano-o-debate-sobre-responsabilidade-ganha-",
+    "titulo": "Quem é o culpado quando uma IA causa dano? O debate sobre responsabilidade ganha novo capítulo",
+    "resumo": "Uma analogia polêmica com o velho debate sobre armas reacende a discussão: afinal, a culpa é do algoritmo ou de quem o treina, vende e usa?",
+    "imagens": [
+      "https://promptmidia.com.br/carrossel/quem-e-o-culpado-quando-uma-ia-causa-dano-o-debate-sobre-responsabilidade-ganha-/slide-1-capa.png",
+      "https://promptmidia.com.br/carrossel/quem-e-o-culpado-quando-uma-ia-causa-dano-o-debate-sobre-responsabilidade-ganha-/slide-2-resumo.png",
+      "https://promptmidia.com.br/carrossel/quem-e-o-culpado-quando-uma-ia-causa-dano-o-debate-sobre-responsabilidade-ganha-/slide-3-cta.png"
+    ],
+    "status": "pendente",
+    "criado_em": "2026-09-13T15:17:26.522Z"
   }
 ]
