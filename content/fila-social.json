@@ -622,5 +622,41 @@
     ],
     "status": "pendente",
     "criado_em": "2026-09-15T15:54:02.956Z"
+  },
+  {
+    "slug": "caminhoes-de-lixo-dos-eua-usam-cameras-com-ia-para-flagrar-irregularidades-nas-c",
+    "titulo": "Caminhões de lixo dos EUA usam câmeras com IA para flagrar irregularidades nas casas",
+    "resumo": "Sistemas de visão computacional instalados em caminhões de coleta estão sendo usados para identificar violações de código municipal enquanto passam pelas ruas, e a novidade já gera debate sobre vigilância.",
+    "imagens": [
+      "https://promptmidia.com.br/carrossel/caminhoes-de-lixo-dos-eua-usam-cameras-com-ia-para-flagrar-irregularidades-nas-c/slide-1-capa.png",
+      "https://promptmidia.com.br/carrossel/caminhoes-de-lixo-dos-eua-usam-cameras-com-ia-para-flagrar-irregularidades-nas-c/slide-2-resumo.png",
+      "https://promptmidia.com.br/carrossel/caminhoes-de-lixo-dos-eua-usam-cameras-com-ia-para-flagrar-irregularidades-nas-c/slide-3-cta.png"
+    ],
+    "status": "pendente",
+    "criado_em": "2026-09-15T19:57:07.643Z"
+  },
+  {
+    "slug": "como-funciona-o-tool-calling-em-ia-o-essencial-cabe-em-40-linhas-de-javascript",
+    "titulo": "Como funciona o 'tool calling' em IA: o essencial cabe em 40 linhas de JavaScript",
+    "resumo": "Um tutorial mostra que o mecanismo por trás de agentes de IA que executam ações não é tão complexo quanto parece — e pode ser reproduzido com JavaScript puro.",
+    "imagens": [
+      "https://promptmidia.com.br/carrossel/como-funciona-o-tool-calling-em-ia-o-essencial-cabe-em-40-linhas-de-javascript/slide-1-capa.png",
+      "https://promptmidia.com.br/carrossel/como-funciona-o-tool-calling-em-ia-o-essencial-cabe-em-40-linhas-de-javascript/slide-2-resumo.png",
+      "https://promptmidia.com.br/carrossel/como-funciona-o-tool-calling-em-ia-o-essencial-cabe-em-40-linhas-de-javascript/slide-3-cta.png"
+    ],
+    "status": "pendente",
+    "criado_em": "2026-09-15T19:57:07.801Z"
+  },
+  {
+    "slug": "jev-proposta-busca-aproximar-modelos-de-ia-das-propriedades-do-codigo-fonte",
+    "titulo": "Jev: proposta busca aproximar modelos de IA das propriedades do código-fonte",
+    "resumo": "Discussão viral no Hacker News apresenta o Jev, um modelo que promete trazer características como previsibilidade e versionamento, comuns em software, para sistemas de inteligência artificial.",
+    "imagens": [
+      "https://promptmidia.com.br/carrossel/jev-proposta-busca-aproximar-modelos-de-ia-das-propriedades-do-codigo-fonte/slide-1-capa.png",
+      "https://promptmidia.com.br/carrossel/jev-proposta-busca-aproximar-modelos-de-ia-das-propriedades-do-codigo-fonte/slide-2-resumo.png",
+      "https://promptmidia.com.br/carrossel/jev-proposta-busca-aproximar-modelos-de-ia-das-propriedades-do-codigo-fonte/slide-3-cta.png"
+    ],
+    "status": "pendente",
+    "criado_em": "2026-09-15T19:57:07.946Z"
   }
 ]
