@@ -586,5 +586,41 @@
     ],
     "status": "pendente",
     "criado_em": "2026-09-14T17:14:24.555Z"
+  },
+  {
+    "slug": "advogado-usa-chatgpt-e-cita-testemunhas-que-nao-existem-em-caso-de-homicidio",
+    "titulo": "Advogado usa ChatGPT e cita testemunhas que não existem em caso de homicídio",
+    "resumo": "Corte de Nova Mexico descobre que petição de recurso continha depoimentos policiais fabricados pela IA — mais um caso de 'alucinação' do ChatGPT indo parar em processo judicial.",
+    "imagens": [
+      "https://promptmidia.com.br/carrossel/advogado-usa-chatgpt-e-cita-testemunhas-que-nao-existem-em-caso-de-homicidio/slide-1-capa.png",
+      "https://promptmidia.com.br/carrossel/advogado-usa-chatgpt-e-cita-testemunhas-que-nao-existem-em-caso-de-homicidio/slide-2-resumo.png",
+      "https://promptmidia.com.br/carrossel/advogado-usa-chatgpt-e-cita-testemunhas-que-nao-existem-em-caso-de-homicidio/slide-3-cta.png"
+    ],
+    "status": "pendente",
+    "criado_em": "2026-09-15T15:54:02.665Z"
+  },
+  {
+    "slug": "cartesian-ferramenta-de-ia-promete-revolucionar-a-modelagem-3d-para-designers",
+    "titulo": "Cartesian: ferramenta de IA promete revolucionar a modelagem 3D para designers",
+    "resumo": "Nova plataforma usa inteligência artificial para gerar e editar modelos 3D a partir de comandos simples, chamando atenção da comunidade do Hacker News.",
+    "imagens": [
+      "https://promptmidia.com.br/carrossel/cartesian-ferramenta-de-ia-promete-revolucionar-a-modelagem-3d-para-designers/slide-1-capa.png",
+      "https://promptmidia.com.br/carrossel/cartesian-ferramenta-de-ia-promete-revolucionar-a-modelagem-3d-para-designers/slide-2-resumo.png",
+      "https://promptmidia.com.br/carrossel/cartesian-ferramenta-de-ia-promete-revolucionar-a-modelagem-3d-para-designers/slide-3-cta.png"
+    ],
+    "status": "pendente",
+    "criado_em": "2026-09-15T15:54:02.822Z"
+  },
+  {
+    "slug": "como-fazer-sua-primeira-chamada-de-api-de-llm-em-python-um-guia-passo-a-passo",
+    "titulo": "Como fazer sua primeira chamada de API de LLM em Python: um guia passo a passo",
+    "resumo": "Tutorial mostra o caminho básico para desenvolvedores iniciantes conectarem seus programas Python a modelos de linguagem como GPT, sem complicação.",
+    "imagens": [
+      "https://promptmidia.com.br/carrossel/como-fazer-sua-primeira-chamada-de-api-de-llm-em-python-um-guia-passo-a-passo/slide-1-capa.png",
+      "https://promptmidia.com.br/carrossel/como-fazer-sua-primeira-chamada-de-api-de-llm-em-python-um-guia-passo-a-passo/slide-2-resumo.png",
+      "https://promptmidia.com.br/carrossel/como-fazer-sua-primeira-chamada-de-api-de-llm-em-python-um-guia-passo-a-passo/slide-3-cta.png"
+    ],
+    "status": "pendente",
+    "criado_em": "2026-09-15T15:54:02.956Z"
   }
 ]
