@@ -1,21 +1,67 @@
 ---
 import type { CollectionEntry } from 'astro:content';
+import { resolveCapa } from '../lib/capa';
+
+interface Relacionado {
+  slug: string;
+  titulo: string;
+  fonte_nome: string;
+}
 
 interface Props {
   artigo: CollectionEntry<'noticias'>;
+  // hero = destaque grande à esquerda; secundaria = coluna lateral (thumb + texto lado a lado);
+  // grade = grid simples abaixo (capa em cima, texto embaixo)
+  variante?: 'hero' | 'secundaria' | 'grade';
+  relacionados?: Relacionado[];
 }
-const { artigo } = Astro.props;
+
+const { artigo, variante = 'grade', relacionados = [] } = Astro.props;
 const { titulo, resumo, data, tags, fonte_nome } = artigo.data;
-const dataFormatada = new Intl.DateTimeFormat('pt-BR', {
-  day: '2-digit',
-  month: 'short',
-}).format(data);
+
+const capa = resolveCapa(artigo);
+const dataFormatada = new Intl.DateTimeFormat('pt-BR', { day: '2-digit', month: 'short' }).format(data);
+const categoria = tags[0];
+const ehExclusivo = tags.some((t) => t.toLowerCase().includes('exclusiv'));
+const href = `/noticias/${artigo.slug}`;
+
+const TituloTag = variante === 'hero' ? 'h1' : 'h2';
 ---
-<a class="card-noticia" href={`/noticias/${artigo.slug}`}>
-  <h2>{titulo}</h2>
-  <p>{resumo}</p>
-  <div class="meta">
-    {tags.slice(0, 3).map((t: string) => <span class="tag">{t}</span>)}
-    {dataFormatada} · {fonte_nome}
-  </div>
-</a>
+<article class={`noticia-card noticia-card--${variante}`}>
+  <a class="noticia-card__link" href={href}>
+    {capa && (
+      <div class="noticia-card__capa-wrap">
+        <img
+          src={capa.src}
+          alt=""
+          class="noticia-card__capa"
+          loading={variante === 'hero' ? 'eager' : 'lazy'}
+        />
+        {variante === 'hero' && categoria && (
+          <span class={`tag-solida ${ehExclusivo ? 'tag-solida--ciano' : ''}`}>{categoria}</span>
+        )}
+      </div>
+    )}
+    <div class="noticia-card__corpo">
+      {variante !== 'hero' && categoria && <span class="tag">{categoria}</span>}
+      {variante === 'hero' && !capa && categoria && <span class="tag">{categoria}</span>}
+      <TituloTag class="noticia-card__titulo">{titulo}</TituloTag>
+      {variante === 'hero' && <p class="noticia-card__resumo">{resumo}</p>}
+      <div class="noticia-card__meta">{dataFormatada} · {fonte_nome}</div>
+    </div>
+  </a>
+
+  {capa?.credito && (
+    <span class="credito-foto">
+      Foto: <a href={capa.credito.fotografoUrl} target="_blank" rel="noopener">{capa.credito.fotografo}</a> / Unsplash
+    </span>
+  )}
+
+  {variante === 'hero' && relacionados.length > 0 && (
+    <ul class="relacionados">
+      {relacionados.map((r) => (
+        <li><a href={`/noticias/${r.slug}`}>{r.titulo} <span class="fonte">{r.fonte_nome}</span></a></li>
+      ))}
+    </ul>
+  )}
+</article>

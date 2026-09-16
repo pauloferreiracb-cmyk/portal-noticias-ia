@@ -1,39 +1,27 @@
 ---
-import fs from 'node:fs';
-import path from 'node:path';
 import { getCollection } from 'astro:content';
 import Layout from '../layouts/Layout.astro';
 import EmailCapture from '../components/EmailCapture.astro';
 import AdSlot from '../components/AdSlot.astro';
+import NewsCard from '../components/NewsCard.astro';
 
 export const prerender = true;
 
 const todas = await getCollection('noticias');
 const ordenadas = todas.sort((a, b) => b.data.data.valueOf() - a.data.data.valueOf());
+
+// Bloco de destaque: hero (mais recente) + 2 colunas secundárias com 3 cards cada
 const [lead, ...resto] = ordenadas;
-const grid = resto.slice(0, 11);
+const coluna1 = resto.slice(0, 3);
+const coluna2 = resto.slice(3, 6);
+const relacionados = resto.slice(6, 9).map((a) => ({
+  slug: a.slug,
+  titulo: a.data.titulo,
+  fonte_nome: a.data.fonte_nome,
+}));
 
-function capaDe(artigo: (typeof ordenadas)[number]) {
-  if (artigo.data.capa) return { src: artigo.data.capa, credito: null };
-
-  const capaIA = `/capas-ia/${artigo.slug}.png`;
-  if (fs.existsSync(path.join(process.cwd(), 'public', capaIA))) {
-    const jsonCredito = path.join(process.cwd(), 'public', 'capas-ia', `${artigo.slug}.json`);
-    const credito = fs.existsSync(jsonCredito) ? JSON.parse(fs.readFileSync(jsonCredito, 'utf-8')) : null;
-    return { src: capaIA, credito };
-  }
-
-  const capaCarrossel = `/carrossel/${artigo.slug}/slide-1-capa.png`;
-  if (fs.existsSync(path.join(process.cwd(), 'public', capaCarrossel))) {
-    return { src: capaCarrossel, credito: null };
-  }
-
-  return null;
-}
-
-function formatarData(d: Date) {
-  return new Intl.DateTimeFormat('pt-BR', { day: '2-digit', month: 'short' }).format(d);
-}
+// Notícias mais antigas: grid simples abaixo do bloco de destaque
+const grid = resto.slice(9);
 
 const categorias = [...new Set(ordenadas.flatMap((a) => a.data.tags))].slice(0, 6);
 ---
@@ -45,26 +33,15 @@ const categorias = [...new Set(ordenadas.flatMap((a) => a.data.tags))].slice(0, 
   )}
 
   {lead && (
-    <a class="lead" href={`/noticias/${lead.slug}`}>
-      <div class="lead-corpo">
-        <div class="meta-topo">
-          {lead.data.tags.slice(0, 2).map((t: string) => <span class="tag">{t}</span>)}
-          <span class="data-fonte">{formatarData(lead.data.data)} · {lead.data.fonte_nome}</span>
-        </div>
-        <h1>{lead.data.titulo}</h1>
-        <p>{lead.data.resumo}</p>
+    <div class="destaque-grid">
+      <NewsCard artigo={lead} variante="hero" relacionados={relacionados} />
+      <div class="coluna-secundaria">
+        {coluna1.map((artigo) => <NewsCard artigo={artigo} variante="secundaria" />)}
       </div>
-      {capaDe(lead) && (
-        <div class="lead-img-wrap">
-          <img src={capaDe(lead)!.src} alt="" class="lead-img" />
-          {capaDe(lead)!.credito && (
-            <span class="credito-foto">
-              Foto: <a href={capaDe(lead)!.credito.fotografoUrl} target="_blank" rel="noopener">{capaDe(lead)!.credito.fotografo}</a> / Unsplash
-            </span>
-          )}
-        </div>
-      )}
-    </a>
+      <div class="coluna-secundaria">
+        {coluna2.map((artigo) => <NewsCard artigo={artigo} variante="secundaria" />)}
+      </div>
+    </div>
   )}
 
   <EmailCapture
@@ -74,34 +51,13 @@ const categorias = [...new Set(ordenadas.flatMap((a) => a.data.tags))].slice(0, 
 
   <AdSlot id="home-topo" />
 
-  <div class="grid">
-    {grid.map((artigo) => (
-      <a class="card-noticia" href={`/noticias/${artigo.slug}`}>
-        {capaDe(artigo) && (
-          <div class="card-img-wrap">
-            <img src={capaDe(artigo)!.src} alt="" class="card-img" />
-            {capaDe(artigo)!.credito && (
-              <span class="credito-foto">
-                Foto: <a href={capaDe(artigo)!.credito.fotografoUrl} target="_blank" rel="noopener">{capaDe(artigo)!.credito.fotografo}</a> / Unsplash
-              </span>
-            )}
-          </div>
-        )}
-        <div class="card-corpo">
-          <h2>{artigo.data.titulo}</h2>
-          <p>{artigo.data.resumo}</p>
-          <div class="meta">
-            {artigo.data.tags.slice(0, 3).map((t: string) => <span class="tag">{t}</span>)}
-            {formatarData(artigo.data.data)} · {artigo.data.fonte_nome}
-          </div>
-        </div>
-      </a>
-    ))}
-  </div>
+  {grid.length > 0 && (
+    <div class="grid">
+      {grid.map((artigo) => <NewsCard artigo={artigo} variante="grade" />)}
+    </div>
+  )}
 
   {todas.length === 0 && (
     <p>Nenhuma notícia publicada ainda. Adicione um .md em src/content/noticias/ e dê push.</p>
   )}
 </Layout>
-
-

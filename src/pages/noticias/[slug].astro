@@ -1,10 +1,9 @@
 ---
-import fs from 'node:fs';
-import path from 'node:path';
 import { getCollection, type CollectionEntry } from 'astro:content';
 import Layout from '../../layouts/Layout.astro';
 import EmailCapture from '../../components/EmailCapture.astro';
 import AdSlot from '../../components/AdSlot.astro';
+import { resolveCapa } from '../../lib/capa';
 
 export const prerender = true;
 
@@ -21,28 +20,14 @@ interface Props {
 }
 const { artigo } = Astro.props;
 const { Content } = await artigo.render();
-const { titulo, resumo, data, tags, fonte_url, fonte_nome, capa } = artigo.data;
+const { titulo, resumo, data, tags, fonte_url, fonte_nome } = artigo.data;
 const dataFormatada = new Intl.DateTimeFormat('pt-BR', {
   day: '2-digit',
   month: 'long',
   year: 'numeric',
 }).format(data);
 
-function capaDoArtigo() {
-  if (capa) return { src: capa, credito: null };
-  const capaIA = `/capas-ia/${artigo.slug}.png`;
-  if (fs.existsSync(path.join(process.cwd(), 'public', capaIA))) {
-    const jsonCredito = path.join(process.cwd(), 'public', 'capas-ia', `${artigo.slug}.json`);
-    const credito = fs.existsSync(jsonCredito) ? JSON.parse(fs.readFileSync(jsonCredito, 'utf-8')) : null;
-    return { src: capaIA, credito };
-  }
-  const capaCarrossel = `/carrossel/${artigo.slug}/slide-1-capa.png`;
-  if (fs.existsSync(path.join(process.cwd(), 'public', capaCarrossel))) {
-    return { src: capaCarrossel, credito: null };
-  }
-  return null;
-}
-const imagemCapa = capaDoArtigo();
+const imagemCapa = resolveCapa(artigo);
 ---
 <Layout titulo={`${titulo} — Prompt Mídia`} descricao={resumo}>
   <article>
