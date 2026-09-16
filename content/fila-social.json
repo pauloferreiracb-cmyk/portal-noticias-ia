@@ -658,5 +658,41 @@
     ],
     "status": "pendente",
     "criado_em": "2026-09-15T19:57:07.946Z"
+  },
+  {
+    "slug": "delta-propoe-ambiente-multiplayer-para-programar-em-conjunto-com-agentes-de-ia",
+    "titulo": "Delta propõe ambiente multiplayer para programar em conjunto com agentes de IA",
+    "resumo": "Novo projeto quer transformar a codificação assistida por IA em uma experiência colaborativa, com humanos e múltiplos agentes trabalhando juntos em tempo real.",
+    "imagens": [
+      "https://promptmidia.com.br/carrossel/delta-propoe-ambiente-multiplayer-para-programar-em-conjunto-com-agentes-de-ia/slide-1-capa.png",
+      "https://promptmidia.com.br/carrossel/delta-propoe-ambiente-multiplayer-para-programar-em-conjunto-com-agentes-de-ia/slide-2-resumo.png",
+      "https://promptmidia.com.br/carrossel/delta-propoe-ambiente-multiplayer-para-programar-em-conjunto-com-agentes-de-ia/slide-3-cta.png"
+    ],
+    "status": "pendente",
+    "criado_em": "2026-09-16T15:45:39.757Z"
+  },
+  {
+    "slug": "lider-do-projeto-de-linux-para-ps5-abandona-iniciativa-e-critica-invasao-de-inic",
+    "titulo": "Líder do projeto de Linux para PS5 abandona iniciativa e critica invasão de 'iniciantes' usando IA",
+    "resumo": "Desenvolvedor à frente do esforço para rodar Linux no PS5 anuncia saída e diz que projetos open source estão sendo tomados por gente que usa LLMs sem entender o que está fazendo.",
+    "imagens": [
+      "https://promptmidia.com.br/carrossel/lider-do-projeto-de-linux-para-ps5-abandona-iniciativa-e-critica-invasao-de-inic/slide-1-capa.png",
+      "https://promptmidia.com.br/carrossel/lider-do-projeto-de-linux-para-ps5-abandona-iniciativa-e-critica-invasao-de-inic/slide-2-resumo.png",
+      "https://promptmidia.com.br/carrossel/lider-do-projeto-de-linux-para-ps5-abandona-iniciativa-e-critica-invasao-de-inic/slide-3-cta.png"
+    ],
+    "status": "pendente",
+    "criado_em": "2026-09-16T15:45:39.913Z"
+  },
+  {
+    "slug": "microsoft-alerta-que-rival-anthropic-pode-causar-impacto-desastroso-a-humanidade",
+    "titulo": "Microsoft alerta que rival Anthropic pode causar 'impacto desastroso' à humanidade",
+    "resumo": "Declaração rara de uma gigante de tecnologia contra outra expõe tensões crescentes no mercado de inteligência artificial e no debate sobre riscos da tecnologia.",
+    "imagens": [
+      "https://promptmidia.com.br/carrossel/microsoft-alerta-que-rival-anthropic-pode-causar-impacto-desastroso-a-humanidade/slide-1-capa.png",
+      "https://promptmidia.com.br/carrossel/microsoft-alerta-que-rival-anthropic-pode-causar-impacto-desastroso-a-humanidade/slide-2-resumo.png",
+      "https://promptmidia.com.br/carrossel/microsoft-alerta-que-rival-anthropic-pode-causar-impacto-desastroso-a-humanidade/slide-3-cta.png"
+    ],
+    "status": "pendente",
+    "criado_em": "2026-09-16T15:45:40.053Z"
   }
 ]
