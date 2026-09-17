@@ -694,5 +694,41 @@
     ],
     "status": "pendente",
     "criado_em": "2026-09-16T15:45:40.053Z"
+  },
+  {
+    "slug": "agente-de-ia-gastou-5-bilhoes-de-tokens-tentando-montar-um-imperio-de-negocios-e",
+    "titulo": "Agente de IA gastou 5 bilhões de tokens tentando montar um 'império de negócios' — e faturou US$ 1,54",
+    "resumo": "Experimento com agente autônomo baseado em LLM rodou por três semanas simulando decisões empresariais, mas o resultado financeiro expõe o abismo entre autonomia de IA e geração real de valor.",
+    "imagens": [
+      "https://promptmidia.com.br/carrossel/agente-de-ia-gastou-5-bilhoes-de-tokens-tentando-montar-um-imperio-de-negocios-e/slide-1-capa.png",
+      "https://promptmidia.com.br/carrossel/agente-de-ia-gastou-5-bilhoes-de-tokens-tentando-montar-um-imperio-de-negocios-e/slide-2-resumo.png",
+      "https://promptmidia.com.br/carrossel/agente-de-ia-gastou-5-bilhoes-de-tokens-tentando-montar-um-imperio-de-negocios-e/slide-3-cta.png"
+    ],
+    "status": "pendente",
+    "criado_em": "2026-09-17T15:52:17.017Z"
+  },
+  {
+    "slug": "openai-usa-framework-sobre-desalinhamento-de-ia-para-influenciar-debate-global-d",
+    "titulo": "OpenAI usa framework sobre 'desalinhamento' de IA para influenciar debate global de governança, diz análise",
+    "resumo": "Artigo publicado no site Asia AI argumenta que a estrutura de segurança da OpenAI funciona como manobra estratégica para antecipar e moldar regras internacionais de IA antes que governos o façam.",
+    "imagens": [
+      "https://promptmidia.com.br/carrossel/openai-usa-framework-sobre-desalinhamento-de-ia-para-influenciar-debate-global-d/slide-1-capa.png",
+      "https://promptmidia.com.br/carrossel/openai-usa-framework-sobre-desalinhamento-de-ia-para-influenciar-debate-global-d/slide-2-resumo.png",
+      "https://promptmidia.com.br/carrossel/openai-usa-framework-sobre-desalinhamento-de-ia-para-influenciar-debate-global-d/slide-3-cta.png"
+    ],
+    "status": "pendente",
+    "criado_em": "2026-09-17T15:52:17.173Z"
+  },
+  {
+    "slug": "projeto-open-source-promete-criar-colegas-de-equipe-de-ia-com-computador-proprio",
+    "titulo": "Projeto open-source promete criar 'colegas de equipe' de IA com computador próprio",
+    "resumo": "Ferramenta divulgada no Hacker News propõe agentes de IA autônomos que operam em máquinas virtuais dedicadas, executando tarefas como se fossem membros reais de um time.",
+    "imagens": [
+      "https://promptmidia.com.br/carrossel/projeto-open-source-promete-criar-colegas-de-equipe-de-ia-com-computador-proprio/slide-1-capa.png",
+      "https://promptmidia.com.br/carrossel/projeto-open-source-promete-criar-colegas-de-equipe-de-ia-com-computador-proprio/slide-2-resumo.png",
+      "https://promptmidia.com.br/carrossel/projeto-open-source-promete-criar-colegas-de-equipe-de-ia-com-computador-proprio/slide-3-cta.png"
+    ],
+    "status": "pendente",
+    "criado_em": "2026-09-17T15:52:17.311Z"
   }
 ]
