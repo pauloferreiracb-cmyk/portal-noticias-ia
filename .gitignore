@@ -5,3 +5,6 @@ dist/
 .env
 output/carrossel/
 .DS_Store
+
+.vercel
+.env*
