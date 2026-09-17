@@ -1,0 +1,27 @@
+name: Gerar rascunhos de notícias
+
+on:
+  schedule:
+    - cron: "0 */3 * * *" # a cada 3 horas — ajuste a frequência conforme o volume desejado
+  workflow_dispatch: {} # permite disparar manualmente pela aba Actions do GitHub
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - run: npm ci
+
+      - name: Buscar fontes e criar rascunhos
+        run: npx tsx scripts/generate-news.ts
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          UNSPLASH_ACCESS_KEY: ${{ secrets.UNSPLASH_ACCESS_KEY }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }} # token automático do Actions, só precisa habilitar permissão de "issues: write"

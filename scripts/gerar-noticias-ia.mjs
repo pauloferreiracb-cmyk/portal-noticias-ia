@@ -26,6 +26,7 @@ import path from "node:path";
 import matter from "gray-matter";
 
 const CONTENT_DIR = path.join(process.cwd(), "src/content/noticias");
+const PUBLISHED_SOURCES_PATH = path.join(process.cwd(), "data/published-sources.json");
 const MAX_NOTICIAS = Number(process.env.MAX_NOTICIAS ?? 3);
 const MODEL = process.env.CLAUDE_MODEL ?? "claude-sonnet-5";
 const API_KEY = process.env.ANTHROPIC_API_KEY;
@@ -85,6 +86,29 @@ async function carregarFontesJaUsadas() {
     // pasta ainda não existe na primeira execução — tudo bem
   }
   return usadas;
+}
+
+// Grava a fonte_url em data/published-sources.json — o mesmo arquivo que
+// scripts/generate-news.ts lê pra não recriar rascunho de notícia já publicada
+// por este script. Lê o array atual, dá push e escreve de volta (read-modify-
+// write) a cada chamada, em vez de guardar uma cópia em memória durante todo
+// o loop — reduz a janela de sobrescrita caso outro processo grave o mesmo
+// arquivo entre duas iterações.
+async function registrarFontePublicada(url) {
+  let lista = [];
+  try {
+    const raw = await fs.readFile(PUBLISHED_SOURCES_PATH, "utf-8");
+    const parsed = JSON.parse(raw);
+    if (Array.isArray(parsed)) lista = parsed;
+  } catch {
+    // arquivo ainda não existe ou está vazio/corrompido — começa do zero
+  }
+
+  if (lista.includes(url)) return;
+  lista.push(url);
+
+  await fs.mkdir(path.dirname(PUBLISHED_SOURCES_PATH), { recursive: true });
+  await fs.writeFile(PUBLISHED_SOURCES_PATH, JSON.stringify(lista, null, 2) + "\n", "utf-8");
 }
 
 // ------------------------------------------------------------
@@ -270,6 +294,7 @@ async function main() {
       const conteudoFinal = matter.stringify(artigo.corpo, frontmatter);
       const caminho = path.join(CONTENT_DIR, `${slug}.md`);
       await fs.writeFile(caminho, conteudoFinal, "utf-8");
+      await registrarFontePublicada(item.link);
 
       console.log(`  -> salvo em ${caminho}`);
       sucesso++;
