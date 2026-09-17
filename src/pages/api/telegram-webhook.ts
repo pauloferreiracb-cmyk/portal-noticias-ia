@@ -1,28 +1,32 @@
-// api/telegram-webhook.ts
+// src/pages/api/telegram-webhook.ts
 //
-// Função serverless na Vercel (fica em /api na raiz do projeto — funciona
-// independente do Astro, não precisa de SSR habilitado no site).
-// Recebe o clique nos botões do Telegram e:
+// Endpoint de API do Astro (roda como serverless function — não é
+// prerenderizado). Recebe o clique nos botões do Telegram e:
 //  - "Publicar": pega o frontmatter + corpo salvos na Issue e cria o arquivo
 //    real no repo, em src/content/noticias/ (dispara o rebuild automático na
 //    Vercel)
 //  - "Descartar": só fecha a Issue
 
-import type { VercelRequest, VercelResponse } from "@vercel/node";
+import type { APIRoute } from "astro";
 import { Octokit } from "@octokit/rest";
+
+export const prerender = false;
 
 const octokit = new Octokit({ auth: process.env.GH_PAT! }); // PAT com escopo "repo"
 const owner = process.env.GH_OWNER!;
 const repo = process.env.GH_REPO!;
 
-export default async function handler(req: VercelRequest, res: VercelResponse) {
+export const POST: APIRoute = async ({ request }) => {
+  const url = new URL(request.url);
+
   // segredo simples na query string pra evitar que qualquer um acione o webhook
-  if (req.query.secret !== process.env.TELEGRAM_WEBHOOK_SECRET) {
-    return res.status(401).end();
+  if (url.searchParams.get("secret") !== process.env.TELEGRAM_WEBHOOK_SECRET) {
+    return new Response(null, { status: 401 });
   }
 
-  const callback = req.body?.callback_query;
-  if (!callback) return res.status(200).end(); // ignora updates que não são clique de botão
+  const body = await request.json().catch(() => null);
+  const callback = body?.callback_query;
+  if (!callback) return new Response(null, { status: 200 }); // ignora updates que não são clique de botão
 
   const [action, issueNumberStr] = (callback.data as string).split(":");
   const issueNumber = Number(issueNumberStr);
@@ -64,8 +68,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     await answerTelegram(callback.id, "Descartado.");
   }
 
-  return res.status(200).end();
-}
+  return new Response(null, { status: 200 });
+};
 
 async function appendPublishedUrl(url: string) {
   const path = "data/published-sources.json";
