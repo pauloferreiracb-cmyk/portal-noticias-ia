@@ -1126,5 +1126,77 @@
     ],
     "status": "pendente",
     "criado_em": "2026-09-19T15:01:54.113Z"
+  },
+  {
+    "slug": "bots-de-ia-sobrecarregam-sites-abertos-e-ameacam-o-proprio-creative-commons",
+    "titulo": "Bots de IA sobrecarregam sites abertos e ameaçam o próprio Creative Commons",
+    "resumo": "Crawlers que alimentam modelos de linguagem estão sufocando a infraestrutura de projetos como Wikimedia e Internet Archive, levando administradores a reconsiderar o acesso aberto que sustentou a web por décadas.",
+    "imagens": [
+      "https://promptmidia.com.br/carrossel/bots-de-ia-sobrecarregam-sites-abertos-e-ameacam-o-proprio-creative-commons/slide-1-capa.png",
+      "https://promptmidia.com.br/carrossel/bots-de-ia-sobrecarregam-sites-abertos-e-ameacam-o-proprio-creative-commons/slide-2-resumo.png",
+      "https://promptmidia.com.br/carrossel/bots-de-ia-sobrecarregam-sites-abertos-e-ameacam-o-proprio-creative-commons/slide-3-cta.png"
+    ],
+    "status": "pendente",
+    "criado_em": "2026-09-20T15:05:30.390Z"
+  },
+  {
+    "slug": "china-rebate-alertas-dos-eua-sobre-corrida-acelerada-da-ia",
+    "titulo": "China rebate alertas dos EUA sobre corrida acelerada da IA",
+    "resumo": "Pequim rejeita tom alarmista de Washington sobre riscos do desenvolvimento rápido de inteligência artificial e defende que a disputa tecnológica exige avanço, não freio. O embate expõe visões opostas sobre segurança e soberania digital.",
+    "imagens": [
+      "https://promptmidia.com.br/carrossel/china-rebate-alertas-dos-eua-sobre-corrida-acelerada-da-ia/slide-1-capa.png",
+      "https://promptmidia.com.br/carrossel/china-rebate-alertas-dos-eua-sobre-corrida-acelerada-da-ia/slide-2-resumo.png",
+      "https://promptmidia.com.br/carrossel/china-rebate-alertas-dos-eua-sobre-corrida-acelerada-da-ia/slide-3-cta.png"
+    ],
+    "status": "pendente",
+    "criado_em": "2026-09-20T15:05:30.546Z"
+  },
+  {
+    "slug": "google-lanca-orquestrador-aberto-para-agentes-de-ia-o-que-se-sabe-sobre-o-agente",
+    "titulo": "Google lança orquestrador aberto para agentes de IA: o que se sabe sobre o AgentExecutor",
+    "resumo": "Novo projeto promete facilitar a coordenação de múltiplos agentes de IA trabalhando juntos, em uma iniciativa de código aberto ligada ao Google.",
+    "imagens": [
+      "https://promptmidia.com.br/carrossel/google-lanca-orquestrador-aberto-para-agentes-de-ia-o-que-se-sabe-sobre-o-agente/slide-1-capa.png",
+      "https://promptmidia.com.br/carrossel/google-lanca-orquestrador-aberto-para-agentes-de-ia-o-que-se-sabe-sobre-o-agente/slide-2-resumo.png",
+      "https://promptmidia.com.br/carrossel/google-lanca-orquestrador-aberto-para-agentes-de-ia-o-que-se-sabe-sobre-o-agente/slide-3-cta.png"
+    ],
+    "status": "pendente",
+    "criado_em": "2026-09-20T15:05:30.681Z"
+  },
+  {
+    "slug": "governador-da-california-quer-botao-de-emergencia-para-desligar-ia",
+    "titulo": "Governador da Califórnia quer botão de emergência para desligar IA",
+    "resumo": "Gavin Newsom assinou ordem executiva que pode obrigar empresas de IA a instalar um 'kill switch' em seus modelos mais avançados. Grupo de especialistas tem dois meses para detalhar como a medida funcionaria na prática.",
+    "imagens": [
+      "https://promptmidia.com.br/carrossel/governador-da-california-quer-botao-de-emergencia-para-desligar-ia/slide-1-capa.png",
+      "https://promptmidia.com.br/carrossel/governador-da-california-quer-botao-de-emergencia-para-desligar-ia/slide-2-resumo.png",
+      "https://promptmidia.com.br/carrossel/governador-da-california-quer-botao-de-emergencia-para-desligar-ia/slide-3-cta.png"
+    ],
+    "status": "pendente",
+    "criado_em": "2026-09-20T15:05:30.815Z"
+  },
+  {
+    "slug": "ia-da-anthropic-ajuda-a-encontrar-colisoes-em-funcoes-hash-populares-independent",
+    "titulo": "IA da Anthropic ajuda a encontrar colisões em funções hash populares, independente da seed",
+    "resumo": "Um experimento usando o modelo Claude revelou que hashes amplamente usados podem ter colisões que não dependem da seed escolhida — um achado que reacende debates sobre segurança em estruturas de dados.",
+    "imagens": [
+      "https://promptmidia.com.br/carrossel/ia-da-anthropic-ajuda-a-encontrar-colisoes-em-funcoes-hash-populares-independent/slide-1-capa.png",
+      "https://promptmidia.com.br/carrossel/ia-da-anthropic-ajuda-a-encontrar-colisoes-em-funcoes-hash-populares-independent/slide-2-resumo.png",
+      "https://promptmidia.com.br/carrossel/ia-da-anthropic-ajuda-a-encontrar-colisoes-em-funcoes-hash-populares-independent/slide-3-cta.png"
+    ],
+    "status": "pendente",
+    "criado_em": "2026-09-20T15:05:30.941Z"
+  },
+  {
+    "slug": "processo-acusa-anthropic-openai-xai-e-google-de-combinarem-desaceleracao-ilegal-",
+    "titulo": "Processo acusa Anthropic, OpenAI, xAI e Google de combinarem desaceleração ilegal no desenvolvimento de IA",
+    "resumo": "Ação judicial nos EUA alega que as quatro gigantes de inteligência artificial fecharam um acordo antitruste para frear avanços na área, usando preocupações de segurança como justificativa.",
+    "imagens": [
+      "https://promptmidia.com.br/carrossel/processo-acusa-anthropic-openai-xai-e-google-de-combinarem-desaceleracao-ilegal-/slide-1-capa.png",
+      "https://promptmidia.com.br/carrossel/processo-acusa-anthropic-openai-xai-e-google-de-combinarem-desaceleracao-ilegal-/slide-2-resumo.png",
+      "https://promptmidia.com.br/carrossel/processo-acusa-anthropic-openai-xai-e-google-de-combinarem-desaceleracao-ilegal-/slide-3-cta.png"
+    ],
+    "status": "pendente",
+    "criado_em": "2026-09-20T15:05:31.074Z"
   }
 ]
