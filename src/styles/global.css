@@ -10,6 +10,35 @@
   --fonte-titulo: 'Space Grotesk', var(--fonte);
   --fonte-mono: 'JetBrains Mono', 'DM Mono', 'SFMono-Regular', Consolas, monospace;
   --raio: 12px;
+
+  /* tema de leitura — padrão claro (sem preferência salva) */
+  --leitura-bg: #F4F6F9;
+  --leitura-bloco: #E8ECF2;
+  --leitura-texto: #141A28;
+  --leitura-titulo: #0A0E17;
+  --leitura-meta: #5B6577;
+  --leitura-link: #7000FF;
+  --leitura-borda: #D5DBE6;
+}
+
+[data-theme="claro"] {
+  --leitura-bg: #F4F6F9;
+  --leitura-bloco: #E8ECF2;
+  --leitura-texto: #141A28;
+  --leitura-titulo: #0A0E17;
+  --leitura-meta: #5B6577;
+  --leitura-link: #7000FF;
+  --leitura-borda: #D5DBE6;
+}
+
+[data-theme="escuro"] {
+  --leitura-bg: #141A28;
+  --leitura-bloco: #232B3D;
+  --leitura-texto: #C9D1DE;
+  --leitura-titulo: #F4F6F9;
+  --leitura-meta: #8B95A5;
+  --leitura-link: #00F0FF;
+  --leitura-borda: #232B3D;
 }
 
 * { box-sizing: border-box; }

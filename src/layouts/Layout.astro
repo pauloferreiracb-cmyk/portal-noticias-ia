@@ -9,9 +9,19 @@ interface Props {
 const { titulo, descricao = 'Notícias de IA, direto ao ponto.', largura = 'normal' } = Astro.props;
 ---
 <!doctype html>
-<html lang="pt-BR" data-theme="dark">
+<html lang="pt-BR">
   <head>
     <meta charset="UTF-8" />
+    <script is:inline>
+      (function () {
+        try {
+          var tema = localStorage.getItem('leitura-tema') || 'claro';
+          document.documentElement.setAttribute('data-theme', tema);
+        } catch (e) {
+          document.documentElement.setAttribute('data-theme', 'claro');
+        }
+      })();
+    </script>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="color-scheme" content="dark" />
     <title>{titulo}</title>
