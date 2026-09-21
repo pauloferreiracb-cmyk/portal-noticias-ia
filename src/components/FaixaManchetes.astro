@@ -1,0 +1,179 @@
+---
+import { getCollection } from 'astro:content';
+
+const QUARENTA_E_OITO_HORAS = 48 * 60 * 60 * 1000;
+
+const todas = await getCollection('noticias');
+const ordenadas = todas.sort((a, b) => b.data.data.valueOf() - a.data.data.valueOf());
+
+const recentes48h = ordenadas.filter((a) => Date.now() - a.data.data.valueOf() <= QUARENTA_E_OITO_HORAS);
+
+const usarRecentes = recentes48h.length >= 3;
+const manchetes = (usarRecentes ? recentes48h : ordenadas).slice(0, 8);
+const rotulo = usarRecentes ? 'AGORA' : 'ÚLTIMAS';
+---
+{manchetes.length > 0 && (
+  <div class="faixa-manchetes" id="faixa-manchetes">
+    <span class="faixa-rotulo">{rotulo}</span>
+
+    <div class="faixa-viewport">
+      <div class="faixa-trilha">
+        <div class="faixa-copia">
+          {manchetes.map((m) => (
+            <>
+              <a href={`/noticias/${m.slug}`} class="faixa-link">{m.data.titulo}</a>
+              <span class="faixa-separador" aria-hidden="true">/</span>
+            </>
+          ))}
+        </div>
+        <div class="faixa-copia" aria-hidden="true" tabindex="-1" inert>
+          {manchetes.map((m) => (
+            <>
+              <a href={`/noticias/${m.slug}`} class="faixa-link" tabindex="-1">{m.data.titulo}</a>
+              <span class="faixa-separador" aria-hidden="true">/</span>
+            </>
+          ))}
+        </div>
+      </div>
+    </div>
+
+    <button type="button" id="faixa-pausa" class="faixa-pausa" aria-pressed="false" aria-label="Pausar manchetes">
+      <svg class="faixa-icone-pausar" viewBox="0 0 16 16" width="12" height="12" aria-hidden="true">
+        <rect x="3" y="2" width="3" height="12" fill="currentColor" />
+        <rect x="10" y="2" width="3" height="12" fill="currentColor" />
+      </svg>
+      <svg class="faixa-icone-retomar" viewBox="0 0 16 16" width="12" height="12" aria-hidden="true">
+        <polygon points="4,2 14,8 4,14" fill="currentColor" />
+      </svg>
+    </button>
+  </div>
+)}
+
+<script>
+  const faixa = document.getElementById('faixa-manchetes');
+  const botao = document.getElementById('faixa-pausa');
+
+  botao?.addEventListener('click', () => {
+    const pausado = faixa?.classList.toggle('pausado');
+    botao.setAttribute('aria-pressed', pausado ? 'true' : 'false');
+    botao.setAttribute('aria-label', pausado ? 'Retomar manchetes' : 'Pausar manchetes');
+  });
+</script>
+
+<style>
+  .faixa-manchetes {
+    display: flex;
+    align-items: stretch;
+    height: 36px;
+    background: var(--faixa-bg);
+    border-bottom: 1px solid var(--faixa-borda);
+    --faixa-duracao: 60s;
+  }
+
+  .faixa-rotulo {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    height: 100%;
+    padding: 0 14px;
+    background: #D90429;
+    color: #FFFFFF;
+    font-family: var(--fonte-mono);
+    font-weight: 700;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    white-space: nowrap;
+  }
+
+  .faixa-viewport {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+  }
+
+  .faixa-trilha {
+    display: flex;
+    width: max-content;
+    height: 100%;
+    animation: faixa-rolar var(--faixa-duracao) linear infinite;
+  }
+
+  .faixa-manchetes:hover .faixa-trilha,
+  .faixa-manchetes:focus-within .faixa-trilha,
+  .faixa-manchetes.pausado .faixa-trilha {
+    animation-play-state: paused;
+  }
+
+  .faixa-copia {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+    white-space: nowrap;
+  }
+
+  .faixa-link {
+    font-family: Inter, ui-sans-serif, system-ui, -apple-system, sans-serif;
+    font-size: 14px;
+    color: var(--faixa-texto);
+    text-decoration: none;
+    padding: 0 10px;
+  }
+  .faixa-link:hover,
+  .faixa-link:focus-visible {
+    text-decoration: underline;
+  }
+  .faixa-link:focus-visible {
+    outline: 2px solid #00F0FF;
+    outline-offset: -2px;
+  }
+
+  .faixa-separador {
+    font-family: var(--fonte-mono);
+    color: var(--faixa-separador);
+  }
+
+  .faixa-pausa {
+    flex-shrink: 0;
+    align-self: center;
+    width: 32px;
+    height: 32px;
+    margin-right: 2px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: 1px solid #00F0FF;
+    border-radius: 0;
+    color: #00F0FF;
+    cursor: pointer;
+  }
+  .faixa-pausa:focus-visible {
+    outline: 2px solid #00F0FF;
+    outline-offset: 2px;
+  }
+
+  .faixa-icone-retomar { display: none; }
+  .faixa-manchetes.pausado .faixa-icone-pausar { display: none; }
+  .faixa-manchetes.pausado .faixa-icone-retomar { display: block; }
+
+  @keyframes faixa-rolar {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .faixa-trilha {
+      animation: none;
+    }
+    .faixa-viewport {
+      overflow-x: auto;
+    }
+    .faixa-copia:last-child {
+      display: none;
+    }
+    .faixa-pausa {
+      display: none;
+    }
+  }
+</style>

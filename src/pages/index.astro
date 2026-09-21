@@ -10,22 +10,17 @@ export const prerender = true;
 const todas = await getCollection('noticias');
 const ordenadas = todas.sort((a, b) => b.data.data.valueOf() - a.data.data.valueOf());
 
-// Bloco de destaque: hero (mais recente) + 2 colunas secundárias com 3 cards cada
+// Bloco de destaque: hero (mais recente) + grade de 6 cards secundários (2 colunas x 3 linhas)
 const [lead, ...resto] = ordenadas;
-const coluna1 = resto.slice(0, 3);
-const coluna2 = resto.slice(3, 6);
-const relacionados = resto.slice(6, 9).map((a) => ({
-  slug: a.slug,
-  titulo: a.data.titulo,
-  fonte_nome: a.data.fonte_nome,
-}));
+const gradeDestaque = resto.slice(0, 6);
+const relacionados = resto.slice(6, 9);
 
 // Notícias mais antigas: grid simples abaixo do bloco de destaque
 const grid = resto.slice(9);
 
 const categorias = [...new Set(ordenadas.flatMap((a) => a.data.tags))].slice(0, 6);
 ---
-<Layout titulo="Prompt Mídia — Notícias de IA, direto ao ponto" largura="larga">
+<Layout titulo="Prompt Mídia — Notícias de IA, direto ao ponto" largura="larga" faixaManchetes>
   {categorias.length > 0 && (
     <nav class="categorias">
       {categorias.map((c) => <span class="categoria-chip">{c}</span>)}
@@ -35,11 +30,8 @@ const categorias = [...new Set(ordenadas.flatMap((a) => a.data.tags))].slice(0, 
   {lead && (
     <div class="destaque-grid">
       <NewsCard artigo={lead} variante="hero" relacionados={relacionados} />
-      <div class="coluna-secundaria">
-        {coluna1.map((artigo) => <NewsCard artigo={artigo} variante="secundaria" />)}
-      </div>
-      <div class="coluna-secundaria">
-        {coluna2.map((artigo) => <NewsCard artigo={artigo} variante="secundaria" />)}
+      <div class="grade-destaque">
+        {gradeDestaque.map((artigo) => <NewsCard artigo={artigo} variante="secundaria" />)}
       </div>
     </div>
   )}
@@ -49,12 +41,15 @@ const categorias = [...new Set(ordenadas.flatMap((a) => a.data.tags))].slice(0, 
     texto="Um resumo por semana, direto na sua caixa de entrada."
   />
 
-  <AdSlot id="home-topo" />
+  {import.meta.env.DEV && <AdSlot id="home-topo" />}
 
   {grid.length > 0 && (
-    <div class="grid">
-      {grid.map((artigo) => <NewsCard artigo={artigo} variante="grade" />)}
-    </div>
+    <section class="secao-ultimas">
+      <h2 class="secao-ultimas__titulo">&gt; ÚLTIMAS</h2>
+      <div class="lista-compacta">
+        {grid.map((artigo) => <NewsCard artigo={artigo} variante="grade" />)}
+      </div>
+    </section>
   )}
 
   {todas.length === 0 && (

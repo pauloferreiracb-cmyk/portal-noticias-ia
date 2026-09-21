@@ -1,0 +1,73 @@
+---
+import { getCollection, type CollectionEntry } from 'astro:content';
+import Layout from '../../layouts/Layout.astro';
+import NewsCard from '../../components/NewsCard.astro';
+import { slugify } from '../../utils/slug';
+
+export const prerender = true;
+
+export async function getStaticPaths() {
+  const artigos = await getCollection('noticias');
+  const tagsPorSlug = new Map<string, string>();
+
+  for (const artigo of artigos) {
+    for (const nomeTag of artigo.data.tags) {
+      const slug = slugify(nomeTag);
+      if (slug && !tagsPorSlug.has(slug)) tagsPorSlug.set(slug, nomeTag);
+    }
+  }
+
+  return Array.from(tagsPorSlug.entries()).map(([slug, nomeTag]) => ({
+    params: { tag: slug },
+    props: { nomeTag },
+  }));
+}
+
+interface Props {
+  nomeTag: string;
+}
+const { nomeTag } = Astro.props;
+const { tag } = Astro.params;
+
+const todas = await getCollection('noticias');
+const artigos: CollectionEntry<'noticias'>[] = todas
+  .filter((artigo) => artigo.data.tags.some((t) => slugify(t) === tag))
+  .sort((a, b) => b.data.data.valueOf() - a.data.data.valueOf());
+
+const canonical = new URL(`/tag/${tag}/`, Astro.site ?? Astro.url.origin).toString();
+const descricao = `Notícias sobre ${nomeTag} — Prompt Mídia.`;
+---
+<Layout
+  titulo={`Notícias sobre ${nomeTag} | Prompt Mídia`}
+  descricao={descricao}
+  canonical={canonical}
+  largura="larga"
+  noindex={artigos.length < 3}
+>
+  <div class="cabecalho-tag">
+    <h1>Notícias sobre {nomeTag}</h1>
+    <p class="contagem-tag">{artigos.length} {artigos.length === 1 ? 'artigo' : 'artigos'}</p>
+  </div>
+
+  {artigos.length > 0 && (
+    <div class="lista-compacta">
+      {artigos.map((artigo) => <NewsCard artigo={artigo} variante="grade" />)}
+    </div>
+  )}
+
+  {artigos.length === 0 && <p>Nenhuma notícia com essa tag ainda.</p>}
+
+  <p class="voltar-home"><a href="/">Ver todas as notícias</a></p>
+</Layout>
+
+<style>
+  .cabecalho-tag { padding: 24px 0 8px; }
+  .contagem-tag {
+    font-family: var(--fonte-mono);
+    font-size: 0.8rem;
+    color: var(--texto-suave);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  .voltar-home { margin-top: 24px; }
+</style>

@@ -4,6 +4,7 @@ import Layout from '../../layouts/Layout.astro';
 import EmailCapture from '../../components/EmailCapture.astro';
 import AdSlot from '../../components/AdSlot.astro';
 import { resolveCapa } from '../../lib/capa';
+import { slugify } from '../../utils/slug';
 
 export const prerender = true;
 
@@ -29,7 +30,7 @@ const dataFormatada = new Intl.DateTimeFormat('pt-BR', {
 
 const imagemCapa = resolveCapa(artigo);
 ---
-<Layout titulo={`${titulo} — Prompt Mídia`} descricao={resumo}>
+<Layout titulo={`${titulo} — Prompt Mídia`} descricao={resumo} paginaLeitura>
   <article class="leitura">
     <button id="leitura-toggle" type="button" class="leitura-toggle" aria-label="Alternar tema de leitura">
       ESCURO
@@ -46,22 +47,28 @@ const imagemCapa = resolveCapa(artigo);
       </div>
     )}
     <h1>{titulo}</h1>
-    <div class="meta">
-      {tags.map((t: string) => <span class="tag">{t}</span>)}
-      {dataFormatada}
+    <div class="tags-artigo">
+      {tags.map((t: string) => (
+        <a href={`/tag/${slugify(t)}/`} class="tag-leitura">{t}</a>
+      ))}
     </div>
+    <div class="data-artigo">{dataFormatada}</div>
 
-    <AdSlot id="artigo-topo" />
-
-    <div class="leitura-corpo">
+    <div class="leitura-corpo" id="leitura-corpo">
       <Content />
     </div>
+
+    {import.meta.env.DEV && (
+      <div id="anuncio-meio-artigo" class="anuncio-leitura" hidden>
+        espaço reservado para anúncio
+      </div>
+    )}
 
     <p class="leitura-corpo">
       Fonte original: <a href={fonte_url} target="_blank" rel="noopener">{fonte_nome}</a>
     </p>
 
-    <AdSlot id="artigo-fim" />
+    {import.meta.env.DEV && <AdSlot id="artigo-fim" />}
 
     <!-- captura de e-mail no fim do artigo -->
     <EmailCapture />
@@ -88,12 +95,24 @@ const imagemCapa = resolveCapa(artigo);
     localStorage.setItem('leitura-tema', atual);
     aplicar(atual);
   });
+
+  const anuncio = document.getElementById('anuncio-meio-artigo');
+  if (anuncio) {
+    const corpo = document.getElementById('leitura-corpo');
+    const paragrafos = corpo ? Array.from(corpo.children).filter((el) => el.tagName === 'P') : [];
+    const alvo = paragrafos[1];
+    if (alvo) {
+      alvo.insertAdjacentElement('afterend', anuncio);
+    } else if (corpo) {
+      corpo.appendChild(anuncio);
+    }
+    anuncio.hidden = false;
+  }
 </script>
 
 <style>
   .leitura {
-    background: var(--leitura-bg);
-    color: var(--leitura-texto);
+    border: 1px solid var(--leitura-borda);
     padding: 28px;
     max-width: 68ch;
     margin: 0 auto;
@@ -103,9 +122,60 @@ const imagemCapa = resolveCapa(artigo);
     color: var(--leitura-titulo);
   }
 
-  .leitura .meta {
+  .tags-artigo {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 14px;
+  }
+
+  .tag-leitura {
+    display: inline-block;
+    border: 1px solid var(--leitura-link);
+    color: var(--leitura-link);
+    font-family: var(--fonte-mono);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 10px 12px;
+    line-height: 1.2;
+    text-decoration: none;
+  }
+
+  .tag-leitura:hover,
+  .tag-leitura:focus-visible {
+    background: var(--leitura-link);
+    color: var(--leitura-bg);
+    text-decoration: none;
+  }
+
+  .tag-leitura:focus-visible {
+    outline: 2px solid var(--leitura-link);
+    outline-offset: 2px;
+  }
+
+  .data-artigo {
+    font-family: var(--fonte-mono);
+    font-size: 12px;
+    color: var(--leitura-meta);
+    white-space: nowrap;
+    margin-top: 10px;
+  }
+
+  .anuncio-leitura {
+    min-height: 100px;
+    border: 1px solid var(--leitura-borda);
+    border-radius: 0;
+    background: var(--leitura-bloco);
     color: var(--leitura-meta);
     font-family: var(--fonte-mono);
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 24px 0;
   }
 
   .leitura-toggle {

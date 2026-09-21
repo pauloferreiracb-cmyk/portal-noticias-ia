@@ -1,19 +1,14 @@
 ---
 import type { CollectionEntry } from 'astro:content';
 import { resolveCapa } from '../lib/capa';
-
-interface Relacionado {
-  slug: string;
-  titulo: string;
-  fonte_nome: string;
-}
+import NewsCard from './NewsCard.astro';
 
 interface Props {
   artigo: CollectionEntry<'noticias'>;
   // hero = destaque grande à esquerda; secundaria = coluna lateral (thumb + texto lado a lado);
   // grade = grid simples abaixo (capa em cima, texto embaixo)
   variante?: 'hero' | 'secundaria' | 'grade';
-  relacionados?: Relacionado[];
+  relacionados?: CollectionEntry<'noticias'>[];
 }
 
 const { artigo, variante = 'grade', relacionados = [] } = Astro.props;
@@ -26,7 +21,34 @@ const ehExclusivo = tags.some((t) => t.toLowerCase().includes('exclusiv'));
 const href = `/noticias/${artigo.slug}`;
 
 const TituloTag = variante === 'hero' ? 'h1' : 'h2';
+
+const MESES_ABREV = ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez'];
+const dataCurta = `${String(data.getDate()).padStart(2, '0')} ${MESES_ABREV[data.getMonth()]}`;
+const dataIso = data.toISOString();
 ---
+{variante === 'grade' ? (
+  <a class="card-compacto" href={href}>
+    {capa && (
+      <img
+        src={capa.src}
+        alt=""
+        class="card-compacto__img"
+        width="96"
+        height="72"
+        loading="lazy"
+      />
+    )}
+    <div class="card-compacto__corpo">
+      <div class="card-compacto__meta">
+        {categoria && <span class="card-compacto__tag">{categoria}</span>}
+        {categoria && <span class="card-compacto__separador"> · </span>}
+        <time class="card-compacto__tempo" datetime={dataIso} data-tempo-relativo={dataIso}>{dataCurta}</time>
+      </div>
+      <h2 class="card-compacto__titulo">{titulo}</h2>
+      <div class="card-compacto__fonte">{fonte_nome}</div>
+    </div>
+  </a>
+) : (
 <article class={`noticia-card noticia-card--${variante}`}>
   <a class="noticia-card__link" href={href}>
     {capa && (
@@ -58,10 +80,32 @@ const TituloTag = variante === 'hero' ? 'h1' : 'h2';
   )}
 
   {variante === 'hero' && relacionados.length > 0 && (
-    <ul class="relacionados">
-      {relacionados.map((r) => (
-        <li><a href={`/noticias/${r.slug}`}>{r.titulo} <span class="fonte">{r.fonte_nome}</span></a></li>
-      ))}
-    </ul>
+    <div class="relacionados-compactos">
+      {relacionados.map((r) => <NewsCard artigo={r} variante="grade" />)}
+    </div>
   )}
 </article>
+)}
+
+<script>
+  const MINUTO = 60_000;
+  const HORA = 60 * MINUTO;
+  const DIA = 24 * HORA;
+
+  function rotular(diffMs: number): string | null {
+    if (diffMs >= 7 * DIA) return null;
+    if (diffMs < MINUTO) return 'agora';
+    if (diffMs < HORA) return `há ${Math.floor(diffMs / MINUTO)} min`;
+    if (diffMs < DIA) return `há ${Math.floor(diffMs / HORA)} h`;
+    const dias = Math.floor(diffMs / DIA);
+    return `há ${dias} ${dias === 1 ? 'dia' : 'dias'}`;
+  }
+
+  document.querySelectorAll<HTMLTimeElement>('[data-tempo-relativo]').forEach((el) => {
+    const iso = el.getAttribute('data-tempo-relativo');
+    if (!iso) return;
+    const diff = Date.now() - new Date(iso).getTime();
+    const rotulo = rotular(diff);
+    if (rotulo) el.textContent = rotulo;
+  });
+</script>

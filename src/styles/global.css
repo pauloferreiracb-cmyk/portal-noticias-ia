@@ -19,6 +19,12 @@
   --leitura-meta: #5B6577;
   --leitura-link: #7000FF;
   --leitura-borda: #D5DBE6;
+
+  /* faixa de manchetes (home) — versão B: escura com rótulo vermelho */
+  --faixa-bg: #141A28;
+  --faixa-texto: #F4F6F9;
+  --faixa-separador: #00F0FF;
+  --faixa-borda: #232B3D;
 }
 
 [data-theme="claro"] {
@@ -63,13 +69,30 @@ h1, h2, h3 { font-family: var(--fonte-titulo); font-weight: 700; letter-spacing:
 
 img { max-width: 100%; height: auto; border-radius: var(--raio); }
 
-.cabecalho {
+.cabecalho-full {
+  background: var(--bg);
+  border-bottom: 1px solid var(--borda);
+}
+
+.cabecalho-inner {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 20px 0;
-  border-bottom: 1px solid var(--borda);
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 20px 16px;
 }
+.cabecalho-inner.largo { max-width: 1180px; }
+
+body.pagina-leitura {
+  background: var(--leitura-bg);
+  color: var(--leitura-texto);
+}
+body.pagina-leitura .rodape {
+  color: var(--leitura-meta);
+  border-top-color: var(--leitura-borda);
+}
+body.pagina-leitura .rodape a { color: var(--leitura-link); }
 
 .logo {
   font-weight: 800;
@@ -246,6 +269,17 @@ img { max-width: 100%; height: auto; border-radius: var(--raio); }
 .noticia-card--secundaria .noticia-card__titulo { font-size: 0.9rem; line-height: 1.3; }
 .noticia-card--secundaria .noticia-card__meta { padding-top: 4px; }
 
+@media (min-width: 900px) {
+  /* desktop: a miniatura passa a ocupar a altura toda do card (a grade estica pra bater com o hero) */
+  .noticia-card--secundaria .noticia-card__capa-wrap { height: 100%; aspect-ratio: unset; }
+  .noticia-card--secundaria .noticia-card__titulo {
+    display: -webkit-box;
+    -webkit-line-clamp: 4;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+}
+
 /* grade — grid simples com notícias mais antigas */
 .noticia-card--grade .noticia-card__capa-wrap { aspect-ratio: 16 / 10; }
 .noticia-card--grade .noticia-card__corpo { padding: 16px; gap: 8px; }
@@ -269,37 +303,39 @@ img { max-width: 100%; height: auto; border-radius: var(--raio); }
 }
 .tag-solida--ciano { background: var(--acento); }
 
-/* ===== Bloco de destaque: hero + 2 colunas secundárias ===== */
+/* ===== Bloco de destaque: hero + grade de 6 cards secundários ===== */
 .destaque-grid {
   display: grid;
-  grid-template-columns: 2fr 1fr 1fr;
+  grid-template-columns: 1fr 1fr;
   gap: 24px;
-  align-items: start;
+  align-items: stretch;
   padding: 28px 0;
   margin-bottom: 8px;
   border-bottom: 1px solid var(--borda);
 }
-.coluna-secundaria { display: flex; flex-direction: column; gap: 14px; }
+/* mobile: 6 cards empilhados numa coluna só */
+.grade-destaque { display: flex; flex-direction: column; gap: 14px; }
 
-.relacionados {
-  list-style: none;
+@media (min-width: 900px) {
+  /* desktop: grid 2x3 esticada pra bater a base com o hero — 6 cards com a mesma altura */
+  .grade-destaque {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: repeat(3, 1fr);
+    grid-auto-flow: column;
+    gap: 14px 24px;
+    height: 100%;
+  }
+}
+
+.relacionados-compactos {
   margin: 16px 0 0;
-  padding: 14px 0 0;
+  padding-top: 14px;
   border-top: 1px solid var(--borda);
   display: flex;
   flex-direction: column;
-  gap: 9px;
 }
-.relacionados a { color: var(--texto); font-size: 0.86rem; font-weight: 500; }
-.relacionados a:hover { color: var(--acento); }
-.relacionados .fonte {
-  font-family: var(--fonte-mono);
-  font-size: 0.66rem;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-  color: var(--texto-suave);
-  margin-left: 6px;
-}
+.relacionados-compactos .card-compacto:last-child { border-bottom: none; }
 
 .credito-foto {
   display: block;
@@ -320,8 +356,88 @@ img { max-width: 100%; height: auto; border-radius: var(--raio); }
 }
 .capa-artigo-wrap { margin-bottom: 20px; }
 
+/* ===== Seção "Últimas" — lista compacta abaixo do destaque ===== */
+.secao-ultimas { margin-top: 8px; }
+.secao-ultimas__titulo {
+  font-family: var(--fonte-mono);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--acento);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin: 0;
+  padding-bottom: 10px;
+  border-bottom: 2px solid var(--borda);
+}
+
+.lista-compacta { display: flex; flex-direction: column; }
+
+.card-compacto {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  min-height: 44px;
+  padding: 14px 4px;
+  border-bottom: 1px solid var(--borda);
+  border-left: 2px solid transparent;
+  color: inherit;
+  text-decoration: none;
+}
+.lista-compacta .card-compacto:last-child { border-bottom: none; }
+
+.card-compacto:hover,
+.card-compacto:focus-visible {
+  background: var(--bg-elevado);
+  border-left-color: var(--acento);
+  text-decoration: none;
+}
+.card-compacto:focus-visible {
+  outline: 2px solid var(--acento);
+  outline-offset: -2px;
+}
+
+.card-compacto__img {
+  width: 96px;
+  height: 72px;
+  object-fit: cover;
+  border-radius: 0;
+  flex-shrink: 0;
+  display: block;
+}
+
+.card-compacto__corpo { flex: 1; min-width: 0; }
+
+.card-compacto__meta {
+  font-family: var(--fonte-mono);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  margin-bottom: 4px;
+}
+.card-compacto__tag { color: var(--acento); text-transform: uppercase; }
+.card-compacto__separador,
+.card-compacto__tempo { color: var(--texto-suave); }
+
+.card-compacto__titulo {
+  font-family: var(--fonte-titulo);
+  font-weight: 600;
+  font-size: 17px;
+  line-height: 1.3;
+  color: var(--texto);
+  margin: 0 0 4px;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.card-compacto__fonte {
+  font-family: var(--fonte-mono);
+  font-size: 11px;
+  color: var(--texto-suave);
+}
+
 @media (max-width: 900px) {
-  /* mobile: uma coluna só, ordem hero → coluna 1 → coluna 2 (já é a ordem no DOM) */
+  /* mobile: uma coluna só, hero em cima e a grade de 6 cards empilhada embaixo */
   .destaque-grid { grid-template-columns: 1fr; }
   .noticia-card--hero .noticia-card__titulo { font-size: 1.5rem; }
 }

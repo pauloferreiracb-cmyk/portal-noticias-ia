@@ -1,12 +1,25 @@
 ---
 import '../styles/global.css';
+import FaixaManchetes from '../components/FaixaManchetes.astro';
 
 interface Props {
   titulo: string;
   descricao?: string;
   largura?: 'normal' | 'larga';
+  canonical?: string;
+  paginaLeitura?: boolean;
+  faixaManchetes?: boolean;
+  noindex?: boolean;
 }
-const { titulo, descricao = 'Notícias de IA, direto ao ponto.', largura = 'normal' } = Astro.props;
+const {
+  titulo,
+  descricao = 'Notícias de IA, direto ao ponto.',
+  largura = 'normal',
+  canonical,
+  paginaLeitura = false,
+  faixaManchetes = false,
+  noindex = false,
+} = Astro.props;
 ---
 <!doctype html>
 <html lang="pt-BR">
@@ -26,6 +39,8 @@ const { titulo, descricao = 'Notícias de IA, direto ao ponto.', largura = 'norm
     <meta name="color-scheme" content="dark" />
     <title>{titulo}</title>
     <meta name="description" content={descricao} />
+    {noindex && <meta name="robots" content="noindex, follow" />}
+    {canonical && <link rel="canonical" href={canonical} />}
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <!-- Tipografia da identidade (Space Grotesk / Inter / JetBrains Mono) -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -35,15 +50,18 @@ const { titulo, descricao = 'Notícias de IA, direto ao ponto.', largura = 'norm
       href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap"
     />
   </head>
-  <body>
-    <div class={`container ${largura === 'larga' ? 'largo' : ''}`}>
-      <header class="cabecalho">
+  <body class={paginaLeitura ? 'pagina-leitura' : ''}>
+    {faixaManchetes && <FaixaManchetes />}
+    <header class="cabecalho-full">
+      <div class={`cabecalho-inner ${largura === 'larga' ? 'largo' : ''}`}>
         <a href="/" class="logo"><span class="cursor">&gt;_</span>PROMPT<span class="midia"> MÍDIA</span></a>
         <nav>
           <a href="/links">Links</a>
         </nav>
-      </header>
+      </div>
+    </header>
 
+    <div class={`container ${largura === 'larga' ? 'largo' : ''}`}>
       <main>
         <slot />
       </main>
