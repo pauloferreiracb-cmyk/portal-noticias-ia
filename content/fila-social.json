@@ -1342,5 +1342,125 @@
     ],
     "status": "pendente",
     "criado_em": "2026-09-21T17:24:36.161Z"
+  },
+  {
+    "slug": "canada-cria-ecossistema-proprio-de-ia-para-uso-militar",
+    "titulo": "Canadá cria ecossistema próprio de IA para uso militar",
+    "resumo": "Governo de Ottawa avança em plano para desenvolver inteligência artificial soberana voltada às Forças Armadas, reduzindo dependência de fornecedores estrangeiros. A iniciativa mira tanto capacidade tecnológica quanto segurança nacional.",
+    "imagens": [
+      "https://promptmidia.com.br/carrossel/canada-cria-ecossistema-proprio-de-ia-para-uso-militar/slide-1-capa.png",
+      "https://promptmidia.com.br/carrossel/canada-cria-ecossistema-proprio-de-ia-para-uso-militar/slide-2-resumo.png",
+      "https://promptmidia.com.br/carrossel/canada-cria-ecossistema-proprio-de-ia-para-uso-militar/slide-3-cta.png"
+    ],
+    "status": "pendente",
+    "criado_em": "2026-09-22T15:56:39.577Z"
+  },
+  {
+    "slug": "como-pedir-a-agentes-de-ia-para-deixar-codigo-rust-mais-rapido-repetidamente",
+    "titulo": "Como pedir a agentes de IA para deixar código Rust mais rápido, repetidamente",
+    "resumo": "Um experimento mostra que insistir com agentes de IA para otimizar performance, ciclo após ciclo, pode gerar ganhos reais em código Rust — mas com armadilhas no caminho.",
+    "imagens": [
+      "https://promptmidia.com.br/carrossel/como-pedir-a-agentes-de-ia-para-deixar-codigo-rust-mais-rapido-repetidamente/slide-1-capa.png",
+      "https://promptmidia.com.br/carrossel/como-pedir-a-agentes-de-ia-para-deixar-codigo-rust-mais-rapido-repetidamente/slide-2-resumo.png",
+      "https://promptmidia.com.br/carrossel/como-pedir-a-agentes-de-ia-para-deixar-codigo-rust-mais-rapido-repetidamente/slide-3-cta.png"
+    ],
+    "status": "pendente",
+    "criado_em": "2026-09-22T15:56:39.686Z"
+  },
+  {
+    "slug": "eff-pede-que-corte-anule-restricao-que-impedia-gravar-agentes-de-imigracao-com-d",
+    "titulo": "EFF pede que corte anule restrição que impedia gravar agentes de imigração com drones",
+    "resumo": "Entidade de defesa de direitos digitais argumenta que restrição de voo criava zona de exclusão para jornalismo e fiscalização cidadã sobre ações do ICE.",
+    "imagens": [
+      "https://promptmidia.com.br/carrossel/eff-pede-que-corte-anule-restricao-que-impedia-gravar-agentes-de-imigracao-com-d/slide-1-capa.png",
+      "https://promptmidia.com.br/carrossel/eff-pede-que-corte-anule-restricao-que-impedia-gravar-agentes-de-imigracao-com-d/slide-2-resumo.png",
+      "https://promptmidia.com.br/carrossel/eff-pede-que-corte-anule-restricao-que-impedia-gravar-agentes-de-imigracao-com-d/slide-3-cta.png"
+    ],
+    "status": "pendente",
+    "criado_em": "2026-09-22T15:56:39.783Z"
+  },
+  {
+    "slug": "ia-turbina-tanto-o-codigo-que-virou-gargalo-empresa-reformula-seu-ci-do-zero",
+    "titulo": "IA turbina tanto o código que virou gargalo: empresa reformula seu CI do zero",
+    "resumo": "Com desenvolvedores usando IA para gerar código em volume inédito, a fila de testes e builds da Linear começou a travar o fluxo de trabalho. A solução exigiu repensar a arquitetura inteira do pipeline de integração contínua.",
+    "imagens": [
+      "https://promptmidia.com.br/carrossel/ia-turbina-tanto-o-codigo-que-virou-gargalo-empresa-reformula-seu-ci-do-zero/slide-1-capa.png",
+      "https://promptmidia.com.br/carrossel/ia-turbina-tanto-o-codigo-que-virou-gargalo-empresa-reformula-seu-ci-do-zero/slide-2-resumo.png",
+      "https://promptmidia.com.br/carrossel/ia-turbina-tanto-o-codigo-que-virou-gargalo-empresa-reformula-seu-ci-do-zero/slide-3-cta.png"
+    ],
+    "status": "pendente",
+    "criado_em": "2026-09-22T15:56:39.882Z"
+  },
+  {
+    "slug": "muse-assistente-de-ia-da-meta-com-acesso-privilegiado-tem-falha-grave-de-seguranca",
+    "titulo": "Muse, assistente de IA da Meta com acesso privilegiado, tem falha grave de segurança",
+    "resumo": "Pesquisadores encontraram uma vulnerabilidade zero-day no Muse que explora justamente os altos privilégios concedidos ao assistente dentro do ecossistema da Meta. A falha expõe dados e ações que deveriam estar protegidos.",
+    "imagens": [
+      "https://promptmidia.com.br/carrossel/muse-assistente-de-ia-da-meta-com-acesso-privilegiado-tem-falha-grave-de-seguranca/slide-1-capa.png",
+      "https://promptmidia.com.br/carrossel/muse-assistente-de-ia-da-meta-com-acesso-privilegiado-tem-falha-grave-de-seguranca/slide-2-resumo.png",
+      "https://promptmidia.com.br/carrossel/muse-assistente-de-ia-da-meta-com-acesso-privilegiado-tem-falha-grave-de-seguranca/slide-3-cta.png"
+    ],
+    "status": "pendente",
+    "criado_em": "2026-09-22T15:56:39.980Z"
+  },
+  {
+    "slug": "novo-app-de-ia-da-meta-o-muse-dispara-no-topo-das-lojas-de-aplicativos",
+    "titulo": "Novo app de IA da Meta, o Muse, dispara no topo das lojas de aplicativos",
+    "resumo": "Lançado recentemente, o aplicativo já aparece entre os mais baixados e coleciona avaliações positivas de usuários. O que explica a corrida pelo Muse?",
+    "imagens": [
+      "https://promptmidia.com.br/carrossel/novo-app-de-ia-da-meta-o-muse-dispara-no-topo-das-lojas-de-aplicativos/slide-1-capa.png",
+      "https://promptmidia.com.br/carrossel/novo-app-de-ia-da-meta-o-muse-dispara-no-topo-das-lojas-de-aplicativos/slide-2-resumo.png",
+      "https://promptmidia.com.br/carrossel/novo-app-de-ia-da-meta-o-muse-dispara-no-topo-das-lojas-de-aplicativos/slide-3-cta.png"
+    ],
+    "status": "pendente",
+    "criado_em": "2026-09-22T15:56:40.071Z"
+  },
+  {
+    "slug": "openai-cria-conselho-de-matematica-enquanto-sua-ia-resolve-100-problemas-abertos",
+    "titulo": "OpenAI cria conselho de matemática enquanto sua IA resolve 100 problemas abertos",
+    "resumo": "A empresa reuniu matemáticos renomados para acompanhar avanços da IA na área, mas o grupo não terá poder para frear ou redirecionar as pesquisas.",
+    "imagens": [
+      "https://promptmidia.com.br/carrossel/openai-cria-conselho-de-matematica-enquanto-sua-ia-resolve-100-problemas-abertos/slide-1-capa.png",
+      "https://promptmidia.com.br/carrossel/openai-cria-conselho-de-matematica-enquanto-sua-ia-resolve-100-problemas-abertos/slide-2-resumo.png",
+      "https://promptmidia.com.br/carrossel/openai-cria-conselho-de-matematica-enquanto-sua-ia-resolve-100-problemas-abertos/slide-3-cta.png"
+    ],
+    "status": "pendente",
+    "criado_em": "2026-09-22T15:56:40.162Z"
+  },
+  {
+    "slug": "presidente-da-finlandia-pede-controle-internacional-sobre-ia-de-fronteira",
+    "titulo": "Presidente da Finlândia pede controle internacional sobre IA de fronteira",
+    "resumo": "Alexander Stubb defende que os modelos mais avançados de inteligência artificial precisam de supervisão global antes que fiquem poderosos demais para conter. Ele compara o momento atual ao início da era nuclear.",
+    "imagens": [
+      "https://promptmidia.com.br/carrossel/presidente-da-finlandia-pede-controle-internacional-sobre-ia-de-fronteira/slide-1-capa.png",
+      "https://promptmidia.com.br/carrossel/presidente-da-finlandia-pede-controle-internacional-sobre-ia-de-fronteira/slide-2-resumo.png",
+      "https://promptmidia.com.br/carrossel/presidente-da-finlandia-pede-controle-internacional-sobre-ia-de-fronteira/slide-3-cta.png"
+    ],
+    "status": "pendente",
+    "criado_em": "2026-09-22T15:56:40.259Z"
+  },
+  {
+    "slug": "v7-quer-dar-memoria-institucional-a-agentes-de-ia-nas-empresas",
+    "titulo": "V7 quer dar memória institucional a agentes de IA nas empresas",
+    "resumo": "A startup virou case da OpenAI ao propor uma solução para o problema recorrente dos agentes de IA corporativos: eles esquecem contexto, decisões e histórico a cada nova tarefa. A ideia é criar uma camada de memória persistente que sobrevive entre sessões.",
+    "imagens": [
+      "https://promptmidia.com.br/carrossel/v7-quer-dar-memoria-institucional-a-agentes-de-ia-nas-empresas/slide-1-capa.png",
+      "https://promptmidia.com.br/carrossel/v7-quer-dar-memoria-institucional-a-agentes-de-ia-nas-empresas/slide-2-resumo.png",
+      "https://promptmidia.com.br/carrossel/v7-quer-dar-memoria-institucional-a-agentes-de-ia-nas-empresas/slide-3-cta.png"
+    ],
+    "status": "pendente",
+    "criado_em": "2026-09-22T15:56:40.357Z"
+  },
+  {
+    "slug": "vibes-ou-dados-o-que-realmente-define-uma-boa-revisao-de-codigo-por-ia",
+    "titulo": "Vibes ou dados: o que realmente define uma boa revisão de código por IA",
+    "resumo": "Um novo estudo questiona como times de desenvolvimento avaliam ferramentas de revisão de código com IA — e mostra que a impressão subjetiva de qualidade nem sempre bate com testes rigorosos.",
+    "imagens": [
+      "https://promptmidia.com.br/carrossel/vibes-ou-dados-o-que-realmente-define-uma-boa-revisao-de-codigo-por-ia/slide-1-capa.png",
+      "https://promptmidia.com.br/carrossel/vibes-ou-dados-o-que-realmente-define-uma-boa-revisao-de-codigo-por-ia/slide-2-resumo.png",
+      "https://promptmidia.com.br/carrossel/vibes-ou-dados-o-que-realmente-define-uma-boa-revisao-de-codigo-por-ia/slide-3-cta.png"
+    ],
+    "status": "pendente",
+    "criado_em": "2026-09-22T15:56:40.461Z"
   }
 ]
