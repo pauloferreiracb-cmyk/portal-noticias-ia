@@ -18,7 +18,7 @@ export interface Fundo {
   credito: string;
 }
 
-interface Candidata { url: string; credito: string }
+interface Candidata { url: string; credito: string; /** tags (Pixabay) ou descrição (Pexels) */ tags: string }
 
 const TEMPO_LIMITE = 12_000;
 
@@ -32,13 +32,14 @@ async function buscarPexels(consulta: string): Promise<Candidata[]> {
   const chave = process.env.PEXELS_API_KEY?.trim();
   if (!chave) return [];
   const u = new URL('https://api.pexels.com/v1/search');
-  u.search = new URLSearchParams({ query: consulta, orientation: 'portrait', size: 'large', per_page: '15' }).toString();
-  const d = await json<{ photos?: { src: { large2x?: string; original: string }; photographer: string }[] }>(
+  u.search = new URLSearchParams({ query: consulta, size: 'large', per_page: '30' }).toString();
+  const d = await json<{ photos?: { src: { large2x?: string; original: string }; photographer: string; alt?: string }[] }>(
     u.toString(), { Authorization: chave }
   );
   return (d.photos ?? []).map((p) => ({
     url: p.src.large2x ?? p.src.original,
     credito: `Imagem: ${p.photographer} / Pexels`,
+    tags: p.alt ?? '',
   }));
 }
 
@@ -47,14 +48,35 @@ async function buscarPixabay(consulta: string): Promise<Candidata[]> {
   if (!chave) return [];
   const u = new URL('https://pixabay.com/api/');
   u.search = new URLSearchParams({
-    key: chave, q: consulta, image_type: 'photo', orientation: 'vertical',
-    min_width: '1000', safesearch: 'true', per_page: '15',
+    key: chave, q: consulta, image_type: 'photo',
+    min_width: '1000', safesearch: 'true', per_page: '30',
   }).toString();
-  const d = await json<{ hits?: { largeImageURL: string; user: string }[] }>(u.toString());
+  const d = await json<{ hits?: { largeImageURL: string; user: string; tags?: string }[] }>(u.toString());
   return (d.hits ?? []).map((h) => ({
     url: h.largeImageURL,
     credito: `Imagem: ${h.user} / Pixabay`,
+    tags: h.tags ?? '',
   }));
+}
+
+const PESSOAS = /\b(man|men|woman|women|girl|boy|people|person|child|children|kid|baby|couple|family|portrait|face|selfie|smile|smiling|hand|hands|businessman|businesswoman)\b/i;
+
+/**
+ * Relevância: quantas palavras da busca aparecem nas tags/descrição da foto.
+ * Fotos com gente em primeiro plano são descartadas (o briefing pede cenas, não retratos).
+ * Score 0 = a foto não tem relação com a busca, então nem é considerada.
+ */
+export function ranquear(candidatas: Candidata[], consulta: string): Candidata[] {
+  const palavras = consulta.toLowerCase().split(/\s+/).filter((w) => w.length > 2);
+  return candidatas
+    .map((c, i) => {
+      const alvo = c.tags.toLowerCase();
+      const score = palavras.filter((w) => alvo.includes(w)).length;
+      return { c, i, score, gente: PESSOAS.test(c.tags) };
+    })
+    .filter((x) => x.score > 0 && !x.gente)
+    .sort((a, b) => b.score - a.score || a.i - b.i)
+    .map((x) => x.c);
 }
 
 async function baixar(url: string): Promise<Buffer> {
@@ -84,13 +106,13 @@ export async function buscarFundo(
   for (const consulta of consultas(roteiro, artigo)) {
     for (const buscar of ordem) {
       try {
-        const achadas = await buscar(consulta);
+        const achadas = ranquear(await buscar(consulta), consulta);
         for (const c of achadas.slice(0, 3)) {
           try {
             const bruto = await baixar(c.url);
             const meta = await sharp(bruto).metadata();
             if ((meta.width ?? 0) >= 800) {
-              console.log(`Fundo: "${consulta}" -> ${c.credito}`);
+              console.log(`Fundo: "${consulta}" -> ${c.credito} [${c.tags.slice(0, 80)}]`);
               return { bruto, credito: c.credito };
             }
           } catch { /* tenta a próxima candidata */ }
