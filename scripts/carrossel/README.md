@@ -6,7 +6,10 @@ Transforma uma notícia de `src/content/noticias/` em 6 a 8 slides PNG + legenda
 npm run carrossel                        # notícia mais recente (campo `data`)
 npm run carrossel -- <slug>              # uma notícia específica
 npm run carrossel -- <slug> --dm PROMPT  # coloca a palavra-chave de DM (ManyChat) no CTA e na legenda
-npm run carrossel -- <slug> --foto       # usa a capa da notícia na capa do carrossel
+npm run carrossel -- <slug> --fundo pixabay     # prefere o Pixabay (padrão: Pexels)
+npm run carrossel -- <slug> --imagem foto.jpg   # usa uma imagem sua (arquivo ou URL) como fundo
+npm run carrossel -- <slug> --refazer-fundo     # busca outra imagem
+npm run carrossel -- <slug> --sem-fundo         # só a moldura, sem foto
 npm run carrossel -- <slug> --refazer-roteiro   # pede um roteiro novo ao Claude
 ```
 
@@ -31,16 +34,26 @@ Saída em `carrosseis/AAAA-MM-DD-<slug>/` (a data é a da notícia):
 | Chave do Claude | `ANTHROPIC_API_KEY` (já existe nos secrets do Actions) |
 | Domínio no CTA | `SITE_DOMINIO` (padrão `promptmidia.com.br`) |
 | Palavra de DM | `CARROSSEL_DM_PALAVRA` ou `--dm`. Vazio = o bloco de DM some |
+| Chave Pexels | `PEXELS_API_KEY` (grátis em pexels.com/api) |
+| Chave Pixabay | `PIXABAY_API_KEY` (grátis em pixabay.com/api/docs) |
 | Modelo | `CLAUDE_MODEL` (mesmo padrão dos outros scripts) |
 
 No Windows/PowerShell, uma execução com variável: `$env:CARROSSEL_DM_PALAVRA="PROMPT"; npm run carrossel`.
 No CMD: `set CARROSSEL_DM_PALAVRA=PROMPT && npm run carrossel`.
 
-## Imagens
+## Imagens de fundo (Pexels e Pixabay)
 
-Por padrão a capa é só tipografia. Com `--foto`, usa `public/capas-ia/<slug>.png` (padrão do projeto)
-ou, na falta dele, a URL do campo `capa`. O crédito do fotógrafo (`.json` ao lado) vai para a legenda.
-Nenhuma fonte de imagem nova foi introduzida.
+O Claude escreve no `roteiro.json` uma busca em inglês que remete à notícia (`imagem.consulta`, com uma
+`alternativa` genérica). O gerador procura no Pexels (ou Pixabay, com `--fundo pixabay`), escolhe a primeira
+foto grande o bastante e a escurece: na capa ela aparece com sombra forte embaixo, nos demais slides fica
+desfocada e escura para o texto ler bem. A moldura de circuito é aplicada por cima.
+
+- A foto escolhida fica salva em `fundo.jpg` (crédito em `fundo.txt`). Rodar de novo reaproveita a mesma foto;
+  use `--refazer-fundo` para trocar.
+- O crédito ("Imagem: fulano / Pexels") entra na legenda automaticamente.
+- Sem chave de API, ou sem resultado, o carrossel sai com a moldura padrão. Nada quebra.
+- Banco de imagens mostra cenas do tema, não fotos do fato. Evite legendas que sugiram o contrário.
+- Confira a licença de cada banco em pexels.com/pt-br/license e pixabay.com/pt/service/license-summary.
 
 ## Automação (GitHub Actions)
 

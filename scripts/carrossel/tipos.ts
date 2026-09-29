@@ -27,6 +27,8 @@ export interface Roteiro {
   conteudo: SlideConteudo[];
   /** penúltimo slide */
   porqueImporta: { titulo?: string; texto: string };
+  /** o que buscar no Pexels/Pixabay (em inglês, cenas concretas, sem pessoas/logos/texto) */
+  imagem?: { consulta: string; alternativa?: string };
   legenda: {
     gancho: string;
     /** 2 a 3 linhas */

@@ -89,6 +89,10 @@ ESTRUTURA (o carrossel final = capa + conteudo + porqueImporta + slide de CTA, d
 - "porqueImporta": por que isso importa para quem lê.
 - O slide de CTA é montado pelo sistema. Não o escreva.
 
+IMAGEM DE FUNDO
+- "imagem.consulta": busca em INGLÊS (2 a 4 palavras) para banco de fotos (Pexels/Pixabay), descrevendo uma cena ou objeto concreto que remeta ao tema da notícia (ex: "server room blue light", "lawyer courtroom gavel"). Evite pessoas identificáveis, logos, marcas, telas com texto e termos abstratos como "AI" ou "technology" sozinhos.
+- "imagem.alternativa": uma segunda busca, mais genérica, caso a primeira não retorne nada.
+
 LEGENDA
 - "gancho": uma primeira linha que funcione como gancho (pode ter 1 emoji no fim).
 - "resumo": 2 a 3 linhas (separe com \\n) resumindo a notícia. Sem CTA (o sistema acrescenta).
@@ -99,6 +103,7 @@ Responda APENAS com JSON válido, sem markdown, neste formato:
   "capa": { "gancho": "...", "tag": "palavra curta da editoria, ex: NSA, OPENAI, SEGURANÇA" },
   "conteudo": [ { "titulo": "rótulo curto (opcional)", "texto": "...", "explica": { "termo": "opcional", "texto": "..." } } ],
   "porqueImporta": { "titulo": "opcional", "texto": "..." },
+  "imagem": { "consulta": "...", "alternativa": "..." },
   "legenda": { "gancho": "...", "resumo": "linha 1\\nlinha 2", "hashtags": ["#..."] }
 }`;
 

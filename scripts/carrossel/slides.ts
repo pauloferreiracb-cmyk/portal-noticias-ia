@@ -88,7 +88,7 @@ const tamanhoPorTexto = (t: string, faixas: [number, number][]) => {
 
 /* ---------- slides ---------- */
 
-function capa(s: Extract<Slide, { tipo: 'capa' }>, total: number, moldura: string, foto?: string): Nodo {
+function capa(s: Extract<Slide, { tipo: 'capa' }>, total: number, moldura: string): Nodo {
   const tamanho = tamanhoPorTexto(s.gancho, [[6, 108], [9, 96], [12, 86]]);
   const filhos: unknown[] = [
     h('div', { justifyContent: 'space-between', alignItems: 'center' }, [
@@ -99,9 +99,8 @@ function capa(s: Extract<Slide, { tipo: 'capa' }>, total: number, moldura: strin
       }, s.tag.toUpperCase()),
     ]),
     h('div', { flexDirection: 'column', gap: 40 }, [
-      ...(foto ? [h('img', { borderRadius: 24, objectFit: 'cover' }, undefined, { src: foto, width: LARGURA - PAD_X * 2, height: 400 })] : []),
       txt({
-        fontFamily: MARCA.fonteTitulo, fontWeight: 700, fontSize: foto ? Math.min(tamanho, 84) : tamanho,
+        fontFamily: MARCA.fonteTitulo, fontWeight: 700, fontSize: tamanho,
         lineHeight: 1.08, color: MARCA.texto, letterSpacing: -2,
       }, s.gancho),
       h('div', { width: 140, height: 8, borderRadius: 4, background: `linear-gradient(90deg, ${MARCA.ciano}, ${MARCA.violeta})` }),
@@ -177,19 +176,23 @@ function cta(s: Extract<Slide, { tipo: 'cta' }>, moldura: string): Nodo {
 
 /* ---------- render ---------- */
 
-export async function renderizarSlides(slides: Slide[], fotoCapa?: Buffer): Promise<Buffer[]> {
+export async function renderizarSlides(
+  slides: Slide[],
+  fundos: { capa?: Buffer; interno?: Buffer } = {}
+): Promise<Buffer[]> {
   const fontes = carregarFontes();
-  const moldura = dataUri('image/jpeg', fs.readFileSync(ARQ_MOLDURA));
-  const foto = fotoCapa ? dataUri('image/jpeg', fotoCapa) : undefined;
+  const padrao = dataUri('image/jpeg', fs.readFileSync(ARQ_MOLDURA));
+  const bgCapa = fundos.capa ? dataUri('image/jpeg', fundos.capa) : padrao;
+  const bgInterno = fundos.interno ? dataUri('image/jpeg', fundos.interno) : padrao;
   const total = slides.length;
 
   const pngs: Buffer[] = [];
   for (const s of slides) {
     const el =
-      s.tipo === 'capa' ? capa(s, total, moldura, foto)
-      : s.tipo === 'conteudo' ? conteudo(s, moldura)
-      : s.tipo === 'importa' ? importa(s, moldura)
-      : cta(s, moldura);
+      s.tipo === 'capa' ? capa(s, total, bgCapa)
+      : s.tipo === 'conteudo' ? conteudo(s, bgInterno)
+      : s.tipo === 'importa' ? importa(s, bgInterno)
+      : cta(s, bgInterno);
     // satori aceita o objeto { type, props } (equivalente ao JSX compilado)
     const svg = await satori(el as never, { width: LARGURA, height: ALTURA, fonts: fontes });
     pngs.push(new Resvg(svg, { fitTo: { mode: 'width', value: LARGURA } }).render().asPng());

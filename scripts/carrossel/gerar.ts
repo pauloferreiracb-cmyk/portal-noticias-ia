@@ -5,12 +5,15 @@
  * Uso:
  *   npm run carrossel                     -> notícia mais recente do site
  *   npm run carrossel -- <slug>           -> uma notícia específica
- *   npm run carrossel -- <slug> --foto    -> usa a capa da notícia na capa do carrossel
+ *   npm run carrossel -- <slug> --fundo pixabay  -> prefere o Pixabay (padrão: Pexels)
+ *   npm run carrossel -- <slug> --imagem foto.jpg -> usa uma imagem sua (arquivo ou URL) como fundo
+ *   npm run carrossel -- <slug> --refazer-fundo   -> busca outra imagem
+ *   npm run carrossel -- <slug> --sem-fundo       -> só a moldura, sem foto
  *   npm run carrossel -- <slug> --dm PROMPT   -> palavra-chave de DM (ManyChat)
  *   npm run carrossel -- <slug> --refazer-roteiro -> chama o Claude de novo
  *
  * Saída: carrosseis/AAAA-MM-DD-<slug>/
- *   slide-01.png ... slide-0N.png, legenda.txt, roteiro.json, meta.json
+ *   slide-01.png ... slide-0N.png, legenda.txt, roteiro.json, fundo.jpg, meta.json
  *
  * O texto vem de roteiro.json. Se o arquivo já existir na pasta, ele é reaproveitado
  * (dá pra editar o texto à mão e rodar de novo só pra redesenhar os slides).
@@ -20,7 +23,8 @@ import fs from 'node:fs';
 import path from 'node:path';
 import sharp from 'sharp';
 import { lerArtigo, slugMaisRecente } from './artigos.ts';
-import { CONFIG, DIR_CAPAS, DIR_SAIDA, RAIZ } from './config.ts';
+import { CONFIG, DIR_SAIDA, RAIZ } from './config.ts';
+import { buscarFundo, comporFundos, fundoManual, type Fundo } from './imagens.ts';
 import { montarLegenda } from './legenda.ts';
 import { gerarRoteiro, validarRoteiro } from './roteiro.ts';
 import { renderizarSlides } from './slides.ts';
@@ -33,36 +37,34 @@ const valorDe = (nome: string) => {
   const i = args.indexOf(nome);
   return i >= 0 ? args[i + 1] : undefined;
 };
-const posicionais = args.filter((a, i) => !a.startsWith('--') && !(i > 0 && args[i - 1] === '--dm'));
+const posicionais = args.filter((a, i) => !a.startsWith('--') && !(i > 0 && ['--dm', '--fundo', '--imagem'].includes(args[i - 1])));
 
-/* ---------- foto da capa (opcional) ---------- */
-/** Segue o padrão do projeto: public/capas-ia/<slug>.png, senão a URL do campo `capa`. */
-async function carregarFoto(artigo: Artigo): Promise<{ buf?: Buffer; credito?: string }> {
-  let bruto: Buffer | undefined;
-  const local = path.join(DIR_CAPAS, `${artigo.slug}.png`);
-  if (fs.existsSync(local)) bruto = fs.readFileSync(local);
-  else if (artigo.capa?.startsWith('http')) {
-    try {
-      const r = await fetch(artigo.capa, { signal: AbortSignal.timeout(10_000) });
-      if (r.ok) bruto = Buffer.from(await r.arrayBuffer());
-    } catch { /* sem foto: segue só com tipografia */ }
-  }
-  if (!bruto) {
-    console.warn('[aviso] --foto pedido, mas a notícia não tem capa disponível. Seguindo só com tipografia.');
-    return {};
-  }
-  const buf = await sharp(bruto).resize(780, 400, { fit: 'cover' }).jpeg({ quality: 85 }).toBuffer();
+/* ---------- imagem de fundo ---------- */
+/**
+ * Ordem: --sem-fundo (nada) > --imagem (sua) > fundo.jpg já salvo na pasta > busca no Pexels/Pixabay.
+ * A imagem escolhida fica salva em fundo.jpg (+ fundo.txt com o crédito) para as próximas
+ * execuções não gastarem a API nem trocarem de foto sozinhas. --refazer-fundo busca outra.
+ */
+async function resolverFundo(pasta: string, roteiro: Roteiro, artigo: Artigo): Promise<Fundo | undefined> {
+  if (flag('--sem-fundo')) return undefined;
+  const arqImg = path.join(pasta, 'fundo.jpg');
+  const arqCred = path.join(pasta, 'fundo.txt');
 
-  // Crédito do fotógrafo (sidecar .json que o pipeline de capas já grava)
-  let credito: string | undefined;
-  const sidecar = path.join(DIR_CAPAS, `${artigo.slug}.json`);
-  if (fs.existsSync(sidecar)) {
-    try {
-      const j = JSON.parse(fs.readFileSync(sidecar, 'utf-8'));
-      if (j.fotografo) credito = `Foto: ${j.fotografo} / Unsplash`;
-    } catch { /* ignora */ }
+  let fundo: Fundo | undefined;
+  if (flag('--imagem')) {
+    fundo = await fundoManual(valorDe('--imagem') ?? '');
+  } else if (fs.existsSync(arqImg) && !flag('--refazer-fundo')) {
+    fundo = { bruto: fs.readFileSync(arqImg), credito: fs.existsSync(arqCred) ? fs.readFileSync(arqCred, 'utf-8').trim() : '' };
+    console.log('Fundo: reaproveitado de fundo.jpg');
+  } else {
+    const fonte = valorDe('--fundo') === 'pixabay' ? 'pixabay' : 'pexels';
+    fundo = await buscarFundo(roteiro, artigo, fonte);
   }
-  return { buf, credito };
+  if (fundo && !(fs.existsSync(arqImg) && !flag('--imagem') && !flag('--refazer-fundo'))) {
+    fs.writeFileSync(arqImg, new Uint8Array(await sharp(fundo.bruto).rotate().resize(1620, 2025, { fit: 'cover', withoutEnlargement: true }).jpeg({ quality: 90 }).toBuffer()));
+    fs.writeFileSync(arqCred, fundo.credito, 'utf-8');
+  }
+  return fundo;
 }
 
 /* ---------- roteiro -> lista de slides ---------- */
@@ -100,22 +102,23 @@ async function main() {
     console.log('Roteiro: gerado pelo Claude');
   }
 
-  // 2) foto (opcional)
-  const foto = flag('--foto') ? await carregarFoto(artigo) : {};
+  // 2) imagem de fundo (Pexels/Pixabay, opcional)
+  const fundo = await resolverFundo(pasta, roteiro, artigo);
+  const fundos = await comporFundos(fundo);
 
   // 3) slides
   const slides = montarSlides(roteiro);
-  const pngs = await renderizarSlides(slides, foto.buf);
+  const pngs = await renderizarSlides(slides, fundos);
   for (const f of fs.readdirSync(pasta)) if (/^slide-\d+\.png$/.test(f)) fs.rmSync(path.join(pasta, f));
   pngs.forEach((png, i) => fs.writeFileSync(path.join(pasta, `slide-${String(i + 1).padStart(2, "0")}.png`), new Uint8Array(png)));
 
   // 4) legenda + metadados
-  fs.writeFileSync(path.join(pasta, 'legenda.txt'), montarLegenda(roteiro, artigo, foto.credito) + '\n', 'utf-8');
+  fs.writeFileSync(path.join(pasta, 'legenda.txt'), montarLegenda(roteiro, artigo, fundo?.credito) + '\n', 'utf-8');
   fs.writeFileSync(
     path.join(pasta, 'meta.json'),
     JSON.stringify({
       slug, titulo: artigo.titulo, url: `https://${CONFIG.siteDominio}/noticias/${slug}`,
-      slides: pngs.length, dmPalavra: CONFIG.dmPalavra || null, gerado_em: new Date().toISOString(),
+      slides: pngs.length, dmPalavra: CONFIG.dmPalavra || null, fundo: fundo?.credito || null, gerado_em: new Date().toISOString(),
     }, null, 2),
     'utf-8'
   );

@@ -45,5 +45,9 @@
       "#Tecnologia",
       "#PromptMidia"
     ]
+  },
+  "imagem": {
+    "consulta": "cybersecurity data center",
+    "alternativa": "server room blue light"
   }
 }
