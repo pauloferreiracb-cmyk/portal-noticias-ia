@@ -1,0 +1,62 @@
+# Copie para .github/workflows/carrossel-on-publish.yml para ativar.
+#
+# Dispara sempre que uma notícia NOVA entra em src/content/noticias/, seja pelo
+# pipeline diário (auto-commit) ou pelo fluxo de aprovação do Telegram.
+# Gera o carrossel só das notícias adicionadas naquele push.
+
+name: Carrossel do Instagram
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "src/content/noticias/**"
+  workflow_dispatch:
+    inputs:
+      slug:
+        description: "Slug da notícia (vazio = a mais recente)"
+        required: false
+
+permissions:
+  contents: read
+
+jobs:
+  carrossel:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2 # precisa do commit anterior para achar o que foi adicionado
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+
+      - run: npm ci
+
+      - name: Gerar carrossel(éis)
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          SITE_DOMINIO: ${{ vars.SITE_DOMINIO }}
+          CARROSSEL_DM_PALAVRA: ${{ vars.CARROSSEL_DM_PALAVRA }}
+        run: |
+          if [ -n "${{ github.event.inputs.slug }}" ]; then
+            npm run carrossel -- "${{ github.event.inputs.slug }}"
+          elif [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            npm run carrossel
+          else
+            for f in $(git diff --name-only --diff-filter=A HEAD~1 HEAD -- src/content/noticias); do
+              npm run carrossel -- "$(basename "$f" .md)"
+            done
+          fi
+
+      - name: Anexar slides e legendas ao run
+        uses: actions/upload-artifact@v4
+        with:
+          name: carrosseis-${{ github.run_id }}
+          path: carrosseis/
+          retention-days: 7
+
+      # Próximo passo (opcional): postar direto. Ex.: avisar no Telegram com o link do artefato,
+      # ou enviar os PNGs para o Buffer/Postiz a partir daqui.
