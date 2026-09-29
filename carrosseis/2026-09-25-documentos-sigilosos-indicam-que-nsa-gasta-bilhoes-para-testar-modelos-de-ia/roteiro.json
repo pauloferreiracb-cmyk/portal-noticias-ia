@@ -1,0 +1,53 @@
+{
+  "capa": {
+    "gancho": "A NSA estaria gastando bilhões para testar IAs. Quais? Segredo.",
+    "tag": "NSA"
+  },
+  "conteudo": [
+    {
+      "titulo": "A notícia",
+      "texto": "Segundo o Washington Sun, estimativas classificadas indicam que a NSA, agência de segurança dos EUA, destina bilhões de dólares a testar IAs."
+    },
+    {
+      "titulo": "Testar uma IA",
+      "texto": "Testes assim costumam avaliar segurança cibernética, resistência a manipulação e uso indevido.",
+      "explica": {
+        "texto": "É como um crash test, só que para software."
+      }
+    },
+    {
+      "titulo": "O que ninguém confirma",
+      "texto": "Como as estimativas são classificadas, não há confirmação de quais empresas ou modelos são avaliados, nem do método."
+    },
+    {
+      "titulo": "Não é caso isolado",
+      "texto": "Outras agências de inteligência e defesa dos EUA também buscam entender riscos e capacidades da IA antes de adotá-la."
+    },
+    {
+      "titulo": "O que é uso dual?",
+      "texto": "Serve tanto ao uso civil quanto ao militar.",
+      "explica": {
+        "texto": "Como uma faca de cozinha: prepara o jantar ou vira arma."
+      }
+    }
+  ],
+  "porqueImporta": {
+    "texto": "A IA afeta a vida civil. Por isso, há debate sobre o quanto o governo deveria revelar."
+  },
+  "legenda": {
+    "gancho": "A NSA estaria gastando bilhões para testar IAs, e os detalhes são secretos. 👀",
+    "resumo": "Segundo o Washington Sun, estimativas classificadas indicam que a agência de segurança dos EUA destina bilhões de dólares a testar modelos de IA.\nNão há confirmação de quais empresas ou modelos são avaliados, nem de como os testes são feitos.\nO caso mostra a corrida silenciosa entre governos para entender os limites e riscos da IA.",
+    "hashtags": [
+      "#NSA",
+      "#InteligenciaArtificial",
+      "#IA",
+      "#SegurancaNacional",
+      "#Tecnologia",
+      "#PromptMidia"
+    ]
+  },
+  "imagem": {
+    "consulta": "server room blue light",
+    "alternativa": "cybersecurity padlock"
+  }
+}
