@@ -24,11 +24,6 @@ import path from 'node:path';
 import sharp from 'sharp';
 import { lerArtigo, slugMaisRecente } from './artigos.ts';
 
-// Carrega o .env da raiz do projeto (Node 20.12+). No Actions as variáveis já vêm dos secrets.
-try {
-  (process as unknown as { loadEnvFile?: (f: string) => void }).loadEnvFile?.(path.join(RAIZ, '.env'));
-} catch { /* sem .env: segue com as variáveis do ambiente */ }
-
 import { CONFIG, DIR_SAIDA, RAIZ } from './config.ts';
 import { buscarFundo, comporFundos, fundoManual, type Fundo } from './imagens.ts';
 import { montarLegenda } from './legenda.ts';

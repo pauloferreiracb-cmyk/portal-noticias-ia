@@ -4,6 +4,12 @@ import { fileURLToPath } from 'node:url';
 const AQUI = path.dirname(fileURLToPath(import.meta.url));
 
 export const RAIZ = path.resolve(AQUI, '../..');
+// Carrega o .env da raiz (Node 20.12+) ANTES de ler as variáveis abaixo.
+// No Actions as variáveis já vêm dos secrets e o .env não existe.
+try {
+  (process as unknown as { loadEnvFile?: (f: string) => void }).loadEnvFile?.(path.join(RAIZ, '.env'));
+} catch { /* sem .env: segue com o ambiente */ }
+
 export const DIR_NOTICIAS = path.join(RAIZ, 'src/content/noticias');
 export const DIR_CAPAS = path.join(RAIZ, 'public/capas-ia');
 export const DIR_SAIDA = path.join(RAIZ, 'carrosseis');
