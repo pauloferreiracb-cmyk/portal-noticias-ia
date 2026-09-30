@@ -36,25 +36,36 @@ const {
       })();
     </script>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="color-scheme" content="dark" />
+    <meta name="color-scheme" content="light dark" />
+    <meta name="theme-color" content="#0B1020" />
     <title>{titulo}</title>
     <meta name="description" content={descricao} />
     {noindex && <meta name="robots" content="noindex, follow" />}
     {canonical && <link rel="canonical" href={canonical} />}
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-    <!-- Tipografia da identidade (Space Grotesk / Inter / JetBrains Mono) -->
+    <!-- Tipografia da identidade v2.0 (Archivo / Source Serif 4 / JetBrains Mono) -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
       rel="stylesheet"
-      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@100..125,500..900&family=JetBrains+Mono:wght@500;700&family=Source+Serif+4:ital,wght@0,400;0,600;1,400&display=swap"
     />
   </head>
   <body class={paginaLeitura ? 'pagina-leitura' : ''}>
     {faixaManchetes && <FaixaManchetes />}
     <header class="cabecalho-full">
       <div class={`cabecalho-inner ${largura === 'larga' ? 'largo' : ''}`}>
-        <a href="/" class="logo"><span class="cursor">&gt;_</span>PROMPT<span class="midia"> MÍDIA</span></a>
+        <a href="/" class="logo" aria-label="Prompt Mídia">
+          <svg class="logo-simbolo" viewBox="0 0 96 96" role="img" aria-label="Prompt Mídia">
+            <path d="M0 0 H72 L96 24 V96 H24 L0 72 Z" fill="#0B1020" />
+            <path d="M18 24 L42 48 L18 72 L18 58 L28 48 L18 38 Z" fill="#FFD60A" />
+            <path d="M38 24 L62 48 L38 72 L38 58 L48 48 L38 38 Z" fill="#FFD60A" fill-opacity="0.45" />
+            <rect x="64" y="66" width="20" height="8" fill="#FFD60A" />
+            <path d="M50 12 H72" stroke="#FFD60A" stroke-width="3" fill="none" /><circle cx="77" cy="12" r="3.5" fill="#FFD60A" />
+            <path d="M24 84 H46" stroke="#FFD60A" stroke-width="3" fill="none" /><circle cx="19" cy="84" r="3.5" fill="#FFD60A" />
+          </svg>
+          <span class="logo-texto">PROMPT<span class="logo-midia">MÍDIA<span class="logo-cursor"></span></span></span>
+        </a>
         <nav>
           <a href="/links">Links</a>
         </nav>
@@ -66,11 +77,14 @@ const {
         <slot />
       </main>
 
-      <footer class="rodape">
-        <span>© {new Date().getFullYear()} Prompt Mídia</span>
-        <a href="/links">todos os links</a>
-      </footer>
     </div>
+
+    <footer class="rodape-full">
+      <div class={`rodape ${largura === 'larga' ? 'largo' : ''}`}>
+        <span>© {new Date().getFullYear()} Prompt Mídia · Redação Prompt Mídia</span>
+        <a href="/links">todos os links</a>
+      </div>
+    </footer>
 
     <script>
       import { capturarUTM, propagarUTMEmLinksInternos } from '../lib/utm';

@@ -24,9 +24,13 @@ const { Content } = await artigo.render();
 const { titulo, resumo, data, tags, fonte_url, fonte_nome } = artigo.data;
 const dataFormatada = new Intl.DateTimeFormat('pt-BR', {
   day: '2-digit',
-  month: 'long',
+  month: 'short',
   year: 'numeric',
-}).format(data);
+  timeZone: 'America/Sao_Paulo',
+})
+  .format(data)
+  .replace(/\./g, '')
+  .replace(/ de /g, ' ');
 
 const imagemCapa = resolveCapa(artigo);
 ---
@@ -52,7 +56,12 @@ const imagemCapa = resolveCapa(artigo);
         <a href={`/tag/${slugify(t)}/`} class="tag-leitura">{t}</a>
       ))}
     </div>
-    <div class="data-artigo">{dataFormatada}</div>
+    <div class="selo-confianca">
+      <svg width="22" height="22" viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="15" fill="#5B8DFF" /><path d="M9 16.5 L14 21.5 L23 11" fill="none" stroke="#0B1020" stroke-width="3.6" stroke-linecap="square" /></svg>
+      <span class="selo-verificado">Verificado</span>
+      <span class="selo-fonte">Fonte: {fonte_nome}</span>
+      <span class="selo-data">{dataFormatada}</span>
+    </div>
 
     <div class="leitura-corpo" id="leitura-corpo">
       <Content />
@@ -67,6 +76,7 @@ const imagemCapa = resolveCapa(artigo);
     <p class="leitura-corpo">
       Fonte original: <a href={fonte_url} target="_blank" rel="noopener">{fonte_nome}</a>
     </p>
+    <p class="assinatura">Redação Prompt Mídia</p>
 
     {import.meta.env.DEV && <AdSlot id="artigo-fim" />}
 
@@ -112,7 +122,8 @@ const imagemCapa = resolveCapa(artigo);
 
 <style>
   .leitura {
-    border: 1px solid var(--leitura-borda);
+    border: 3px solid var(--leitura-borda);
+    background: var(--leitura-bg);
     padding: 28px;
     max-width: 68ch;
     margin: 0 auto;
@@ -120,6 +131,9 @@ const imagemCapa = resolveCapa(artigo);
 
   .leitura h1 {
     color: var(--leitura-titulo);
+    font-size: clamp(2rem, 6vw, 3rem);
+    line-height: 0.98;
+    letter-spacing: -0.035em;
   }
 
   .tags-artigo {
@@ -131,9 +145,10 @@ const imagemCapa = resolveCapa(artigo);
 
   .tag-leitura {
     display: inline-block;
-    border: 1px solid var(--leitura-link);
-    color: var(--leitura-link);
+    border: 2px solid var(--leitura-titulo);
+    color: var(--leitura-titulo);
     font-family: var(--fonte-mono);
+    font-weight: 700;
     font-size: 11px;
     text-transform: uppercase;
     letter-spacing: 0.05em;
@@ -144,27 +159,50 @@ const imagemCapa = resolveCapa(artigo);
 
   .tag-leitura:hover,
   .tag-leitura:focus-visible {
-    background: var(--leitura-link);
-    color: var(--leitura-bg);
+    background: var(--amarelo);
+    border-color: var(--tinta);
+    color: var(--tinta);
     text-decoration: none;
   }
 
   .tag-leitura:focus-visible {
-    outline: 2px solid var(--leitura-link);
+    outline: 3px solid var(--leitura-titulo);
     outline-offset: 2px;
   }
 
-  .data-artigo {
+  /* selo de confiança: Verificado (azul) + Fonte + data */
+  .selo-confianca {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px 14px;
+    margin-top: 16px;
     font-family: var(--fonte-mono);
+    font-weight: 700;
     font-size: 12px;
-    color: var(--leitura-meta);
-    white-space: nowrap;
-    margin-top: 10px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .selo-verificado { color: var(--azul-claro); }
+  [data-theme="escuro"] .selo-verificado { color: var(--azul); }
+  .selo-fonte { color: var(--leitura-meta); font-weight: 500; }
+  .selo-data { color: var(--leitura-meta); margin-left: auto; white-space: nowrap; }
+
+  .assinatura {
+    margin: 28px 0 0;
+    padding-top: 16px;
+    border-top: 3px solid var(--leitura-borda);
+    font-family: var(--fonte-mono);
+    font-weight: 700;
+    font-size: 12px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--leitura-titulo);
   }
 
   .anuncio-leitura {
     min-height: 100px;
-    border: 1px solid var(--leitura-borda);
+    border: 2px dashed var(--leitura-meta);
     border-radius: 0;
     background: var(--leitura-bloco);
     color: var(--leitura-meta);
@@ -182,11 +220,12 @@ const imagemCapa = resolveCapa(artigo);
     display: block;
     margin: 0 0 20px auto;
     padding: 8px 14px;
-    border: 1px solid var(--leitura-borda);
+    border: 2px solid var(--leitura-titulo);
     border-radius: 0;
     background: var(--leitura-bloco);
     color: var(--leitura-texto);
     font-family: var(--fonte-mono);
+    font-weight: 700;
     font-size: 12px;
     letter-spacing: 0.05em;
     text-transform: uppercase;
@@ -194,14 +233,15 @@ const imagemCapa = resolveCapa(artigo);
   }
 
   .leitura-toggle:hover {
-    color: var(--leitura-link);
-    border-color: var(--leitura-link);
+    background: var(--amarelo);
+    color: var(--tinta);
+    border-color: var(--tinta);
   }
 
   .leitura-corpo {
-    font-family: Inter, ui-sans-serif, system-ui, -apple-system, sans-serif;
-    font-size: 18px;
-    line-height: 1.75;
+    font-family: var(--fonte);
+    font-size: 21px;
+    line-height: 1.6;
     color: var(--leitura-texto);
   }
 
@@ -214,19 +254,21 @@ const imagemCapa = resolveCapa(artigo);
   .leitura-corpo :global(h3) {
     color: var(--leitura-titulo);
     font-family: var(--fonte-titulo);
+    font-weight: 900;
+    letter-spacing: -0.03em;
   }
 
   .leitura-corpo :global(blockquote) {
     margin: 24px 0;
     padding: 14px 18px;
     background: var(--leitura-bloco);
-    border-left: 3px solid var(--leitura-link);
+    border-left: 6px solid var(--amarelo);
     color: var(--leitura-texto);
   }
 
   .leitura-corpo :global(pre) {
     background: var(--leitura-bloco);
-    border: 1px solid var(--leitura-borda);
+    border: 2px solid var(--leitura-titulo);
     padding: 16px;
     overflow-x: auto;
     border-radius: 0;
@@ -239,7 +281,7 @@ const imagemCapa = resolveCapa(artigo);
 
   .leitura-corpo :global(hr) {
     border: none;
-    border-top: 1px solid var(--leitura-borda);
+    border-top: 3px solid var(--leitura-borda);
     margin: 32px 0;
   }
 </style>
