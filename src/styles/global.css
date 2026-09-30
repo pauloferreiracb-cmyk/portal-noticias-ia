@@ -360,16 +360,28 @@ body.pagina-leitura {
 .noticia-card--secundaria .noticia-card__corpo { padding: 12px; gap: 6px; justify-content: center; }
 .noticia-card--secundaria .noticia-card__titulo { font-size: 0.85rem; line-height: 1.4; }
 .noticia-card--secundaria .noticia-card__meta { padding-top: 4px; }
+/* começo da notícia (resumo) nos cards laterais: preenche o vazio entre título e fonte */
+.noticia-card--secundaria .noticia-card__resumo {
+  font-size: 0.78rem;
+  line-height: 1.45;
+  margin: 2px 0 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.noticia-card--secundaria .noticia-card__corpo { justify-content: flex-start; }
 
 @media (min-width: 900px) {
   /* desktop: a miniatura passa a ocupar a altura toda do card (a grade estica pra bater com o hero) */
   .noticia-card--secundaria .noticia-card__capa-wrap { height: 100%; aspect-ratio: unset; }
   .noticia-card--secundaria .noticia-card__titulo {
     display: -webkit-box;
-    -webkit-line-clamp: 4;
+    -webkit-line-clamp: 5;
     -webkit-box-orient: vertical;
     overflow: hidden;
   }
+  .noticia-card--secundaria .noticia-card__resumo { -webkit-line-clamp: 4; }
 }
 
 /* grade — grid simples com notícias mais antigas */

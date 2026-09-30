@@ -68,7 +68,7 @@ const dataIso = data.toISOString();
       {variante !== 'hero' && categoria && <span class="tag">{categoria}</span>}
       {variante === 'hero' && !capa && categoria && <span class="tag">{categoria}</span>}
       <TituloTag class="noticia-card__titulo"><span class="marca">{titulo}</span></TituloTag>
-      {variante === 'hero' && <p class="noticia-card__resumo">{resumo}</p>}
+      {(variante === 'hero' || variante === 'secundaria') && resumo && <p class="noticia-card__resumo">{resumo}</p>}
       <div class="noticia-card__meta">{dataFormatada} · {fonte_nome}</div>
     </div>
   </a>
