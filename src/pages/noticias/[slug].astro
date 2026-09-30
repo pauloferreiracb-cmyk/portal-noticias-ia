@@ -34,7 +34,7 @@ const dataFormatada = new Intl.DateTimeFormat('pt-BR', {
 
 const imagemCapa = resolveCapa(artigo);
 ---
-<Layout titulo={`${titulo} — Prompt Mídia`} descricao={resumo} paginaLeitura>
+<Layout titulo={`${titulo} — Prompt Mídia`} descricao={resumo} largura="larga" paginaLeitura>
   <article class="leitura">
     <button id="leitura-toggle" type="button" class="leitura-toggle" aria-label="Alternar tema de leitura">
       ESCURO
@@ -50,7 +50,7 @@ const imagemCapa = resolveCapa(artigo);
         )}
       </div>
     )}
-    <h1>{titulo}</h1>
+    <h1><span class="marca">{titulo}</span></h1>
     <div class="tags-artigo">
       {tags.map((t: string) => (
         <a href={`/tag/${slugify(t)}/`} class="tag-leitura">{t}</a>
@@ -124,15 +124,15 @@ const imagemCapa = resolveCapa(artigo);
   .leitura {
     border: 3px solid var(--leitura-borda);
     background: var(--leitura-bg);
-    padding: 28px;
-    max-width: 68ch;
+    padding: 36px 44px;
+    max-width: 940px;
     margin: 0 auto;
   }
 
   .leitura h1 {
     color: var(--leitura-titulo);
-    font-size: clamp(2rem, 6vw, 3rem);
-    line-height: 0.98;
+    font-size: clamp(1.6rem, 4.2vw, 2.4rem);
+    line-height: 1.2;
     letter-spacing: -0.035em;
   }
 
@@ -240,8 +240,8 @@ const imagemCapa = resolveCapa(artigo);
 
   .leitura-corpo {
     font-family: var(--fonte);
-    font-size: 21px;
-    line-height: 1.6;
+    font-size: 19px;
+    line-height: 1.65;
     color: var(--leitura-texto);
   }
 

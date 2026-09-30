@@ -64,9 +64,9 @@ const rotulo = usarRecentes ? 'AGORA' : 'ÚLTIMAS';
   .faixa-manchetes {
     display: flex;
     align-items: stretch;
-    height: 36px;
+    height: 42px;
+    border-bottom: 3px solid var(--tinta);
     background: var(--faixa-bg);
-    border-bottom: 1px solid var(--faixa-borda);
     --faixa-duracao: 60s;
   }
 
@@ -75,15 +75,29 @@ const rotulo = usarRecentes ? 'AGORA' : 'ÚLTIMAS';
     display: flex;
     align-items: center;
     height: 100%;
-    padding: 0 14px;
-    background: var(--amarelo);
-    color: var(--tinta);
+    gap: 8px;
+    padding: 0 16px;
+    background: var(--tinta);
+    color: var(--amarelo);
     font-family: var(--fonte-mono);
     font-weight: 700;
     font-size: 13px;
     text-transform: uppercase;
     letter-spacing: 0.08em;
     white-space: nowrap;
+  }
+
+  .faixa-rotulo::before {
+    content: '';
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: var(--amarelo);
+    animation: faixa-pulso 1.4s ease-in-out infinite;
+  }
+  @keyframes faixa-pulso {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.35; transform: scale(0.7); }
   }
 
   .faixa-viewport {
@@ -114,7 +128,7 @@ const rotulo = usarRecentes ? 'AGORA' : 'ÚLTIMAS';
 
   .faixa-link {
     font-family: var(--fonte-titulo);
-    font-weight: 700;
+    font-weight: 800;
     font-size: 14px;
     color: var(--faixa-texto);
     text-decoration: none;
@@ -125,7 +139,7 @@ const rotulo = usarRecentes ? 'AGORA' : 'ÚLTIMAS';
     text-decoration: underline;
   }
   .faixa-link:focus-visible {
-    outline: 2px solid var(--amarelo);
+    outline: 2px solid var(--tinta);
     outline-offset: -2px;
   }
 
@@ -144,13 +158,13 @@ const rotulo = usarRecentes ? 'AGORA' : 'ÚLTIMAS';
     align-items: center;
     justify-content: center;
     background: transparent;
-    border: 2px solid var(--amarelo);
+    border: 2px solid var(--tinta);
     border-radius: 0;
-    color: var(--amarelo);
+    color: var(--tinta);
     cursor: pointer;
   }
   .faixa-pausa:focus-visible {
-    outline: 2px solid var(--papel);
+    outline: 2px solid var(--tinta);
     outline-offset: 2px;
   }
 
@@ -164,6 +178,7 @@ const rotulo = usarRecentes ? 'AGORA' : 'ÚLTIMAS';
   }
 
   @media (prefers-reduced-motion: reduce) {
+    .faixa-rotulo::before { animation: none; }
     .faixa-trilha {
       animation: none;
     }

@@ -44,7 +44,7 @@ const dataIso = data.toISOString();
         {categoria && <span class="card-compacto__separador"> · </span>}
         <time class="card-compacto__tempo" datetime={dataIso} data-tempo-relativo={dataIso}>{dataCurta}</time>
       </div>
-      <h2 class="card-compacto__titulo">{titulo}</h2>
+      <h2 class="card-compacto__titulo"><span class="marca">{titulo}</span></h2>
       <div class="card-compacto__fonte">{fonte_nome}</div>
     </div>
   </a>
@@ -67,7 +67,7 @@ const dataIso = data.toISOString();
     <div class="noticia-card__corpo">
       {variante !== 'hero' && categoria && <span class="tag">{categoria}</span>}
       {variante === 'hero' && !capa && categoria && <span class="tag">{categoria}</span>}
-      <TituloTag class="noticia-card__titulo">{titulo}</TituloTag>
+      <TituloTag class="noticia-card__titulo"><span class="marca">{titulo}</span></TituloTag>
       {variante === 'hero' && <p class="noticia-card__resumo">{resumo}</p>}
       <div class="noticia-card__meta">{dataFormatada} · {fonte_nome}</div>
     </div>
