@@ -491,8 +491,10 @@ async function publicarArquivo(item, artigo, slug) {
   };
 
   const caminho = path.join(CONTENT_DIR, `${slug}.md`);
-  await fs.writeFile(caminho, matter.stringify(artigo.corpo, frontmatter), "utf-8");
+  // Registra a fonte ANTES de gravar o .md: se algo falhar no meio, a notícia
+  // nunca pode ser republicada (o workflow commita os dois arquivos juntos).
   await registrarFontePublicada(item.link);
+  await fs.writeFile(caminho, matter.stringify(artigo.corpo, frontmatter), "utf-8");
   console.log(`  -> publicado direto em ${caminho}`);
 }
 

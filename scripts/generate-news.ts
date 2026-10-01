@@ -508,17 +508,32 @@ async function appendPublishedUrl(url: string) {
   });
 }
 
-// Publicação direta: commita o .md e registra a fonte.
-async function publishDirect(candidate: Candidate, draft: Draft, cover: Cover, slug: string) {
-  await commitFile(
-    `src/content/noticias/${slug}.md`,
-    buildArticleMarkdown(candidate, draft, cover),
-    `feat(noticias): publica "${slug}" automaticamente (fonte: ${candidate.source})`
-  );
+// Publicação direta. A URL é registrada em data/published-sources.json ANTES de
+// commitar o .md: este script só consulta esse arquivo pra saber o que já foi
+// usado, então uma falha no meio nunca pode permitir republicar a mesma notícia.
+//  - registro falha  -> lança; nada foi publicado, o próximo run tenta de novo.
+//  - .md falha (após 1 retry) -> a fonte já está registrada, então cai pra rascunho
+//    (Issue + Telegram) em vez de a notícia se perder. Retorna "draft" nesse caso.
+async function publishDirect(candidate: Candidate, draft: Draft, cover: Cover, slug: string): Promise<"published" | "draft"> {
+  await appendPublishedUrl(candidate.link);
+
+  const mdPath = `src/content/noticias/${slug}.md`;
+  const message = `feat(noticias): publica "${slug}" automaticamente (fonte: ${candidate.source})`;
+  const markdown = buildArticleMarkdown(candidate, draft, cover);
   try {
-    await appendPublishedUrl(candidate.link);
+    try {
+      await commitFile(mdPath, markdown, message);
+    } catch (err) {
+      console.warn(`Commit de "${slug}" falhou (${errMsg(err)}) — tentando de novo.`);
+      await new Promise((r) => setTimeout(r, 2000));
+      await commitFile(mdPath, markdown, message);
+    }
+    return "published";
   } catch (err) {
-    console.error(`Artigo "${slug}" publicado, mas falhou ao atualizar published-sources.json: ${errMsg(err)}`);
+    console.error(`Não consegui commitar "${slug}" (fonte já registrada) — criando rascunho: ${errMsg(err)}`);
+    const issueRef = await createDraftIssue(candidate, draft, cover, slug);
+    await notifyTelegram(issueRef);
+    return "draft";
   }
 }
 
@@ -638,9 +653,12 @@ async function main() {
       const cover = await resolveCover(draft, slug);
 
       if (publicarDireto) {
-        await publishDirect(candidate, draft, cover, slug);
-        await notifyPublished({ slug, title: draft.titulo, source: candidate.source });
-        autoPublished++;
+        if ((await publishDirect(candidate, draft, cover, slug)) === "published") {
+          await notifyPublished({ slug, title: draft.titulo, source: candidate.source });
+          autoPublished++;
+        } else {
+          drafts++;
+        }
       } else {
         const issueRef = await createDraftIssue(candidate, draft, cover, slug);
         await notifyTelegram(issueRef);
