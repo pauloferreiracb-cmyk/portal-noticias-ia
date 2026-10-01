@@ -10,6 +10,12 @@ permissions:
   contents: write
   issues: write # cria as Issues de rascunho (aprovação via Telegram)
 
+# Os dois workflows de notícias entram na mesma fila: nunca rodam juntos
+# (evita sobrescrita de data/published-sources.json).
+concurrency:
+  group: noticias-pipeline
+  cancel-in-progress: false
+
 jobs:
   gerar-conteudo:
     runs-on: ubuntu-latest

@@ -10,6 +10,12 @@ permissions:
   contents: write
   issues: write
 
+# Os dois workflows de notícias entram na mesma fila: nunca rodam juntos
+# (evita sobrescrita de data/published-sources.json).
+concurrency:
+  group: noticias-pipeline
+  cancel-in-progress: false
+
 jobs:
   generate:
     runs-on: ubuntu-latest
