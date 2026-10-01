@@ -91,6 +91,14 @@ async function carregarFontesJaUsadas() {
   } catch {
     // pasta ainda não existe na primeira execução — tudo bem
   }
+  // Inclui data/published-sources.json: notícia despublicada via Telegram sai de
+  // src/content/noticias, mas a fonte continua registrada aqui e não deve voltar.
+  try {
+    const lista = JSON.parse(await fs.readFile(PUBLISHED_SOURCES_PATH, "utf-8"));
+    if (Array.isArray(lista)) lista.forEach((u) => usadas.add(u));
+  } catch {
+    // arquivo ainda não existe ou ilegível — segue só com os .md
+  }
   return usadas;
 }
 

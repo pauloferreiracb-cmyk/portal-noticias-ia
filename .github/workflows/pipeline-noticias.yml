@@ -33,6 +33,7 @@ jobs:
       - name: Gerar artigo(s) novo(s)
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          USE_GEMINI_IMAGES: ${{ vars.USE_GEMINI_IMAGES }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
@@ -56,6 +57,8 @@ jobs:
           git config user.email "bot@portal-ia.local"
           git add src/content/noticias public/carrossel public/capas-ia content/fila-social.json
           git diff --cached --quiet || git commit -m "auto: novas notícias de IA $(date +%F)"
+          # generate-news.ts agora commita direto no main; sincroniza antes do push
+          git pull --rebase
           git push
 
       - name: Disponibilizar carrossel pra download (backup manual)
