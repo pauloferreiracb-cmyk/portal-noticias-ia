@@ -34,6 +34,9 @@ export const POST: APIRoute = async ({ request }) => {
   // Só o dono do bot pode acionar qualquer botão: o clique precisa vir do chat
   // (ou do usuário) configurado em TELEGRAM_CHAT_ID. Sem a env, nega tudo.
   const allowedChatId = process.env.TELEGRAM_CHAT_ID;
+  if (!allowedChatId) {
+    console.error("TELEGRAM_CHAT_ID não configurado na Vercel — todos os callbacks serão negados.");
+  }
   const fromId = String(callback.from?.id ?? "");
   const chatId = String(callback.message?.chat?.id ?? "");
   if (!allowedChatId || (fromId !== allowedChatId && chatId !== allowedChatId)) {
