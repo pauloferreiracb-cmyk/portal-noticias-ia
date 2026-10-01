@@ -12,11 +12,14 @@
  * 5. Salva em src/content/noticias/<slug>.md
  *
  * Uso:
- *   ANTHROPIC_API_KEY=sk-ant-... node scripts/gerar-noticias-ia.mjs
+ *   GEMINI_API_KEY=... ANTHROPIC_API_KEY=sk-ant-... node scripts/gerar-noticias-ia.mjs
  *
  * Variáveis de ambiente:
- *   ANTHROPIC_API_KEY   (obrigatória)
+ *   GEMINI_API_KEY      (provedor principal; sem ela cai direto pro Claude)
+ *   GEMINI_MODEL        (opcional, default gemini-2.5-flash)
+ *   ANTHROPIC_API_KEY   (fallback; ao menos uma das duas chaves é obrigatória)
  *   CLAUDE_MODEL        (opcional, ver docs.claude.com/en/docs/about-claude/models)
+ *   TELEGRAM_BOT_TOKEN / TELEGRAM_CHAT_ID  (opcionais, alerta de falha)
  *   MAX_NOTICIAS        (opcional, default 3 por execução)
  * ------------------------------------------------------------
  */
@@ -24,12 +27,15 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 import matter from "gray-matter";
+import { GoogleGenAI } from "@google/genai";
 
 const CONTENT_DIR = path.join(process.cwd(), "src/content/noticias");
 const PUBLISHED_SOURCES_PATH = path.join(process.cwd(), "data/published-sources.json");
 const MAX_NOTICIAS = Number(process.env.MAX_NOTICIAS ?? 3);
 const MODEL = process.env.CLAUDE_MODEL ?? "claude-sonnet-5";
 const API_KEY = process.env.ANTHROPIC_API_KEY;
+const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
+const GEMINI_MODEL = process.env.GEMINI_MODEL || "gemini-2.5-flash";
 
 const PALAVRAS_CHAVE = [
   "ia", "ai", "artificial intelligence", "llm", "modelo de linguagem",
@@ -182,7 +188,94 @@ async function buscarTechCrunch() {
 }
 
 // ------------------------------------------------------------
-// Geração do artigo (Claude reescreve, nunca copia)
+// LLM com fallback: Gemini (principal) -> Claude
+// ------------------------------------------------------------
+
+class AllProvidersFailedError extends Error {}
+
+async function chamarGemini(system, user) {
+  if (!GEMINI_API_KEY) throw new Error("GEMINI_API_KEY ausente");
+
+  const ai = new GoogleGenAI({ apiKey: GEMINI_API_KEY });
+  const response = await ai.models.generateContent({
+    model: GEMINI_MODEL,
+    contents: user,
+    config: { systemInstruction: system, responseMimeType: "application/json" },
+  });
+  if (!response.text) throw new Error("resposta vazia do Gemini (possível bloqueio de segurança)");
+  return response.text;
+}
+
+async function chamarClaude(system, user) {
+  if (!API_KEY) throw new Error("ANTHROPIC_API_KEY ausente");
+
+  const resp = await fetch("https://api.anthropic.com/v1/messages", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "x-api-key": API_KEY,
+      "anthropic-version": "2023-06-01",
+    },
+    body: JSON.stringify({
+      model: MODEL,
+      max_tokens: 1500,
+      system,
+      messages: [{ role: "user", content: user }],
+    }),
+  });
+
+  if (!resp.ok) {
+    throw new Error(`Erro na API da Anthropic: ${resp.status} ${await resp.text()}`);
+  }
+
+  const data = await resp.json();
+  const texto = data.content.find((b) => b.type === "text")?.text;
+  if (!texto) throw new Error("resposta do Claude sem bloco de texto");
+  return texto;
+}
+
+async function callLLM(system, user) {
+  let erroGemini;
+  try {
+    const texto = await chamarGemini(system, user);
+    console.log(`  [LLM] respondeu: Gemini (${GEMINI_MODEL})`);
+    return texto;
+  } catch (err) {
+    erroGemini = err.message;
+    console.warn(`  [LLM] Gemini falhou (${erroGemini}) — tentando Claude.`);
+  }
+
+  try {
+    const texto = await chamarClaude(system, user);
+    console.log(`  [LLM] respondeu: Claude (${MODEL}) [fallback]`);
+    return texto;
+  } catch (err) {
+    throw new AllProvidersFailedError(`Gemini: ${erroGemini} | Claude: ${err.message}`);
+  }
+}
+
+// Alerta de falha no Telegram. Nunca lança.
+async function enviarAlertaTelegram(texto) {
+  const chatId = process.env.TELEGRAM_CHAT_ID;
+  const botToken = process.env.TELEGRAM_BOT_TOKEN;
+  if (!chatId || !botToken) {
+    console.warn("Alerta Telegram não enviado: TELEGRAM_CHAT_ID/TELEGRAM_BOT_TOKEN ausentes.");
+    return;
+  }
+  try {
+    const res = await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ chat_id: chatId, text: texto }),
+    });
+    if (!res.ok) console.error(`Telegram recusou o alerta: ${res.status} ${await res.text()}`);
+  } catch (err) {
+    console.error("Falha ao enviar alerta no Telegram:", err.message);
+  }
+}
+
+// ------------------------------------------------------------
+// Geração do artigo (LLM reescreve, nunca copia)
 // ------------------------------------------------------------
 
 async function gerarArtigo(item) {
@@ -211,27 +304,7 @@ Regras:
 Fonte: ${item.fonte_nome}
 Link: ${item.link}`;
 
-  const resp = await fetch("https://api.anthropic.com/v1/messages", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "x-api-key": API_KEY,
-      "anthropic-version": "2023-06-01",
-    },
-    body: JSON.stringify({
-      model: MODEL,
-      max_tokens: 1500,
-      system: systemPrompt,
-      messages: [{ role: "user", content: userPrompt }],
-    }),
-  });
-
-  if (!resp.ok) {
-    throw new Error(`Erro na API da Anthropic: ${resp.status} ${await resp.text()}`);
-  }
-
-  const data = await resp.json();
-  const textoResposta = data.content.find((b) => b.type === "text")?.text ?? "";
+  const textoResposta = await callLLM(systemPrompt, userPrompt);
   const limpo = textoResposta.replace(/```json|```/g, "").trim();
 
   return JSON.parse(limpo);
@@ -242,8 +315,9 @@ Link: ${item.link}`;
 // ------------------------------------------------------------
 
 async function main() {
-  if (!API_KEY) {
-    console.error("ERRO: defina ANTHROPIC_API_KEY antes de rodar.");
+  if (!GEMINI_API_KEY && !API_KEY) {
+    console.error("ERRO: defina GEMINI_API_KEY e/ou ANTHROPIC_API_KEY antes de rodar.");
+    await enviarAlertaTelegram("⚠️ Pipeline falhou: nenhuma chave de LLM configurada (GEMINI_API_KEY/ANTHROPIC_API_KEY)");
     process.exit(1);
   }
 
@@ -274,6 +348,7 @@ async function main() {
   await fs.mkdir(CONTENT_DIR, { recursive: true });
 
   let sucesso = 0;
+  let falhaApi = null;
   for (const item of novos) {
     try {
       console.log(`Gerando artigo: ${item.titulo_original}`);
@@ -300,10 +375,23 @@ async function main() {
       sucesso++;
     } catch (err) {
       console.error(`  Falhou pra "${item.titulo_original}":`, err.message);
+      if (err instanceof AllProvidersFailedError) {
+        // Os dois provedores caíram — insistir nos próximos itens só gasta tempo.
+        falhaApi = err.message;
+        await enviarAlertaTelegram(`⚠️ Pipeline falhou: todos os provedores de LLM falharam (${falhaApi})`);
+        break;
+      }
     }
   }
 
   console.log(`Concluído. ${sucesso} de ${novos.length} artigo(s) gerado(s) com sucesso.`);
+
+  // Falha de API sem nenhum artigo: o job precisa ficar vermelho, não verde.
+  if (falhaApi && sucesso === 0) process.exit(1);
 }
 
-main();
+main().catch(async (err) => {
+  console.error(err);
+  await enviarAlertaTelegram(`⚠️ Pipeline falhou: ${err.message}`);
+  process.exit(1);
+});

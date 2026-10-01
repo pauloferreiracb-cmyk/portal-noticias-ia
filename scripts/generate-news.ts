@@ -10,6 +10,7 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import Parser from "rss-parser";
 import Anthropic from "@anthropic-ai/sdk";
+import { GoogleGenAI } from "@google/genai";
 import { Octokit } from "@octokit/rest";
 import matter from "gray-matter";
 
@@ -36,7 +37,9 @@ const MAX_DRAFTS_PER_RUN = 4;
 const RECENT_TITLES_LIMIT = 15;
 const NOTICIAS_DIR = path.join(process.cwd(), "src/content/noticias");
 
-const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY! });
+const GEMINI_MODEL = process.env.GEMINI_MODEL || "gemini-2.5-flash";
+const CLAUDE_MODEL = "claude-sonnet-5";
+
 const octokit = new Octokit({ auth: process.env.GH_TOKEN! });
 const [owner, repo] = process.env.GITHUB_REPOSITORY!.split("/");
 
@@ -146,7 +149,73 @@ async function loadRecentPublishedTitles(limit: number): Promise<string[]> {
     .map((a) => a.titulo);
 }
 
-// --- 3. Claude: traduzir, gerar gancho, escrever corpo, julgar clickbait e duplicata --
+// --- 3a. LLM com fallback: Gemini (principal) -> Claude ----------------------
+class AllProvidersFailedError extends Error {}
+
+function errMsg(err: unknown): string {
+  return err instanceof Error ? err.message : String(err);
+}
+
+async function callGemini(prompt: string): Promise<string> {
+  const apiKey = process.env.GEMINI_API_KEY;
+  if (!apiKey) throw new Error("GEMINI_API_KEY ausente");
+
+  const ai = new GoogleGenAI({ apiKey });
+  const response = await ai.models.generateContent({
+    model: GEMINI_MODEL,
+    contents: prompt,
+    config: { responseMimeType: "application/json" },
+  });
+  const text = response.text;
+  if (!text) throw new Error("resposta vazia do Gemini (possível bloqueio de segurança)");
+  return text;
+}
+
+async function callClaude(prompt: string): Promise<string> {
+  const apiKey = process.env.ANTHROPIC_API_KEY;
+  if (!apiKey) throw new Error("ANTHROPIC_API_KEY ausente");
+
+  const anthropic = new Anthropic({ apiKey });
+  const msg = await anthropic.messages.create({
+    model: CLAUDE_MODEL,
+    max_tokens: 1500,
+    messages: [{ role: "user", content: prompt }],
+  });
+  const textBlock = msg.content.find((b) => b.type === "text");
+  if (!textBlock || textBlock.type !== "text") throw new Error("resposta do Claude sem bloco de texto");
+  return textBlock.text;
+}
+
+async function callLLM(prompt: string): Promise<string> {
+  let geminiErr: string;
+  try {
+    const text = await callGemini(prompt);
+    console.log(`[LLM] respondeu: Gemini (${GEMINI_MODEL})`);
+    return text;
+  } catch (err) {
+    geminiErr = errMsg(err);
+    console.warn(`[LLM] Gemini falhou (${geminiErr}) — tentando Claude.`);
+  }
+
+  try {
+    const text = await callClaude(prompt);
+    console.log(`[LLM] respondeu: Claude (${CLAUDE_MODEL}) [fallback]`);
+    return text;
+  } catch (err) {
+    throw new AllProvidersFailedError(`Gemini: ${geminiErr} | Claude: ${errMsg(err)}`);
+  }
+}
+
+// Gemini costuma envolver o JSON em ```json ... ```.
+function stripCodeFences(text: string): string {
+  return text
+    .trim()
+    .replace(/^```(?:json)?\s*/i, "")
+    .replace(/\s*```$/, "")
+    .trim();
+}
+
+// --- 3b. Traduzir, gerar gancho, escrever corpo, julgar clickbait e duplicata --
 async function judgeAndDraft(candidate: Candidate, recentTitles: string[]): Promise<Draft | null> {
   const listaTitulosRecentes =
     recentTitles.length > 0
@@ -178,20 +247,13 @@ Tarefas:
 Responda em JSON puro, sem markdown e sem texto fora do JSON:
 {"relevante": true, "duplicataDe": null, "titulo": "...", "resumo": "...", "corpo": "...", "tags": ["...", "..."], "clickbaitCheck": "ok"}`;
 
-  const msg = await anthropic.messages.create({
-    model: "claude-sonnet-5",
-    max_tokens: 1500,
-    messages: [{ role: "user", content: prompt }],
-  });
-
-  const textBlock = msg.content.find((b) => b.type === "text");
-  if (!textBlock || textBlock.type !== "text") return null;
+  const text = await callLLM(prompt);
 
   let parsed: any;
   try {
-    parsed = JSON.parse(textBlock.text);
+    parsed = JSON.parse(stripCodeFences(text));
   } catch {
-    console.warn("Resposta do Claude não era JSON válido, pulando candidato.");
+    console.warn("Resposta do LLM não era JSON válido, pulando candidato.");
     return null;
   }
 
@@ -276,7 +338,7 @@ async function notifyTelegram(draft: { issueNumber: number; title: string }) {
   const chatId = process.env.TELEGRAM_CHAT_ID!;
   const botToken = process.env.TELEGRAM_BOT_TOKEN!;
 
-  await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+  const res = await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
@@ -293,6 +355,33 @@ async function notifyTelegram(draft: { issueNumber: number; title: string }) {
       },
     }),
   });
+
+  if (!res.ok) {
+    console.error(
+      `Telegram recusou a notificação do rascunho #${draft.issueNumber}: ${res.status} ${await res.text()}`
+    );
+  }
+}
+
+// Alerta de falha do pipeline. Nunca lança — não pode mascarar o erro original.
+async function sendTelegramAlert(text: string) {
+  const chatId = process.env.TELEGRAM_CHAT_ID;
+  const botToken = process.env.TELEGRAM_BOT_TOKEN;
+  if (!chatId || !botToken) {
+    console.warn("Alerta Telegram não enviado: TELEGRAM_CHAT_ID/TELEGRAM_BOT_TOKEN ausentes.");
+    return;
+  }
+
+  try {
+    const res = await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ chat_id: chatId, text }),
+    });
+    if (!res.ok) console.error(`Telegram recusou o alerta: ${res.status} ${await res.text()}`);
+  } catch (err) {
+    console.error("Falha ao enviar alerta no Telegram:", err);
+  }
 }
 
 // --- main --------------------------------------------------------------------
@@ -309,10 +398,21 @@ async function main() {
   const fresh = candidates.filter((c) => !published.has(c.link) && !pending.urls.has(c.link));
 
   let created = 0;
+  let apiFailure: string | null = null;
   for (const candidate of fresh) {
     if (created >= MAX_DRAFTS_PER_RUN) break;
 
-    const draft = await judgeAndDraft(candidate, recentTitles);
+    let draft: Draft | null;
+    try {
+      draft = await judgeAndDraft(candidate, recentTitles);
+    } catch (err) {
+      if (!(err instanceof AllProvidersFailedError)) throw err;
+      // Os dois provedores caíram — insistir nos próximos candidatos só gasta tempo.
+      apiFailure = err.message;
+      console.error(`Todos os provedores de LLM falharam: ${apiFailure}`);
+      await sendTelegramAlert(`⚠️ Pipeline falhou: todos os provedores de LLM falharam (${apiFailure})`);
+      break;
+    }
     if (!draft) continue;
 
     const cover = await fetchCoverImage(draft.tags[0] ?? "inteligência artificial");
@@ -322,9 +422,13 @@ async function main() {
   }
 
   console.log(`Rascunhos criados nesta execução: ${created} (de ${fresh.length} candidatos novos)`);
+
+  // Falha de API sem nenhum rascunho: o job precisa ficar vermelho, não verde.
+  if (apiFailure && created === 0) process.exit(1);
 }
 
-main().catch((err) => {
+main().catch(async (err) => {
   console.error(err);
+  await sendTelegramAlert(`⚠️ Pipeline falhou: ${errMsg(err)}`);
   process.exit(1);
 });
