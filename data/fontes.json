@@ -1,10 +1,10 @@
 [
-  { "nome": "OpenAI Blog", "url": "https://openai.com/news/rss.xml", "autoPublicar": true, "peso": 10 },
-  { "nome": "Google DeepMind Blog", "url": "https://deepmind.google/blog/rss.xml", "autoPublicar": true, "peso": 10 },
+  { "nome": "OpenAI Blog", "url": "https://openai.com/news/rss.xml", "autoPublicar": false, "peso": 10 },
+  { "nome": "Google DeepMind Blog", "url": "https://deepmind.google/blog/rss.xml", "autoPublicar": false, "peso": 10 },
   { "nome": "Anthropic News", "url": "https://raw.githubusercontent.com/Olshansk/rss-feeds/main/feeds/feed_anthropic_news.xml", "autoPublicar": false, "peso": 10 },
-  { "nome": "The Verge AI", "url": "https://www.theverge.com/rss/ai-artificial-intelligence/index.xml", "autoPublicar": true, "peso": 8 },
-  { "nome": "Ars Technica AI", "url": "https://arstechnica.com/ai/feed/", "autoPublicar": true, "peso": 8 },
-  { "nome": "MIT Tech Review AI", "url": "https://www.technologyreview.com/topic/artificial-intelligence/feed", "autoPublicar": true, "peso": 8 },
+  { "nome": "The Verge AI", "url": "https://www.theverge.com/rss/ai-artificial-intelligence/index.xml", "autoPublicar": false, "peso": 8 },
+  { "nome": "Ars Technica AI", "url": "https://arstechnica.com/ai/feed/", "autoPublicar": false, "peso": 8 },
+  { "nome": "MIT Tech Review AI", "url": "https://www.technologyreview.com/topic/artificial-intelligence/feed", "autoPublicar": false, "peso": 8 },
   { "nome": "TechCrunch AI", "url": "https://techcrunch.com/category/artificial-intelligence/feed/", "autoPublicar": false, "peso": 5 },
   { "nome": "VentureBeat AI", "url": "https://venturebeat.com/category/ai/feed/", "autoPublicar": false, "peso": 3 },
   { "nome": "Hacker News (IA)", "url": "https://hnrss.org/newest?q=AI+OR+%22artificial+intelligence%22", "autoPublicar": false, "peso": 1 }

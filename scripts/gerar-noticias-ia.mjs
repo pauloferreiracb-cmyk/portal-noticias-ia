@@ -201,6 +201,17 @@ async function buscarTechCrunch() {
 
 class AllProvidersFailedError extends Error {}
 
+// Defesa em profundidade: nenhuma chave/token pode vazar em log ou alerta, mesmo
+// que uma mensagem de erro de SDK/fetch inclua a URL ou o header da requisição.
+function redact(texto) {
+  let out = String(texto);
+  for (const nome of ["GEMINI_API_KEY", "ANTHROPIC_API_KEY", "TELEGRAM_BOT_TOKEN", "GH_TOKEN"]) {
+    const valor = process.env[nome];
+    if (valor && valor.length >= 8) out = out.split(valor).join(`[${nome}]`);
+  }
+  return out;
+}
+
 async function chamarGemini(system, user) {
   if (!GEMINI_API_KEY) throw new Error("GEMINI_API_KEY ausente");
 
@@ -249,7 +260,7 @@ async function callLLM(system, user) {
     console.log(`  [LLM] respondeu: Gemini (${GEMINI_MODEL})`);
     return texto;
   } catch (err) {
-    erroGemini = err.message;
+    erroGemini = redact(err.message);
     console.warn(`  [LLM] Gemini falhou (${erroGemini}) — tentando Claude.`);
   }
 
@@ -258,7 +269,7 @@ async function callLLM(system, user) {
     console.log(`  [LLM] respondeu: Claude (${MODEL}) [fallback]`);
     return texto;
   } catch (err) {
-    throw new AllProvidersFailedError(`Gemini: ${erroGemini} | Claude: ${err.message}`);
+    throw new AllProvidersFailedError(`Gemini: ${erroGemini} | Claude: ${redact(err.message)}`);
   }
 }
 
@@ -278,7 +289,7 @@ async function enviarAlertaTelegram(texto) {
     });
     if (!res.ok) console.error(`Telegram recusou o alerta: ${res.status} ${await res.text()}`);
   } catch (err) {
-    console.error("Falha ao enviar alerta no Telegram:", err.message);
+    console.error("Falha ao enviar alerta no Telegram:", redact(err.message));
   }
 }
 
@@ -382,7 +393,7 @@ async function main() {
       console.log(`  -> salvo em ${caminho}`);
       sucesso++;
     } catch (err) {
-      console.error(`  Falhou pra "${item.titulo_original}":`, err.message);
+      console.error(`  Falhou pra "${item.titulo_original}":`, redact(err.message));
       if (err instanceof AllProvidersFailedError) {
         // Os dois provedores caíram — insistir nos próximos itens só gasta tempo.
         falhaApi = err.message;
@@ -399,7 +410,7 @@ async function main() {
 }
 
 main().catch(async (err) => {
-  console.error(err);
-  await enviarAlertaTelegram(`⚠️ Pipeline falhou: ${err.message}`);
+  console.error(redact(err?.stack ?? String(err)));
+  await enviarAlertaTelegram(`⚠️ Pipeline falhou: ${redact(err?.message ?? String(err))}`);
   process.exit(1);
 });

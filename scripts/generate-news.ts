@@ -161,8 +161,19 @@ async function loadRecentPublishedTitles(limit: number): Promise<string[]> {
 // --- 3a. LLM com fallback: Gemini (principal) -> Claude ----------------------
 class AllProvidersFailedError extends Error {}
 
+// Defesa em profundidade: nenhuma chave/token pode vazar em log ou alerta, mesmo
+// que uma mensagem de erro de SDK/fetch inclua a URL ou o header da requisição.
+function redact(text: string): string {
+  let out = text;
+  for (const name of ["GEMINI_API_KEY", "ANTHROPIC_API_KEY", "TELEGRAM_BOT_TOKEN", "GH_TOKEN"]) {
+    const value = process.env[name];
+    if (value && value.length >= 8) out = out.split(value).join(`[${name}]`);
+  }
+  return out;
+}
+
 function errMsg(err: unknown): string {
-  return err instanceof Error ? err.message : String(err);
+  return redact(err instanceof Error ? err.message : String(err));
 }
 
 async function callGemini(prompt: string): Promise<string> {
@@ -479,7 +490,7 @@ async function publishDirect(candidate: Candidate, draft: Draft, cover: Cover, s
   try {
     await appendPublishedUrl(candidate.link);
   } catch (err) {
-    console.error(`Artigo "${slug}" publicado, mas falhou ao atualizar published-sources.json:`, err);
+    console.error(`Artigo "${slug}" publicado, mas falhou ao atualizar published-sources.json: ${errMsg(err)}`);
   }
 }
 
@@ -506,7 +517,7 @@ async function telegramSend(payload: Record<string, unknown>, label: string): Pr
     }
     return true;
   } catch (err) {
-    console.error(`Falha ao chamar o Telegram (${label}):`, err);
+    console.error(`Falha ao chamar o Telegram (${label}): ${errMsg(err)}`);
     return false;
   }
 }
@@ -615,7 +626,7 @@ async function main() {
 }
 
 main().catch(async (err) => {
-  console.error(err);
+  console.error(redact(err instanceof Error ? (err.stack ?? err.message) : String(err)));
   await sendTelegramAlert(`⚠️ Pipeline falhou: ${errMsg(err)}`);
   process.exit(1);
 });
