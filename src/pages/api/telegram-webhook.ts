@@ -31,6 +31,17 @@ export const POST: APIRoute = async ({ request }) => {
   const callback = body?.callback_query;
   if (!callback) return new Response(null, { status: 200 }); // ignora updates que não são clique de botão
 
+  // Só o dono do bot pode acionar qualquer botão: o clique precisa vir do chat
+  // (ou do usuário) configurado em TELEGRAM_CHAT_ID. Sem a env, nega tudo.
+  const allowedChatId = process.env.TELEGRAM_CHAT_ID;
+  const fromId = String(callback.from?.id ?? "");
+  const chatId = String(callback.message?.chat?.id ?? "");
+  if (!allowedChatId || (fromId !== allowedChatId && chatId !== allowedChatId)) {
+    console.warn(`Callback negado: from.id=${fromId || "?"} chat.id=${chatId || "?"}`);
+    await answerTelegram(callback.id, "Não autorizado.");
+    return new Response(null, { status: 200 });
+  }
+
   const [action, arg] = (callback.data as string).split(":");
 
   if (action === "unpublish") {

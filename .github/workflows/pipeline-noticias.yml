@@ -8,6 +8,7 @@ on:
 
 permissions:
   contents: write
+  issues: write # cria as Issues de rascunho (aprovação via Telegram)
 
 jobs:
   gerar-conteudo:
@@ -24,6 +25,14 @@ jobs:
       - name: Instalar dependências
         run: npm ci
 
+      # Estado do limite de 1 alerta de falha a cada 6h (compartilhado com generate-news.yml)
+      - name: Restaurar estado dos alertas
+        uses: actions/cache/restore@v4
+        with:
+          path: .alert-state
+          key: alert-state-${{ github.run_id }}
+          restore-keys: alert-state-
+
       - name: Baixar fontes do carrossel (se ainda não existirem)
         run: |
           mkdir -p scripts/fonts
@@ -37,7 +46,15 @@ jobs:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }} # cria Issues de rascunho e lê as pendentes
         run: npm run gerar-noticias
+
+      - name: Salvar estado dos alertas
+        if: always()
+        uses: actions/cache/save@v4
+        with:
+          path: .alert-state
+          key: alert-state-${{ github.run_id }}
 
       - name: Gerar carrossel dos artigos novos
         env:

@@ -41,9 +41,18 @@ const RECENT_TITLES_LIMIT = 15;
 const NOTICIAS_DIR = path.join(process.cwd(), "src/content/noticias");
 
 const GEMINI_MODEL = process.env.GEMINI_MODEL || "gemini-3.5-flash";
+// Segundo modelo Gemini, tentado antes do Claude (os modelos "flash" mais novos
+// oscilam entre 200 e 503 por demanda; o lite costuma estar disponível).
+const GEMINI_FALLBACK_MODEL = process.env.GEMINI_FALLBACK_MODEL || "gemini-3.1-flash-lite";
 const GEMINI_IMAGE_MODEL = process.env.GEMINI_IMAGE_MODEL || "gemini-2.5-flash-image";
 const USE_GEMINI_IMAGES = process.env.USE_GEMINI_IMAGES === "true";
 const CLAUDE_MODEL = "claude-sonnet-5";
+
+// Alertas de falha: no máximo 1 a cada 6h. O estado (.alert-state/last-alert.json)
+// é restaurado/salvo entre execuções pelo actions/cache nos workflows. O exit
+// code 1 do job não depende disso — o limite só evita spam no Telegram.
+const ALERT_STATE_PATH = path.join(process.cwd(), ".alert-state/last-alert.json");
+const ALERT_COOLDOWN_MS = 6 * 60 * 60 * 1000;
 
 const octokit = new Octokit({ auth: process.env.GH_TOKEN! });
 const [owner, repo] = process.env.GITHUB_REPOSITORY!.split("/");
@@ -176,13 +185,13 @@ function errMsg(err: unknown): string {
   return redact(err instanceof Error ? err.message : String(err));
 }
 
-async function callGemini(prompt: string): Promise<string> {
+async function callGemini(prompt: string, model: string): Promise<string> {
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) throw new Error("GEMINI_API_KEY ausente");
 
   const ai = new GoogleGenAI({ apiKey });
   const response = await ai.models.generateContent({
-    model: GEMINI_MODEL,
+    model,
     contents: prompt,
     config: { responseMimeType: "application/json" },
   });
@@ -206,23 +215,42 @@ async function callClaude(prompt: string): Promise<string> {
   return textBlock.text;
 }
 
-async function callLLM(prompt: string): Promise<string> {
-  let geminiErr: string;
-  try {
-    const text = await callGemini(prompt);
-    console.log(`[LLM] respondeu: Gemini (${GEMINI_MODEL})`);
-    return text;
-  } catch (err) {
-    geminiErr = errMsg(err);
-    console.warn(`[LLM] Gemini falhou (${geminiErr}) — tentando Claude.`);
+// 503 "alto demanda" do Gemini costuma passar em segundos: 2 retentativas curtas
+// antes de gastar o fallback (Claude). Outros erros (429 de cota, chave) não repetem.
+async function withRetry<T>(fn: () => Promise<T>, label: string): Promise<T> {
+  const delaysMs = [2000, 6000];
+  for (let i = 0; ; i++) {
+    try {
+      return await fn();
+    } catch (err) {
+      if (!/503|UNAVAILABLE/i.test(errMsg(err)) || i >= delaysMs.length) throw err;
+      console.warn(`[LLM] ${label} indisponível (503) — nova tentativa em ${delaysMs[i] / 1000}s.`);
+      await new Promise((resolve) => setTimeout(resolve, delaysMs[i]));
+    }
   }
+}
+
+async function callLLM(prompt: string): Promise<string> {
+  const geminiErrs: string[] = [];
+  const geminiModels = [...new Set([GEMINI_MODEL, GEMINI_FALLBACK_MODEL])];
+  for (const model of geminiModels) {
+    try {
+      const text = await withRetry(() => callGemini(prompt, model), model);
+      console.log(`[LLM] respondeu: Gemini (${model})${model === GEMINI_MODEL ? "" : " [modelo reserva]"}`);
+      return text;
+    } catch (err) {
+      geminiErrs.push(`${model}: ${errMsg(err)}`);
+      console.warn(`[LLM] Gemini ${model} falhou (${errMsg(err)}).`);
+    }
+  }
+  console.warn("[LLM] Gemini indisponível — tentando Claude.");
 
   try {
     const text = await callClaude(prompt);
     console.log(`[LLM] respondeu: Claude (${CLAUDE_MODEL}) [fallback]`);
     return text;
   } catch (err) {
-    throw new AllProvidersFailedError(`Gemini: ${geminiErr} | Claude: ${errMsg(err)}`);
+    throw new AllProvidersFailedError(`Gemini: ${geminiErrs.join(" / ")} | Claude: ${errMsg(err)}`);
   }
 }
 
@@ -552,9 +580,22 @@ async function notifyPublished(info: { slug: string; title: string; source: stri
   );
 }
 
-// Alerta de falha do pipeline.
+// Alerta de falha do pipeline (no máximo 1 a cada 6h).
 async function sendTelegramAlert(text: string) {
-  await telegramSend({ text }, "alerta");
+  try {
+    const { ts } = JSON.parse(await fs.readFile(ALERT_STATE_PATH, "utf-8"));
+    if (Date.now() - ts < ALERT_COOLDOWN_MS) {
+      console.warn(`Alerta suprimido (já houve um alerta de falha nas últimas 6h): ${text}`);
+      return;
+    }
+  } catch {
+    // sem estado anterior — pode alertar
+  }
+
+  if (await telegramSend({ text }, "alerta")) {
+    await fs.mkdir(path.dirname(ALERT_STATE_PATH), { recursive: true });
+    await fs.writeFile(ALERT_STATE_PATH, JSON.stringify({ ts: Date.now() }), "utf-8");
+  }
 }
 
 // --- main --------------------------------------------------------------------

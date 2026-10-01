@@ -22,6 +22,14 @@ jobs:
 
       - run: npm ci
 
+      # Estado do limite de 1 alerta de falha a cada 6h (compartilhado com o pipeline diário)
+      - name: Restaurar estado dos alertas
+        uses: actions/cache/restore@v4
+        with:
+          path: .alert-state
+          key: alert-state-${{ github.run_id }}
+          restore-keys: alert-state-
+
       - name: Buscar fontes e criar rascunhos
         run: npx tsx scripts/generate-news.ts
         env:
@@ -32,3 +40,10 @@ jobs:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }} # token automático do Actions, só precisa habilitar permissão de "issues: write"
+
+      - name: Salvar estado dos alertas
+        if: always()
+        uses: actions/cache/save@v4
+        with:
+          path: .alert-state
+          key: alert-state-${{ github.run_id }}

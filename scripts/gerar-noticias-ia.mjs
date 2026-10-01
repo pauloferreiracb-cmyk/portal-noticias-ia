@@ -1,15 +1,18 @@
 #!/usr/bin/env node
 /**
- * Pipeline: Portal de Notícias de IA
+ * Pipeline diário: Portal de Notícias de IA
  * ------------------------------------------------------------
- * 1. Busca itens recentes no Hacker News (API oficial) e no feed
- *    RSS da categoria de IA do TechCrunch.
+ * 1. Lê as fontes de data/fontes.json ({ nome, url, autoPublicar, peso }) e
+ *    busca os itens recentes de cada feed RSS.
  * 2. Filtra por palavras-chave do nicho e por janela de tempo.
- * 3. Ignora tudo que já foi publicado antes (dedupe por fonte_url).
- * 4. Pra cada item novo, chama a API da Anthropic pra REESCREVER
- *    (nunca copiar) um artigo original em PT-BR, com resumo pro
- *    card/carrossel e frontmatter no formato que o site espera.
- * 5. Salva em src/content/noticias/<slug>.md
+ * 3. Ignora tudo que já foi publicado ou está em rascunho pendente.
+ * 4. Pra cada item novo, chama o LLM (Gemini, com fallback Claude) pra
+ *    REESCREVER (nunca copiar) um artigo original em PT-BR.
+ * 5. Decide o destino (mesma regra de scripts/generate-news.ts):
+ *    - fonte com autoPublicar=true E checagem de fidelidade aprovada:
+ *      grava em src/content/noticias/<slug>.md (o workflow commita);
+ *    - caso contrário: cria Issue de rascunho + aviso no Telegram com
+ *      botões Publicar/Descartar (webhook em src/pages/api/telegram-webhook.ts).
  *
  * Uso:
  *   GEMINI_API_KEY=... ANTHROPIC_API_KEY=sk-ant-... node scripts/gerar-noticias-ia.mjs
@@ -19,7 +22,8 @@
  *   GEMINI_MODEL        (opcional, default gemini-3.5-flash)
  *   ANTHROPIC_API_KEY   (fallback; ao menos uma das duas chaves é obrigatória)
  *   CLAUDE_MODEL        (opcional, ver docs.claude.com/en/docs/about-claude/models)
- *   TELEGRAM_BOT_TOKEN / TELEGRAM_CHAT_ID  (opcionais, alerta de falha)
+ *   GH_TOKEN + GITHUB_REPOSITORY  (criam as Issues de rascunho; sem eles, rascunhos não são criados)
+ *   TELEGRAM_BOT_TOKEN / TELEGRAM_CHAT_ID  (avisos e alertas de falha)
  *   MAX_NOTICIAS        (opcional, default 3 por execução)
  * ------------------------------------------------------------
  */
@@ -27,15 +31,26 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 import matter from "gray-matter";
+import Parser from "rss-parser";
+import { Octokit } from "@octokit/rest";
 import { GoogleGenAI } from "@google/genai";
 
 const CONTENT_DIR = path.join(process.cwd(), "src/content/noticias");
 const PUBLISHED_SOURCES_PATH = path.join(process.cwd(), "data/published-sources.json");
+const FONTES_PATH = path.join(process.cwd(), "data/fontes.json");
+const ALERT_STATE_PATH = path.join(process.cwd(), ".alert-state/last-alert.json");
+const ALERT_COOLDOWN_MS = 6 * 60 * 60 * 1000; // 1 alerta de falha a cada 6h
 const MAX_NOTICIAS = Number(process.env.MAX_NOTICIAS ?? 3);
 const MODEL = process.env.CLAUDE_MODEL ?? "claude-sonnet-5";
 const API_KEY = process.env.ANTHROPIC_API_KEY;
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 const GEMINI_MODEL = process.env.GEMINI_MODEL || "gemini-3.5-flash";
+// Segundo modelo Gemini, tentado antes do Claude (os modelos "flash" mais novos
+// oscilam entre 200 e 503 por demanda; o lite costuma estar disponível).
+const GEMINI_FALLBACK_MODEL = process.env.GEMINI_FALLBACK_MODEL || "gemini-3.1-flash-lite";
+
+const octokit = process.env.GH_TOKEN ? new Octokit({ auth: process.env.GH_TOKEN }) : null;
+const [owner, repo] = (process.env.GITHUB_REPOSITORY ?? "/").split("/");
 
 const PALAVRAS_CHAVE = [
   "ia", "ai", "artificial intelligence", "llm", "modelo de linguagem",
@@ -50,14 +65,17 @@ const JANELA_HORAS = 36; // um pouco mais largo que 24h pra não perder nada no 
 // Utilidades
 // ------------------------------------------------------------
 
+// Limitado a 50 chars: o callback_data do Telegram aceita no máximo 64 bytes e
+// "unpublish:<slug>" precisa caber.
 function slugify(texto) {
   return texto
-    .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+    .normalize("NFD").replace(/[̀-ͯ]/g, "")
     .toLowerCase()
     .replace(/[^a-z0-9\s-]/g, "")
     .trim()
     .replace(/\s+/g, "-")
-    .slice(0, 80);
+    .slice(0, 50)
+    .replace(/-+$/, "");
 }
 
 function bateComKeyword(texto) {
@@ -102,6 +120,23 @@ async function carregarFontesJaUsadas() {
   return usadas;
 }
 
+// Rascunhos já esperando aprovação (Issues abertas com label news-draft), pra
+// não criar Issue duplicada a cada execução.
+async function carregarRascunhosPendentes() {
+  const urls = new Set();
+  if (!octokit) return urls;
+  try {
+    const issues = await octokit.issues.listForRepo({ owner, repo, state: "open", labels: "news-draft" });
+    for (const issue of issues.data) {
+      const match = issue.body?.match(/fonte_url:\s*"(.+?)"/);
+      if (match) urls.add(match[1]);
+    }
+  } catch (err) {
+    console.warn("Não consegui listar rascunhos pendentes:", redact(err.message));
+  }
+  return urls;
+}
+
 // Grava a fonte_url em data/published-sources.json — o mesmo arquivo que
 // scripts/generate-news.ts lê pra não recriar rascunho de notícia já publicada
 // por este script. Lê o array atual, dá push e escreve de volta (read-modify-
@@ -126,71 +161,41 @@ async function registrarFontePublicada(url) {
 }
 
 // ------------------------------------------------------------
-// Fonte 1: Hacker News (API oficial, sem scraping)
+// Fontes: data/fontes.json (todas RSS)
 // ------------------------------------------------------------
 
-async function buscarHackerNews() {
-  const idsResp = await fetch("https://hacker-news.firebaseio.com/v0/newstories.json");
-  const ids = (await idsResp.json()).slice(0, 100); // primeiras 100 mais novas
+async function carregarFontes() {
+  const lista = JSON.parse(await fs.readFile(FONTES_PATH, "utf-8"));
+  if (!Array.isArray(lista) || lista.length === 0) throw new Error("data/fontes.json vazio ou inválido");
+  return lista;
+}
 
+async function buscarFontes(fontes) {
+  const parser = new Parser();
   const itens = [];
-  for (const id of ids) {
+
+  for (const fonte of fontes) {
     try {
-      const r = await fetch(`https://hacker-news.firebaseio.com/v0/item/${id}.json`);
-      const item = await r.json();
-      if (!item?.title || !item?.url) continue;
-      if (!dentroDaJanela(item.time * 1000)) continue;
-      if (!bateComKeyword(item.title)) continue;
+      const feed = await parser.parseURL(fonte.url);
+      for (const item of feed.items) {
+        if (!item.title || !item.link) continue;
+        const timestamp = new Date(item.isoDate ?? item.pubDate ?? 0).getTime();
+        if (!dentroDaJanela(timestamp)) continue;
+        if (!bateComKeyword(item.title)) continue;
 
-      itens.push({
-        titulo_original: item.title,
-        link: item.url,
-        fonte_nome: "Hacker News",
-        pontos: item.score ?? 0,
-        publicado_em: new Date(item.time * 1000).toISOString(),
-      });
-    } catch {
-      // item individual falhou, segue o baile
+        itens.push({
+          titulo_original: item.title,
+          link: item.link,
+          fonte_nome: fonte.nome,
+          autoPublicar: fonte.autoPublicar === true,
+          peso: fonte.peso ?? 0,
+          trecho: item.contentSnippet ?? "",
+          publicado_em: new Date(timestamp).toISOString(),
+        });
+      }
+    } catch (err) {
+      console.warn(`Fonte "${fonte.nome}" falhou:`, redact(err.message));
     }
-  }
-  return itens;
-}
-
-// ------------------------------------------------------------
-// Fonte 2: TechCrunch AI (RSS oficial, sem scraping de HTML)
-// ------------------------------------------------------------
-
-function extrairTagsRSS(xml, tag) {
-  const regex = new RegExp(`<${tag}>([\\s\\S]*?)<\\/${tag}>`, "g");
-  return [...xml.matchAll(regex)].map((m) =>
-    m[1].replace("<![CDATA[", "").replace("]]>", "").trim()
-  );
-}
-
-async function buscarTechCrunch() {
-  const resp = await fetch("https://techcrunch.com/category/artificial-intelligence/feed/");
-  const xml = await resp.text();
-
-  const blocos = xml.split("<item>").slice(1);
-  const itens = [];
-
-  for (const bloco of blocos) {
-    const titulo = extrairTagsRSS(bloco, "title")[0];
-    const link = extrairTagsRSS(bloco, "link")[0];
-    const pubDateStr = extrairTagsRSS(bloco, "pubDate")[0];
-    if (!titulo || !link || !pubDateStr) continue;
-
-    const timestamp = new Date(pubDateStr).getTime();
-    if (!dentroDaJanela(timestamp)) continue;
-    if (!bateComKeyword(titulo)) continue;
-
-    itens.push({
-      titulo_original: titulo,
-      link,
-      fonte_nome: "TechCrunch",
-      pontos: 0,
-      publicado_em: new Date(timestamp).toISOString(),
-    });
   }
   return itens;
 }
@@ -212,12 +217,12 @@ function redact(texto) {
   return out;
 }
 
-async function chamarGemini(system, user) {
+async function chamarGemini(system, user, model) {
   if (!GEMINI_API_KEY) throw new Error("GEMINI_API_KEY ausente");
 
   const ai = new GoogleGenAI({ apiKey: GEMINI_API_KEY });
   const response = await ai.models.generateContent({
-    model: GEMINI_MODEL,
+    model,
     contents: user,
     config: { systemInstruction: system, responseMimeType: "application/json" },
   });
@@ -253,43 +258,93 @@ async function chamarClaude(system, user) {
   return texto;
 }
 
-async function callLLM(system, user) {
-  let erroGemini;
-  try {
-    const texto = await chamarGemini(system, user);
-    console.log(`  [LLM] respondeu: Gemini (${GEMINI_MODEL})`);
-    return texto;
-  } catch (err) {
-    erroGemini = redact(err.message);
-    console.warn(`  [LLM] Gemini falhou (${erroGemini}) — tentando Claude.`);
+// 503 "alta demanda" do Gemini costuma passar em segundos: 2 retentativas curtas
+// antes de gastar o fallback (Claude). Outros erros (429 de cota, chave) não repetem.
+async function comRetry(fn, rotulo) {
+  const esperasMs = [2000, 6000];
+  for (let i = 0; ; i++) {
+    try {
+      return await fn();
+    } catch (err) {
+      if (!/503|UNAVAILABLE/i.test(String(err.message)) || i >= esperasMs.length) throw err;
+      console.warn(`  [LLM] ${rotulo} indisponível (503) — nova tentativa em ${esperasMs[i] / 1000}s.`);
+      await new Promise((resolve) => setTimeout(resolve, esperasMs[i]));
+    }
   }
+}
+
+async function callLLM(system, user) {
+  const errosGemini = [];
+  for (const modelo of new Set([GEMINI_MODEL, GEMINI_FALLBACK_MODEL])) {
+    try {
+      const texto = await comRetry(() => chamarGemini(system, user, modelo), modelo);
+      console.log(`  [LLM] respondeu: Gemini (${modelo})${modelo === GEMINI_MODEL ? "" : " [modelo reserva]"}`);
+      return texto;
+    } catch (err) {
+      errosGemini.push(`${modelo}: ${redact(err.message)}`);
+      console.warn(`  [LLM] Gemini ${modelo} falhou (${redact(err.message)}).`);
+    }
+  }
+  console.warn("  [LLM] Gemini indisponível — tentando Claude.");
 
   try {
     const texto = await chamarClaude(system, user);
     console.log(`  [LLM] respondeu: Claude (${MODEL}) [fallback]`);
     return texto;
   } catch (err) {
-    throw new AllProvidersFailedError(`Gemini: ${erroGemini} | Claude: ${redact(err.message)}`);
+    throw new AllProvidersFailedError(`Gemini: ${errosGemini.join(" / ")} | Claude: ${redact(err.message)}`);
   }
 }
 
-// Alerta de falha no Telegram. Nunca lança.
-async function enviarAlertaTelegram(texto) {
+function removerCercas(texto) {
+  return texto.replace(/```json|```/g, "").trim();
+}
+
+// ------------------------------------------------------------
+// Telegram (todas as chamadas checam res.ok e nunca lançam)
+// ------------------------------------------------------------
+
+async function telegramSend(payload, rotulo) {
   const chatId = process.env.TELEGRAM_CHAT_ID;
   const botToken = process.env.TELEGRAM_BOT_TOKEN;
   if (!chatId || !botToken) {
-    console.warn("Alerta Telegram não enviado: TELEGRAM_CHAT_ID/TELEGRAM_BOT_TOKEN ausentes.");
-    return;
+    console.warn(`Telegram (${rotulo}) não enviado: TELEGRAM_CHAT_ID/TELEGRAM_BOT_TOKEN ausentes.`);
+    return false;
   }
   try {
     const res = await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ chat_id: chatId, text: texto }),
+      body: JSON.stringify({ chat_id: chatId, ...payload }),
     });
-    if (!res.ok) console.error(`Telegram recusou o alerta: ${res.status} ${await res.text()}`);
+    if (!res.ok) {
+      console.error(`Telegram recusou (${rotulo}): ${res.status} ${await res.text()}`);
+      return false;
+    }
+    return true;
   } catch (err) {
-    console.error("Falha ao enviar alerta no Telegram:", redact(err.message));
+    console.error(`Falha ao chamar o Telegram (${rotulo}):`, redact(err.message));
+    return false;
+  }
+}
+
+// Alerta de falha: no máximo 1 a cada 6h. O estado (.alert-state/last-alert.json)
+// é restaurado/salvo entre execuções pelo actions/cache nos workflows. O exit
+// code 1 do job não depende disso — o limite só evita spam no Telegram.
+async function enviarAlertaTelegram(texto) {
+  try {
+    const { ts } = JSON.parse(await fs.readFile(ALERT_STATE_PATH, "utf-8"));
+    if (Date.now() - ts < ALERT_COOLDOWN_MS) {
+      console.warn("Alerta suprimido (já houve um alerta de falha nas últimas 6h):", texto);
+      return;
+    }
+  } catch {
+    // sem estado anterior — pode alertar
+  }
+
+  if (await telegramSend({ text: texto }, "alerta")) {
+    await fs.mkdir(path.dirname(ALERT_STATE_PATH), { recursive: true });
+    await fs.writeFile(ALERT_STATE_PATH, JSON.stringify({ ts: Date.now() }), "utf-8");
   }
 }
 
@@ -319,14 +374,126 @@ Regras:
   "corpo": "corpo do artigo em markdown, 3 a 5 parágrafos"
 }`;
 
+  const regraExtra = item.autoPublicar
+    ? "\nREGRA EXTRA: esta matéria pode ser publicada sem revisão humana. Use APENAS fatos, números, nomes e afirmações presentes no título/trecho acima — não acrescente números, citações, datas ou detalhes que não estejam lá; no contexto, seja genérico."
+    : "";
+
   const userPrompt = `Título original (pode estar em inglês): ${item.titulo_original}
+Trecho: ${item.trecho || "(sem trecho disponível)"}
 Fonte: ${item.fonte_nome}
-Link: ${item.link}`;
+Link: ${item.link}${regraExtra}`;
 
   const textoResposta = await callLLM(systemPrompt, userPrompt);
-  const limpo = textoResposta.replace(/```json|```/g, "").trim();
+  return JSON.parse(removerCercas(textoResposta));
+}
 
-  return JSON.parse(limpo);
+// Checagem de segurança (mesma de scripts/generate-news.ts): só o que está no
+// título/trecho da fonte pode aparecer no artigo. fiel != true, JSON inválido
+// ou qualquer dúvida = NÃO publica direto.
+async function checarFidelidade(item, artigo) {
+  const system = "Você é um verificador de fatos rigoroso.";
+  const user = `Compare o ARTIGO com a FONTE.
+A FONTE é só o título e o trecho abaixo — nada além disso pode ser considerado conhecido.
+
+FONTE (${item.fonte_nome}):
+Título: ${item.titulo_original}
+Trecho: ${item.trecho || "(sem trecho disponível)"}
+
+ARTIGO (em português):
+Título: ${artigo.titulo}
+Resumo: ${artigo.resumo}
+Corpo:
+${artigo.corpo}
+
+Verifique se TODOS os números, datas, nomes (pessoas, empresas, produtos) e afirmações factuais do artigo constam no título/trecho da fonte. Tradução e reformulação são aceitas; qualquer fato, número, nome, citação ou conclusão que NÃO conste na fonte torna o artigo infiel.
+
+Responda em JSON puro: {"fiel": true|false, "motivo": "explicação curta; se infiel, cite o que não consta na fonte"}`;
+
+  const texto = await callLLM(system, user);
+  try {
+    const parsed = JSON.parse(removerCercas(texto));
+    return { fiel: parsed.fiel === true, motivo: String(parsed.motivo ?? "") };
+  } catch {
+    return { fiel: false, motivo: "resposta da checagem de fidelidade não era JSON válido" };
+  }
+}
+
+// ------------------------------------------------------------
+// Destinos: rascunho (Issue + Telegram) ou publicação direta (arquivo)
+// ------------------------------------------------------------
+
+// Mesmo formato do rascunho de scripts/generate-news.ts — o webhook grava o
+// corpo da Issue (sem os comentários de controle) em src/content/noticias/.
+// Sem `capa`: a capa é resolvida pelo site/scripts de capa (src/lib/capa.ts).
+async function criarRascunho(item, artigo, slug) {
+  if (!octokit) {
+    console.warn("  GH_TOKEN ausente — rascunho NÃO criado (rode no GitHub Actions).");
+    return false;
+  }
+
+  const body = `<!-- slug: ${slug} -->
+---
+titulo: "${artigo.titulo.replace(/"/g, '\\"')}"
+resumo: "${artigo.resumo.replace(/"/g, '\\"')}"
+data: "${new Date().toISOString()}"
+fonte_url: "${item.link}"
+fonte_nome: "${item.fonte_nome}"
+tags: [${(artigo.tags ?? []).map((t) => `"${t}"`).join(", ")}]
+---
+
+${artigo.corpo}
+`;
+
+  const issue = await octokit.issues.create({
+    owner,
+    repo,
+    title: `[draft] ${artigo.titulo}`,
+    body,
+    labels: ["news-draft"],
+  });
+
+  await telegramSend(
+    {
+      text: `📰 Novo rascunho: *${artigo.titulo}*`,
+      parse_mode: "Markdown",
+      reply_markup: {
+        inline_keyboard: [
+          [
+            { text: "✅ Publicar", callback_data: `publish:${issue.data.number}` },
+            { text: "❌ Descartar", callback_data: `discard:${issue.data.number}` },
+          ],
+        ],
+      },
+    },
+    `rascunho #${issue.data.number}`
+  );
+  return true;
+}
+
+async function slugUnico(titulo) {
+  const base = slugify(titulo) || `noticia-${Date.now().toString(36)}`;
+  try {
+    await fs.access(path.join(CONTENT_DIR, `${base}.md`));
+  } catch {
+    return base;
+  }
+  return `${base.slice(0, 45)}-${Date.now().toString(36).slice(-4)}`;
+}
+
+async function publicarArquivo(item, artigo, slug) {
+  const frontmatter = {
+    titulo: artigo.titulo,
+    resumo: artigo.resumo,
+    data: new Date().toISOString().slice(0, 10),
+    fonte_url: item.link,
+    fonte_nome: item.fonte_nome,
+    tags: artigo.tags,
+  };
+
+  const caminho = path.join(CONTENT_DIR, `${slug}.md`);
+  await fs.writeFile(caminho, matter.stringify(artigo.corpo, frontmatter), "utf-8");
+  await registrarFontePublicada(item.link);
+  console.log(`  -> publicado direto em ${caminho}`);
 }
 
 // ------------------------------------------------------------
@@ -341,22 +508,14 @@ async function main() {
   }
 
   console.log("Buscando notícias de IA...");
-  const [hn, tc] = await Promise.allSettled([buscarHackerNews(), buscarTechCrunch()]);
+  const fontes = await carregarFontes();
+  const candidatos = await buscarFontes(fontes);
+  console.log(`Encontrados ${candidatos.length} candidatos (${fontes.length} fontes) dentro da janela e do filtro.`);
 
-  const candidatos = [
-    ...(hn.status === "fulfilled" ? hn.value : []),
-    ...(tc.status === "fulfilled" ? tc.value : []),
-  ];
-
-  if (hn.status === "rejected") console.warn("Hacker News falhou:", hn.reason?.message);
-  if (tc.status === "rejected") console.warn("TechCrunch falhou:", tc.reason?.message);
-
-  console.log(`Encontrados ${candidatos.length} candidatos (HN + TechCrunch) dentro da janela e do filtro.`);
-
-  const jaUsadas = await carregarFontesJaUsadas();
+  const [jaUsadas, pendentes] = await Promise.all([carregarFontesJaUsadas(), carregarRascunhosPendentes()]);
   const novos = candidatos
-    .filter((c) => !jaUsadas.has(c.link))
-    .sort((a, b) => b.pontos - a.pontos)
+    .filter((c) => !jaUsadas.has(c.link) && !pendentes.has(c.link))
+    .sort((a, b) => b.peso - a.peso)
     .slice(0, MAX_NOTICIAS);
 
   if (novos.length === 0) {
@@ -366,32 +525,38 @@ async function main() {
 
   await fs.mkdir(CONTENT_DIR, { recursive: true });
 
-  let sucesso = 0;
+  let publicados = 0;
+  let rascunhos = 0;
   let falhaApi = null;
   for (const item of novos) {
     try {
       console.log(`Gerando artigo: ${item.titulo_original}`);
       const artigo = await gerarArtigo(item);
+      const slug = await slugUnico(artigo.titulo);
 
-      const slug = slugify(artigo.titulo);
-      const dataHoje = new Date().toISOString().slice(0, 10);
+      let publicarDireto = false;
+      if (item.autoPublicar) {
+        const check = await checarFidelidade(item, artigo);
+        publicarDireto = check.fiel;
+        if (!check.fiel) console.log(`  Fidelidade reprovada — vai pra aprovação manual: ${check.motivo}`);
+      }
 
-      const frontmatter = {
-        titulo: artigo.titulo,
-        resumo: artigo.resumo,
-        data: dataHoje,
-        fonte_url: item.link,
-        fonte_nome: item.fonte_nome,
-        tags: artigo.tags,
-      };
-
-      const conteudoFinal = matter.stringify(artigo.corpo, frontmatter);
-      const caminho = path.join(CONTENT_DIR, `${slug}.md`);
-      await fs.writeFile(caminho, conteudoFinal, "utf-8");
-      await registrarFontePublicada(item.link);
-
-      console.log(`  -> salvo em ${caminho}`);
-      sucesso++;
+      if (publicarDireto) {
+        await publicarArquivo(item, artigo, slug);
+        publicados++;
+        // O arquivo só vai pro ar quando o workflow commitar/push (próximos passos).
+        await telegramSend(
+          {
+            text: `✅ Publicado: ${artigo.titulo} (fonte: ${item.fonte_nome})`,
+            reply_markup: {
+              inline_keyboard: [[{ text: "↩️ Despublicar", callback_data: `unpublish:${slug}` }]],
+            },
+          },
+          `publicado ${slug}`
+        );
+      } else if (await criarRascunho(item, artigo, slug)) {
+        rascunhos++;
+      }
     } catch (err) {
       console.error(`  Falhou pra "${item.titulo_original}":`, redact(err.message));
       if (err instanceof AllProvidersFailedError) {
@@ -403,10 +568,10 @@ async function main() {
     }
   }
 
-  console.log(`Concluído. ${sucesso} de ${novos.length} artigo(s) gerado(s) com sucesso.`);
+  console.log(`Concluído. Publicados direto: ${publicados} | Rascunhos p/ aprovação: ${rascunhos} (de ${novos.length} item(ns)).`);
 
-  // Falha de API sem nenhum artigo: o job precisa ficar vermelho, não verde.
-  if (falhaApi && sucesso === 0) process.exit(1);
+  // Falha de API sem nada processado: o job precisa ficar vermelho, não verde.
+  if (falhaApi && publicados + rascunhos === 0) process.exit(1);
 }
 
 main().catch(async (err) => {
