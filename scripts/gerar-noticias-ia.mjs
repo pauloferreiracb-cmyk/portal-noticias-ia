@@ -16,7 +16,7 @@
  *
  * Variáveis de ambiente:
  *   GEMINI_API_KEY      (provedor principal; sem ela cai direto pro Claude)
- *   GEMINI_MODEL        (opcional, default gemini-2.5-flash)
+ *   GEMINI_MODEL        (opcional, default gemini-3.5-flash)
  *   ANTHROPIC_API_KEY   (fallback; ao menos uma das duas chaves é obrigatória)
  *   CLAUDE_MODEL        (opcional, ver docs.claude.com/en/docs/about-claude/models)
  *   TELEGRAM_BOT_TOKEN / TELEGRAM_CHAT_ID  (opcionais, alerta de falha)
@@ -35,7 +35,7 @@ const MAX_NOTICIAS = Number(process.env.MAX_NOTICIAS ?? 3);
 const MODEL = process.env.CLAUDE_MODEL ?? "claude-sonnet-5";
 const API_KEY = process.env.ANTHROPIC_API_KEY;
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
-const GEMINI_MODEL = process.env.GEMINI_MODEL || "gemini-2.5-flash";
+const GEMINI_MODEL = process.env.GEMINI_MODEL || "gemini-3.5-flash";
 
 const PALAVRAS_CHAVE = [
   "ia", "ai", "artificial intelligence", "llm", "modelo de linguagem",

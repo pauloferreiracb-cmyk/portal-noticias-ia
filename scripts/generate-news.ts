@@ -40,7 +40,7 @@ const MAX_DRAFTS_PER_RUN = 4;
 const RECENT_TITLES_LIMIT = 15;
 const NOTICIAS_DIR = path.join(process.cwd(), "src/content/noticias");
 
-const GEMINI_MODEL = process.env.GEMINI_MODEL || "gemini-2.5-flash";
+const GEMINI_MODEL = process.env.GEMINI_MODEL || "gemini-3.5-flash";
 const GEMINI_IMAGE_MODEL = process.env.GEMINI_IMAGE_MODEL || "gemini-2.5-flash-image";
 const USE_GEMINI_IMAGES = process.env.USE_GEMINI_IMAGES === "true";
 const CLAUDE_MODEL = "claude-sonnet-5";
