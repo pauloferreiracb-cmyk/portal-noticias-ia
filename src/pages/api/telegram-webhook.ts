@@ -6,6 +6,9 @@
 //    real no repo, em src/content/noticias/ (dispara o rebuild automático na
 //    Vercel)
 //  - "Descartar": só fecha a Issue
+//  - "Despublicar" (callback unpublish:<slug>): remove o .md de
+//    src/content/noticias via commit. A fonte continua em
+//    data/published-sources.json, então o pipeline não republica a notícia.
 
 import type { APIRoute } from "astro";
 import { Octokit } from "@octokit/rest";
@@ -28,8 +31,28 @@ export const POST: APIRoute = async ({ request }) => {
   const callback = body?.callback_query;
   if (!callback) return new Response(null, { status: 200 }); // ignora updates que não são clique de botão
 
-  const [action, issueNumberStr] = (callback.data as string).split(":");
-  const issueNumber = Number(issueNumberStr);
+  // Só o dono do bot pode acionar qualquer botão: o clique precisa vir do chat
+  // (ou do usuário) configurado em TELEGRAM_CHAT_ID. Sem a env, nega tudo.
+  const allowedChatId = process.env.TELEGRAM_CHAT_ID;
+  if (!allowedChatId) {
+    console.error("TELEGRAM_CHAT_ID não configurado na Vercel — todos os callbacks serão negados.");
+  }
+  const fromId = String(callback.from?.id ?? "");
+  const chatId = String(callback.message?.chat?.id ?? "");
+  if (!allowedChatId || (fromId !== allowedChatId && chatId !== allowedChatId)) {
+    console.warn(`Callback negado: from.id=${fromId || "?"} chat.id=${chatId || "?"}`);
+    await answerTelegram(callback.id, "Não autorizado.");
+    return new Response(null, { status: 200 });
+  }
+
+  const [action, arg] = (callback.data as string).split(":");
+
+  if (action === "unpublish") {
+    await handleUnpublish(callback.id, arg);
+    return new Response(null, { status: 200 });
+  }
+
+  const issueNumber = Number(arg);
 
   const { data: issue } = await octokit.issues.get({ owner, repo, issue_number: issueNumber });
   const issueBody = issue.body ?? "";
@@ -71,6 +94,36 @@ export const POST: APIRoute = async ({ request }) => {
   return new Response(null, { status: 200 });
 };
 
+async function handleUnpublish(callbackId: string, slug: string | undefined) {
+  // slug vem do callback_data: só aceita o formato gerado pelo pipeline
+  // (evita path traversal caso o payload seja adulterado).
+  if (!slug || !/^[a-z0-9-]+$/.test(slug)) {
+    await answerTelegram(callbackId, "Slug inválido.");
+    return;
+  }
+
+  const path = `src/content/noticias/${slug}.md`;
+  try {
+    const { data } = await octokit.repos.getContent({ owner, repo, path });
+    if (Array.isArray(data) || !("sha" in data)) throw new Error("caminho não é um arquivo");
+
+    await octokit.repos.deleteFile({
+      owner,
+      repo,
+      path,
+      message: `revert(noticias): despublica "${slug}" via Telegram`,
+      sha: data.sha,
+    });
+    await answerTelegram(callbackId, "Despublicado. A Vercel já está gerando o deploy.");
+  } catch (err: any) {
+    console.error(`Falha ao despublicar "${slug}":`, err);
+    await answerTelegram(
+      callbackId,
+      err?.status === 404 ? "Já estava despublicado." : "Erro ao despublicar — veja os logs."
+    );
+  }
+}
+
 async function appendPublishedUrl(url: string) {
   const path = "data/published-sources.json";
   const { data } = await octokit.repos.getContent({ owner, repo, path });
@@ -90,9 +143,10 @@ async function appendPublishedUrl(url: string) {
 }
 
 async function answerTelegram(callbackQueryId: string, text: string) {
-  await fetch(`https://api.telegram.org/bot${process.env.TELEGRAM_BOT_TOKEN}/answerCallbackQuery`, {
+  const res = await fetch(`https://api.telegram.org/bot${process.env.TELEGRAM_BOT_TOKEN}/answerCallbackQuery`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ callback_query_id: callbackQueryId, text }),
   });
+  if (!res.ok) console.error(`Telegram recusou answerCallbackQuery: ${res.status} ${await res.text()}`);
 }

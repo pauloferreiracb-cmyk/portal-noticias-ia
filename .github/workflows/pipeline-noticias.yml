@@ -8,6 +8,13 @@ on:
 
 permissions:
   contents: write
+  issues: write # cria as Issues de rascunho (aprovação via Telegram)
+
+# Os dois workflows de notícias entram na mesma fila: nunca rodam juntos
+# (evita sobrescrita de data/published-sources.json).
+concurrency:
+  group: noticias-pipeline
+  cancel-in-progress: false
 
 jobs:
   gerar-conteudo:
@@ -24,6 +31,14 @@ jobs:
       - name: Instalar dependências
         run: npm ci
 
+      # Estado do limite de 1 alerta de falha a cada 6h (compartilhado com generate-news.yml)
+      - name: Restaurar estado dos alertas
+        uses: actions/cache/restore@v4
+        with:
+          path: .alert-state
+          key: alert-state-${{ github.run_id }}
+          restore-keys: alert-state-
+
       - name: Baixar fontes do carrossel (se ainda não existirem)
         run: |
           mkdir -p scripts/fonts
@@ -32,8 +47,20 @@ jobs:
 
       - name: Gerar artigo(s) novo(s)
         env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          USE_GEMINI_IMAGES: ${{ vars.USE_GEMINI_IMAGES }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }} # cria Issues de rascunho e lê as pendentes
         run: npm run gerar-noticias
+
+      - name: Salvar estado dos alertas
+        if: always()
+        uses: actions/cache/save@v4
+        with:
+          path: .alert-state
+          key: alert-state-${{ github.run_id }}
 
       - name: Gerar carrossel dos artigos novos
         env:
@@ -53,6 +80,8 @@ jobs:
           git config user.email "bot@portal-ia.local"
           git add src/content/noticias public/carrossel public/capas-ia content/fila-social.json
           git diff --cached --quiet || git commit -m "auto: novas notícias de IA $(date +%F)"
+          # generate-news.ts agora commita direto no main; sincroniza antes do push
+          git pull --rebase
           git push
 
       - name: Disponibilizar carrossel pra download (backup manual)

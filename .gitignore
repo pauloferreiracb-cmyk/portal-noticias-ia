@@ -8,3 +8,5 @@ output/carrossel/
 
 .vercel
 .env*
+# estado do limite de alertas do Telegram (actions/cache)
+.alert-state/
