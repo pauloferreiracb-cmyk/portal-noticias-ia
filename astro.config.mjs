@@ -1,5 +1,5 @@
 import { defineConfig } from 'astro/config';
-import vercel from '@astrojs/vercel/serverless';
+import vercel from '@astrojs/vercel';
 
 // Modo "server": a maioria das páginas é pré-renderizada (prerender = true),
 // só o endpoint de captura de e-mail (/api/subscribe) roda como function.
