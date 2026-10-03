@@ -1762,5 +1762,53 @@
     ],
     "status": "pendente",
     "criado_em": "2026-09-25T16:07:56.668Z"
+  },
+  {
+    "slug": "a-proxima-economia-da-ia-sera-moldada-pela-execuca",
+    "titulo": "A próxima economia da IA será moldada pela 'execução' de tarefas rotineiras",
+    "resumo": "Em novo artigo, a OpenAI argumenta que o verdadeiro impacto da IA avançada não virá apenas de grandes descobertas, mas da automação estratégica do trabalho braçal por trás delas.",
+    "imagens": [
+      "https://promptmidia.com.br/carrossel/a-proxima-economia-da-ia-sera-moldada-pela-execuca/slide-1-capa.png",
+      "https://promptmidia.com.br/carrossel/a-proxima-economia-da-ia-sera-moldada-pela-execuca/slide-2-resumo.png",
+      "https://promptmidia.com.br/carrossel/a-proxima-economia-da-ia-sera-moldada-pela-execuca/slide-3-cta.png"
+    ],
+    "status": "pendente",
+    "criado_em": "2026-10-03T15:24:20.353Z"
+  },
+  {
+    "slug": "chatham-financial-reduz-tempo-de-validacao-de-merc",
+    "titulo": "Chatham Financial reduz tempo de validação de mercado em 87% com IA da OpenAI",
+    "resumo": "Empresa de consultoria financeira reestruturou fluxos de trabalho utilizando modelos Codex e GPT, reduzindo processos de 30 minutos para menos de quatro.",
+    "imagens": [
+      "https://promptmidia.com.br/carrossel/chatham-financial-reduz-tempo-de-validacao-de-merc/slide-1-capa.png",
+      "https://promptmidia.com.br/carrossel/chatham-financial-reduz-tempo-de-validacao-de-merc/slide-2-resumo.png",
+      "https://promptmidia.com.br/carrossel/chatham-financial-reduz-tempo-de-validacao-de-merc/slide-3-cta.png"
+    ],
+    "status": "pendente",
+    "criado_em": "2026-10-03T15:24:20.507Z"
+  },
+  {
+    "slug": "como-a-gigante-de-supermercados-albertsons-usa-o-c",
+    "titulo": "Como a gigante de supermercados Albertsons usa o ChatGPT para transformar o varejo",
+    "resumo": "A rede varejista Albertsons Companies integrou o ChatGPT Enterprise e a API da OpenAI para otimizar o trabalho de suas equipes corporativas e personalizar a experiência de compra de milhões de clientes.",
+    "imagens": [
+      "https://promptmidia.com.br/carrossel/como-a-gigante-de-supermercados-albertsons-usa-o-c/slide-1-capa.png",
+      "https://promptmidia.com.br/carrossel/como-a-gigante-de-supermercados-albertsons-usa-o-c/slide-2-resumo.png",
+      "https://promptmidia.com.br/carrossel/como-a-gigante-de-supermercados-albertsons-usa-o-c/slide-3-cta.png"
+    ],
+    "status": "pendente",
+    "criado_em": "2026-10-03T15:24:20.649Z"
+  },
+  {
+    "slug": "openai-publica-guia-definitivo-para-integrar-model",
+    "titulo": "OpenAI publica guia definitivo para integrar modelos GPT-6 em produtos",
+    "resumo": "A OpenAI divulgou um manual técnico prático focado em startups, detalhando como otimizar o uso da família GPT-6 em fluxos de trabalho reais.",
+    "imagens": [
+      "https://promptmidia.com.br/carrossel/openai-publica-guia-definitivo-para-integrar-model/slide-1-capa.png",
+      "https://promptmidia.com.br/carrossel/openai-publica-guia-definitivo-para-integrar-model/slide-2-resumo.png",
+      "https://promptmidia.com.br/carrossel/openai-publica-guia-definitivo-para-integrar-model/slide-3-cta.png"
+    ],
+    "status": "pendente",
+    "criado_em": "2026-10-03T15:24:20.780Z"
   }
 ]
