@@ -42,7 +42,7 @@ const MAX_PER_SOURCE = Number(process.env.MAX_PER_SOURCE) > 0 ? Number(process.e
 const RECENT_USAGE_LIMIT = 20;
 // Teto de candidatos enviados ao LLM por execução (limita tempo e custo quando
 // muitos itens são irrelevantes ou duplicados).
-const MAX_ATTEMPTS_PER_RUN = 15;
+const MAX_ATTEMPTS_PER_RUN = Math.max(15, MAX_ITEMS_PER_RUN * 2);
 
 // Chave geral de publicação automática. Só quando AUTOPUBLICAR_LIGADO=true (variável
 // do repositório) as fontes com autoPublicar=true publicam direto; sem ela, tudo

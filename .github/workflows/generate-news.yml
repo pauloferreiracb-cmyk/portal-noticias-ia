@@ -10,6 +10,9 @@ on:
       max_items:
         description: "Máximo de publicações + rascunhos nesta execução"
         default: "4"
+      max_per_source:
+        description: "Máximo de itens da mesma fonte nesta execução"
+        default: "1"
 
 # contents: commita notícias/capas direto no repo; issues: cria rascunhos
 permissions:
@@ -46,6 +49,7 @@ jobs:
         run: npx tsx scripts/generate-news.ts
         env:
           # agendado = 1 notícia por execução (6 por dia); manual = valor informado (padrão 4)
+          MAX_PER_SOURCE: ${{ github.event_name == 'schedule' && '1' || inputs.max_per_source || '1' }}
           MAX_ITEMS_PER_RUN: ${{ github.event_name == 'schedule' && '1' || inputs.max_items || '4' }}
           # chave geral: só publica direto se a variável do repo AUTOPUBLICAR_LIGADO for "true"
           AUTOPUBLICAR_LIGADO: ${{ vars.AUTOPUBLICAR_LIGADO }}
