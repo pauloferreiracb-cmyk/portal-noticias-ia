@@ -11,7 +11,8 @@
     "preview": "astro preview",
     "gerar-carrossel": "node scripts/generate-carousel.mjs",
     "gerar-noticias": "node scripts/gerar-noticias-ia.mjs",
-    "gerar-capas-ia": "node scripts/gerar-capa-ia.mjs"
+    "gerar-capas-ia": "node scripts/gerar-capa-ia.mjs",
+    "carrossel": "tsx scripts/carrossel/gerar.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.125.0",
