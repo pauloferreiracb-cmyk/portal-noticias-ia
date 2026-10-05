@@ -2,8 +2,14 @@ name: Gerar rascunhos de notícias
 
 on:
   schedule:
-    - cron: "0 */3 * * *" # a cada 3 horas — ajuste a frequência conforme o volume desejado
-  workflow_dispatch: {} # permite disparar manualmente pela aba Actions do GitHub
+    # 7h, 11h, 14h, 16h, 18h e 20h no horário de Brasília (UTC-3). O GitHub Actions
+    # costuma atrasar cron em alguns minutos (até ~30 min em horários de pico).
+    - cron: "0 10,14,17,19,21,23 * * *"
+  workflow_dispatch: # permite disparar manualmente pela aba Actions do GitHub
+    inputs:
+      max_items:
+        description: "Máximo de publicações + rascunhos nesta execução"
+        default: "4"
 
 # contents: commita notícias/capas direto no repo; issues: cria rascunhos
 permissions:
@@ -39,6 +45,10 @@ jobs:
       - name: Buscar fontes e criar rascunhos
         run: npx tsx scripts/generate-news.ts
         env:
+          # agendado = 1 notícia por execução (6 por dia); manual = valor informado (padrão 4)
+          MAX_ITEMS_PER_RUN: ${{ github.event_name == 'schedule' && '1' || inputs.max_items || '4' }}
+          # chave geral: só publica direto se a variável do repo AUTOPUBLICAR_LIGADO for "true"
+          AUTOPUBLICAR_LIGADO: ${{ vars.AUTOPUBLICAR_LIGADO }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           USE_GEMINI_IMAGES: ${{ vars.USE_GEMINI_IMAGES }} # "true" liga capas via Gemini (fallback Unsplash)
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
