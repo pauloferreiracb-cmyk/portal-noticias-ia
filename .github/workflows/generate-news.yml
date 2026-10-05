@@ -5,6 +5,17 @@ on:
     - cron: "0 */3 * * *" # a cada 3 horas — ajuste a frequência conforme o volume desejado
   workflow_dispatch: {} # permite disparar manualmente pela aba Actions do GitHub
 
+# contents: commita notícias/capas direto no repo; issues: cria rascunhos
+permissions:
+  contents: write
+  issues: write
+
+# Os dois workflows de notícias entram na mesma fila: nunca rodam juntos
+# (evita sobrescrita de data/published-sources.json).
+concurrency:
+  group: noticias-pipeline
+  cancel-in-progress: false
+
 jobs:
   generate:
     runs-on: ubuntu-latest
@@ -17,11 +28,28 @@ jobs:
 
       - run: npm ci
 
+      # Estado do limite de 1 alerta de falha a cada 6h (compartilhado com o pipeline diário)
+      - name: Restaurar estado dos alertas
+        uses: actions/cache/restore@v4
+        with:
+          path: .alert-state
+          key: alert-state-${{ github.run_id }}
+          restore-keys: alert-state-
+
       - name: Buscar fontes e criar rascunhos
         run: npx tsx scripts/generate-news.ts
         env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          USE_GEMINI_IMAGES: ${{ vars.USE_GEMINI_IMAGES }} # "true" liga capas via Gemini (fallback Unsplash)
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           UNSPLASH_ACCESS_KEY: ${{ secrets.UNSPLASH_ACCESS_KEY }}
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }} # token automático do Actions, só precisa habilitar permissão de "issues: write"
+
+      - name: Salvar estado dos alertas
+        if: always()
+        uses: actions/cache/save@v4
+        with:
+          path: .alert-state
+          key: alert-state-${{ github.run_id }}
