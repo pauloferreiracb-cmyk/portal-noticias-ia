@@ -16,7 +16,7 @@ permissions:
   contents: write
   issues: write
 
-# Os dois workflows de notícias entram na mesma fila: nunca rodam juntos
+# Execuções entram na mesma fila: nunca rodam juntas
 # (evita sobrescrita de data/published-sources.json).
 concurrency:
   group: noticias-pipeline
@@ -34,7 +34,7 @@ jobs:
 
       - run: npm ci
 
-      # Estado do limite de 1 alerta de falha a cada 6h (compartilhado com o pipeline diário)
+      # Estado do limite de 1 alerta de falha a cada 6h
       - name: Restaurar estado dos alertas
         uses: actions/cache/restore@v4
         with:
