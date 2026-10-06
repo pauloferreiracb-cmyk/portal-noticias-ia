@@ -1870,5 +1870,53 @@
     ],
     "status": "pendente",
     "criado_em": "2026-10-05T19:56:00.562Z"
+  },
+  {
+    "slug": "amazon-investe-us-1-bi-contra-criticas-a-data-cent",
+    "titulo": "Amazon investe US$ 1 bi contra críticas a data centers, mas gera nova polêmica",
+    "resumo": "A gigante de tecnologia tenta melhorar sua imagem ambiental ao eliminar cláusulas de confidencialidade, mas ambientalistas apontam minimização dos danos causados pela infraestrutura de IA.",
+    "imagens": [
+      "https://promptmidia.com.br/carrossel/amazon-investe-us-1-bi-contra-criticas-a-data-cent/slide-1-capa.png",
+      "https://promptmidia.com.br/carrossel/amazon-investe-us-1-bi-contra-criticas-a-data-cent/slide-2-resumo.png",
+      "https://promptmidia.com.br/carrossel/amazon-investe-us-1-bi-contra-criticas-a-data-cent/slide-3-cta.png"
+    ],
+    "status": "pendente",
+    "criado_em": "2026-10-06T17:35:34.621Z"
+  },
+  {
+    "slug": "google-research-projeta-a-proxima-fase-da-ia-da-ci",
+    "titulo": "Google Research projeta a próxima fase da IA: da ciência à infraestrutura",
+    "resumo": "Yossi Matias, líder de pesquisa do Google, aponta que o real impacto da inteligência artificial ocorrerá na intersecção entre tecnologias e setores produtivos.",
+    "imagens": [
+      "https://promptmidia.com.br/carrossel/google-research-projeta-a-proxima-fase-da-ia-da-ci/slide-1-capa.png",
+      "https://promptmidia.com.br/carrossel/google-research-projeta-a-proxima-fase-da-ia-da-ci/slide-2-resumo.png",
+      "https://promptmidia.com.br/carrossel/google-research-projeta-a-proxima-fase-da-ia-da-ci/slide-3-cta.png"
+    ],
+    "status": "pendente",
+    "criado_em": "2026-10-06T17:35:34.754Z"
+  },
+  {
+    "slug": "google-testa-gemini-para-ligar-para-sua-familia-e",
+    "titulo": "Google testa Gemini para ligar para sua família e dar recados rápidos",
+    "resumo": "Descoberta em código do Android revela que o recurso de assistente de chamadas por IA deve ser expandido para contatos pessoais, permitindo que a IA telefone para seus parentes no seu lugar.",
+    "imagens": [
+      "https://promptmidia.com.br/carrossel/google-testa-gemini-para-ligar-para-sua-familia-e/slide-1-capa.png",
+      "https://promptmidia.com.br/carrossel/google-testa-gemini-para-ligar-para-sua-familia-e/slide-2-resumo.png",
+      "https://promptmidia.com.br/carrossel/google-testa-gemini-para-ligar-para-sua-familia-e/slide-3-cta.png"
+    ],
+    "status": "pendente",
+    "criado_em": "2026-10-06T17:35:34.863Z"
+  },
+  {
+    "slug": "ia-preditiva-autonoma-o-desafio-de-manter-agentes",
+    "titulo": "IA preditiva autônoma: o desafio de manter agentes alinhados aos negócios",
+    "resumo": "O debate sobre eficiência já foi superado; a nova fronteira corporativa exige sistemas que decidam sozinhos sem perder de vista os objetivos estratégicos.",
+    "imagens": [
+      "https://promptmidia.com.br/carrossel/ia-preditiva-autonoma-o-desafio-de-manter-agentes/slide-1-capa.png",
+      "https://promptmidia.com.br/carrossel/ia-preditiva-autonoma-o-desafio-de-manter-agentes/slide-2-resumo.png",
+      "https://promptmidia.com.br/carrossel/ia-preditiva-autonoma-o-desafio-de-manter-agentes/slide-3-cta.png"
+    ],
+    "status": "pendente",
+    "criado_em": "2026-10-06T17:35:34.969Z"
   }
 ]
