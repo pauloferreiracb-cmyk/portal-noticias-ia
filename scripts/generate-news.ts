@@ -659,20 +659,32 @@ async function telegramSend(payload: Record<string, unknown>, label: string): Pr
     return false;
   }
 
-  try {
-    const res = await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ chat_id: chatId, ...payload }),
-    });
-    if (!res.ok) {
-      console.error(`Telegram recusou (${label}): ${res.status} ${await res.text()}`);
-      return false;
+  // Erro de rede ("fetch failed"), 429 e 5xx costumam passar em segundos: até 3
+  // tentativas. Outros status (400/401/403) são erro de configuração e não repetem.
+  const delaysMs = [2000, 5000];
+  for (let attempt = 0; ; attempt++) {
+    try {
+      const res = await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ chat_id: chatId, ...payload }),
+      });
+      if (res.ok) return true;
+      const retryable = res.status === 429 || res.status >= 500;
+      if (retryable && attempt < delaysMs.length) {
+        console.warn(`Telegram (${label}) respondeu ${res.status} — nova tentativa em ${delaysMs[attempt] / 1000}s.`);
+      } else {
+        console.error(`Telegram recusou (${label}): ${res.status} ${await res.text()}`);
+        return false;
+      }
+    } catch (err) {
+      if (attempt >= delaysMs.length) {
+        console.error(`Falha ao chamar o Telegram (${label}): ${errMsg(err)}`);
+        return false;
+      }
+      console.warn(`Telegram (${label}) falhou (${errMsg(err)}) — nova tentativa em ${delaysMs[attempt] / 1000}s.`);
     }
-    return true;
-  } catch (err) {
-    console.error(`Falha ao chamar o Telegram (${label}): ${errMsg(err)}`);
-    return false;
+    await new Promise((resolve) => setTimeout(resolve, delaysMs[attempt]));
   }
 }
 
