@@ -30,10 +30,27 @@ async function loadSources(): Promise<Source[]> {
   return list as Source[];
 }
 
-// Trava de volume por execução (evita publicar demais de uma vez).
-// Com cron de 3 em 3h e 4 por execução, o teto teórico é 32/dia — na prática
-// bem menos, porque a maioria dos candidatos é descartada pelo filtro de relevância.
+// Trava de volume por execução (publicações + rascunhos). O workflow agendado
+// passa MAX_ITEMS_PER_RUN=1 (6 execuções por dia = 6 notícias); execução manual
+// usa o padrão de 4.
 const MAX_DRAFTS_PER_RUN = 4;
+const MAX_ITEMS_PER_RUN = Number(process.env.MAX_ITEMS_PER_RUN) > 0 ? Number(process.env.MAX_ITEMS_PER_RUN) : MAX_DRAFTS_PER_RUN;
+
+// Diversidade: no máximo N itens da mesma fonte por execução; e, entre fontes com
+// o mesmo peso, a que menos apareceu nas últimas notícias vai primeiro (rodízio).
+const MAX_PER_SOURCE = Number(process.env.MAX_PER_SOURCE) > 0 ? Number(process.env.MAX_PER_SOURCE) : 1;
+const RECENT_USAGE_LIMIT = 20;
+// Teto de candidatos enviados ao LLM por execução (limita tempo e custo quando
+// muitos itens são irrelevantes ou duplicados).
+// Toda chamada de rede (feeds, Unsplash, Telegram) tem limite de tempo: sem isso uma
+// conexão travada deixa o workflow preso até o timeout do GitHub (6h).
+const FETCH_TIMEOUT_MS = 20_000;
+const MAX_ATTEMPTS_PER_RUN = Math.max(15, MAX_ITEMS_PER_RUN * 2);
+
+// Chave geral de publicação automática. Só quando AUTOPUBLICAR_LIGADO=true (variável
+// do repositório) as fontes com autoPublicar=true publicam direto; sem ela, tudo
+// vira rascunho para aprovação no Telegram. Pausa sem mexer em código.
+const AUTOPUBLICAR_LIGADO = process.env.AUTOPUBLICAR_LIGADO === "true";
 
 // Quantas manchetes recentes (publicadas + rascunhos pendentes) entram no
 // prompt do Claude pra checagem de duplicata semântica (item 1 do pedido).
@@ -77,7 +94,7 @@ type Draft = {
 
 // --- 1. Buscar candidatos ---------------------------------------------------
 async function fetchAllSources(sources: Source[]): Promise<Candidate[]> {
-  const parser = new Parser();
+  const parser = new Parser({ timeout: FETCH_TIMEOUT_MS });
   const all: Candidate[] = [];
 
   for (const src of sources) {
@@ -89,7 +106,7 @@ async function fetchAllSources(sources: Source[]): Promise<Candidate[]> {
           title: item.title,
           link: item.link,
           source: src.nome,
-          autoPublicar: src.autoPublicar === true,
+          autoPublicar: src.autoPublicar === true && AUTOPUBLICAR_LIGADO,
           peso: src.peso ?? 0,
           contentSnippet: item.contentSnippet,
         });
@@ -120,7 +137,7 @@ async function loadPublishedUrls(): Promise<Set<string>> {
   return new Set();
 }
 
-async function loadPendingDrafts(): Promise<{ urls: Set<string>; titles: string[] }> {
+async function loadPendingDrafts(): Promise<{ urls: Set<string>; titles: string[]; sources: string[] }> {
   const issues = await octokit.issues.listForRepo({
     owner,
     repo,
@@ -130,14 +147,17 @@ async function loadPendingDrafts(): Promise<{ urls: Set<string>; titles: string[
 
   const urls = new Set<string>();
   const titles: string[] = [];
+  const sources: string[] = [];
   for (const issue of issues.data) {
     const match = issue.body?.match(/fonte_url:\s*"(.+?)"/);
     if (match) urls.add(match[1]);
+    const nome = issue.body?.match(/fonte_nome:\s*"(.+?)"/);
+    if (nome) sources.push(nome[1]);
     // título da Issue já é "[draft] <título>" (ver createDraftIssue) — não
     // precisa parsear o body de novo.
     titles.push(issue.title.replace(/^\[draft\]\s*/, ""));
   }
-  return { urls, titles };
+  return { urls, titles, sources };
 }
 
 // --- 2b. Últimas notícias publicadas, pra checagem de duplicata semântica --
@@ -165,6 +185,34 @@ async function loadRecentPublishedTitles(limit: number): Promise<string[]> {
     .sort((a, b) => b.data - a.data)
     .slice(0, limit)
     .map((a) => a.titulo);
+}
+
+// Quantas vezes cada fonte apareceu nas últimas notícias publicadas (arquivos locais)
+// e nos rascunhos pendentes. Serve pro rodízio entre fontes de mesmo peso.
+async function loadRecentSourceUsage(limit: number, pendingSources: string[]): Promise<Map<string, number>> {
+  const usage = new Map<string, number>();
+  for (const nome of pendingSources) usage.set(nome, (usage.get(nome) ?? 0) + 1);
+
+  let arquivos: string[] = [];
+  try {
+    arquivos = (await fs.readdir(NOTICIAS_DIR)).filter((f) => f.endsWith(".md"));
+  } catch {
+    return usage;
+  }
+
+  const artigos: { fonte: string; data: number }[] = [];
+  for (const arquivo of arquivos) {
+    try {
+      const { data } = matter(await fs.readFile(path.join(NOTICIAS_DIR, arquivo), "utf-8"));
+      if (data.fonte_nome) artigos.push({ fonte: String(data.fonte_nome), data: new Date(data.data ?? 0).getTime() });
+    } catch {
+      // arquivo individual ilegível, pula
+    }
+  }
+  for (const a of artigos.sort((x, y) => y.data - x.data).slice(0, limit)) {
+    usage.set(a.fonte, (usage.get(a.fonte) ?? 0) + 1);
+  }
+  return usage;
 }
 
 // --- 3a. LLM com fallback: Gemini (principal) -> Claude ----------------------
@@ -350,6 +398,44 @@ Responda em JSON puro: {"fiel": true|false, "motivo": "explicação curta; se in
   }
 }
 
+// --- 3d. Autocorreção ------------------------------------------------------
+// Artigo reprovado na fidelidade: uma única tentativa de reescrever sem os
+// pontos apontados. Quem chama confere de novo com checkFidelity; reprovou de
+// novo = vai pra aprovação manual. Retorna null se a resposta não for utilizável.
+async function reviseDraft(candidate: Candidate, draft: Draft, motivo: string): Promise<Draft | null> {
+  const prompt = `Você é o editor-chefe do PromptMídia. O artigo abaixo foi REPROVADO pelo verificador de fatos.
+
+FONTE (${candidate.source}) — única base de fatos permitida:
+Título: ${candidate.title}
+Trecho: ${candidate.contentSnippet ?? "(sem trecho disponível)"}
+
+ARTIGO REPROVADO:
+Título: ${draft.titulo}
+Resumo: ${draft.resumo}
+Corpo:
+${draft.corpo}
+
+MOTIVO DA REPROVAÇÃO: ${motivo}
+
+Reescreva o artigo corrigindo o problema: remova ou generalize TODO número, data, nome, citação ou afirmação que não conste no título/trecho da fonte. Mantenha o tom jornalístico em português do Brasil, título com gancho real (máximo 90 caracteres), resumo de 1 a 2 frases e corpo em 3 a 4 parágrafos em markdown puro. No contexto, seja genérico.
+
+Responda em JSON puro: {"titulo": "...", "resumo": "...", "corpo": "...", "tags": ["...", "..."]}`;
+
+  const text = await callLLM(prompt);
+  try {
+    const parsed = JSON.parse(stripCodeFences(text));
+    if (!parsed.titulo || !parsed.resumo || !parsed.corpo) return null;
+    return {
+      titulo: String(parsed.titulo),
+      resumo: String(parsed.resumo),
+      corpo: String(parsed.corpo),
+      tags: Array.isArray(parsed.tags) ? parsed.tags.map(String).slice(0, 4) : draft.tags,
+    };
+  } catch {
+    return null;
+  }
+}
+
 // --- 4. Imagem de capa -------------------------------------------------------
 // Padrão: Unsplash. Com USE_GEMINI_IMAGES=true tenta Gemini primeiro; qualquer
 // erro/cota cai pro Unsplash. A imagem do Gemini vai pra public/capas-ia/<slug>.png,
@@ -360,7 +446,7 @@ type Cover = { url: string; credit: string; creditUrl: string };
 async function fetchUnsplashCover(query: string): Promise<Cover> {
   const res = await fetch(
     `https://api.unsplash.com/photos/random?query=${encodeURIComponent(query)}&orientation=landscape`,
-    { headers: { Authorization: `Client-ID ${process.env.UNSPLASH_ACCESS_KEY}` } }
+    { headers: { Authorization: `Client-ID ${process.env.UNSPLASH_ACCESS_KEY}` }, signal: AbortSignal.timeout(FETCH_TIMEOUT_MS) }
   );
   const data = await res.json();
   return {
@@ -452,17 +538,45 @@ async function commitFile(filePath: string, content: string | Buffer, message: s
 }
 
 function buildArticleMarkdown(candidate: Candidate, draft: Draft, cover: Cover): string {
+  // JSON.stringify gera string YAML válida (aspas, barras e quebras de linha escapadas):
+  // texto do LLM nunca quebra o frontmatter — um .md inválido derrubaria o build do site.
   return `---
-titulo: "${draft.titulo.replace(/"/g, '\\"')}"
-resumo: "${draft.resumo.replace(/"/g, '\\"')}"
+titulo: ${JSON.stringify(draft.titulo)}
+resumo: ${JSON.stringify(draft.resumo)}
 data: "${new Date().toISOString()}"
-fonte_url: "${candidate.link}"
-fonte_nome: "${candidate.source}"
-tags: [${draft.tags.map((t) => `"${t}"`).join(", ")}]
-${cover.url ? `capa: "${cover.url}"\n` : ""}---
+fonte_url: ${JSON.stringify(candidate.link)}
+fonte_nome: ${JSON.stringify(candidate.source)}
+tags: [${draft.tags.map((t) => JSON.stringify(t)).join(", ")}]
+${cover.url ? `capa: ${JSON.stringify(cover.url)}\n` : ""}---
 
 ${draft.corpo}
 `;
+}
+
+// Espelha o schema de src/content/config.ts. Devolve o motivo se o arquivo não
+// passaria no build do Astro; null se está ok.
+function validateArticle(markdown: string): string | null {
+  let data: Record<string, unknown>;
+  let content: string;
+  try {
+    ({ data, content } = matter(markdown));
+  } catch (err) {
+    return `frontmatter ilegível: ${errMsg(err)}`;
+  }
+  const str = (v: unknown) => typeof v === "string" && v.trim().length > 0;
+  if (!str(data.titulo)) return "titulo ausente ou vazio";
+  if (!str(data.resumo)) return "resumo ausente ou vazio";
+  if (Number.isNaN(new Date(data.data as any).getTime())) return "data inválida";
+  try {
+    new URL(String(data.fonte_url));
+  } catch {
+    return "fonte_url inválida";
+  }
+  if (!str(data.fonte_nome)) return "fonte_nome ausente";
+  if (!Array.isArray(data.tags) || data.tags.some((t) => typeof t !== "string")) return "tags inválidas";
+  if (data.capa !== undefined && typeof data.capa !== "string") return "capa inválida";
+  if (content.trim().length < 200) return "corpo ausente ou curto demais";
+  return null;
 }
 
 async function createDraftIssue(candidate: Candidate, draft: Draft, cover: Cover, slug: string) {
@@ -548,20 +662,33 @@ async function telegramSend(payload: Record<string, unknown>, label: string): Pr
     return false;
   }
 
-  try {
-    const res = await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ chat_id: chatId, ...payload }),
-    });
-    if (!res.ok) {
-      console.error(`Telegram recusou (${label}): ${res.status} ${await res.text()}`);
-      return false;
+  // Erro de rede ("fetch failed"), 429 e 5xx costumam passar em segundos: até 3
+  // tentativas. Outros status (400/401/403) são erro de configuração e não repetem.
+  const delaysMs = [2000, 5000];
+  for (let attempt = 0; ; attempt++) {
+    try {
+      const res = await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ chat_id: chatId, ...payload }),
+        signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
+      });
+      if (res.ok) return true;
+      const retryable = res.status === 429 || res.status >= 500;
+      if (retryable && attempt < delaysMs.length) {
+        console.warn(`Telegram (${label}) respondeu ${res.status} — nova tentativa em ${delaysMs[attempt] / 1000}s.`);
+      } else {
+        console.error(`Telegram recusou (${label}): ${res.status} ${await res.text()}`);
+        return false;
+      }
+    } catch (err) {
+      if (attempt >= delaysMs.length) {
+        console.error(`Falha ao chamar o Telegram (${label}): ${errMsg(err)}`);
+        return false;
+      }
+      console.warn(`Telegram (${label}) falhou (${errMsg(err)}) — nova tentativa em ${delaysMs[attempt] / 1000}s.`);
     }
-    return true;
-  } catch (err) {
-    console.error(`Falha ao chamar o Telegram (${label}): ${errMsg(err)}`);
-    return false;
+    await new Promise((resolve) => setTimeout(resolve, delaysMs[attempt]));
   }
 }
 
@@ -625,32 +752,61 @@ async function main() {
 
   const recentTitles = [...recentPublishedTitles, ...pending.titles];
 
-  // sort é estável: dentro do mesmo peso mantém a ordem original das fontes.
+  // Ordem: peso (maior primeiro); entre fontes de mesmo peso, a que menos apareceu
+  // nas últimas notícias vai primeiro (rodízio); o resto mantém a ordem original
+  // (sort é estável).
+  const usage = await loadRecentSourceUsage(RECENT_USAGE_LIMIT, pending.sources);
   const fresh = candidates
     .filter((c) => !published.has(c.link) && !pending.urls.has(c.link))
-    .sort((a, b) => b.peso - a.peso);
+    .sort((a, b) => b.peso - a.peso || (usage.get(a.source) ?? 0) - (usage.get(b.source) ?? 0));
 
   let drafts = 0;
   let autoPublished = 0;
   let apiFailure: string | null = null;
+  let attempts = 0;
+  const usedInRun = new Map<string, number>();
   for (const candidate of fresh) {
-    if (drafts + autoPublished >= MAX_DRAFTS_PER_RUN) break;
+    if (drafts + autoPublished >= MAX_ITEMS_PER_RUN) break;
+    if (attempts >= MAX_ATTEMPTS_PER_RUN) {
+      console.log(`Limite de ${MAX_ATTEMPTS_PER_RUN} tentativas de LLM por execução atingido.`);
+      break;
+    }
+    if ((usedInRun.get(candidate.source) ?? 0) >= MAX_PER_SOURCE) continue;
 
     try {
-      const draft = await judgeAndDraft(candidate, recentTitles);
+      attempts++;
+      let draft = await judgeAndDraft(candidate, recentTitles);
       if (!draft) continue;
 
       let publicarDireto = false;
       if (candidate.autoPublicar) {
-        const check = await checkFidelity(candidate, draft);
-        publicarDireto = check.fiel;
+        let check = await checkFidelity(candidate, draft);
         if (!check.fiel) {
-          console.log(`Fidelidade reprovada ("${draft.titulo}") — vai pra aprovação manual: ${check.motivo}`);
+          // Autocorreção: uma reescrita guiada pelo motivo da reprovação, e confere de novo.
+          console.log(`Fidelidade reprovada ("${draft.titulo}"): ${check.motivo} — tentando autocorreção.`);
+          const revised = await reviseDraft(candidate, draft, check.motivo);
+          if (revised) {
+            draft = revised;
+            check = await checkFidelity(candidate, draft);
+          }
         }
+        publicarDireto = check.fiel;
+        console.log(
+          check.fiel
+            ? `Fidelidade aprovada ("${draft.titulo}").`
+            : `Fidelidade reprovada mesmo após autocorreção ("${draft.titulo}") — vai pra aprovação manual: ${check.motivo}`
+        );
       }
 
       const slug = await uniqueSlug(draft.titulo);
       const cover = await resolveCover(draft, slug);
+
+      // Nada vai pro repo (publicação ou rascunho) se o arquivo não passaria no build.
+      const invalido = validateArticle(buildArticleMarkdown(candidate, draft, cover));
+      if (invalido) {
+        console.warn(`Artigo "${draft.titulo}" descartado: ${invalido}.`);
+        continue;
+      }
 
       if (publicarDireto) {
         if ((await publishDirect(candidate, draft, cover, slug)) === "published") {
@@ -666,6 +822,7 @@ async function main() {
       }
       recentTitles.unshift(draft.titulo);
       published.add(candidate.link);
+      usedInRun.set(candidate.source, (usedInRun.get(candidate.source) ?? 0) + 1);
     } catch (err) {
       if (!(err instanceof AllProvidersFailedError)) throw err;
       // Os dois provedores caíram — insistir nos próximos candidatos só gasta tempo.
@@ -684,8 +841,12 @@ async function main() {
   if (apiFailure && drafts + autoPublished === 0) process.exit(1);
 }
 
-main().catch(async (err) => {
-  console.error(redact(err instanceof Error ? (err.stack ?? err.message) : String(err)));
-  await sendTelegramAlert(`⚠️ Pipeline falhou: ${errMsg(err)}`);
-  process.exit(1);
-});
+main()
+  // Encerra explicitamente: uma conexão HTTP pendente (keep-alive travado) mantinha o processo
+  // vivo depois de tudo pronto e o job ficava preso (run de 08/10).
+  .then(() => process.exit(0))
+  .catch(async (err) => {
+    console.error(redact(err instanceof Error ? (err.stack ?? err.message) : String(err)));
+    await sendTelegramAlert(`⚠️ Pipeline falhou: ${errMsg(err)}`);
+    process.exit(1);
+  });
