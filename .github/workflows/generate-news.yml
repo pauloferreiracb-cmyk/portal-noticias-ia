@@ -27,6 +27,7 @@ concurrency:
 
 jobs:
   generate:
+    timeout-minutes: 25 # um run travado não pode ocupar a fila (concurrency) por horas
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4

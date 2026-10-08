@@ -42,6 +42,9 @@ const MAX_PER_SOURCE = Number(process.env.MAX_PER_SOURCE) > 0 ? Number(process.e
 const RECENT_USAGE_LIMIT = 20;
 // Teto de candidatos enviados ao LLM por execução (limita tempo e custo quando
 // muitos itens são irrelevantes ou duplicados).
+// Toda chamada de rede (feeds, Unsplash, Telegram) tem limite de tempo: sem isso uma
+// conexão travada deixa o workflow preso até o timeout do GitHub (6h).
+const FETCH_TIMEOUT_MS = 20_000;
 const MAX_ATTEMPTS_PER_RUN = Math.max(15, MAX_ITEMS_PER_RUN * 2);
 
 // Chave geral de publicação automática. Só quando AUTOPUBLICAR_LIGADO=true (variável
@@ -91,7 +94,7 @@ type Draft = {
 
 // --- 1. Buscar candidatos ---------------------------------------------------
 async function fetchAllSources(sources: Source[]): Promise<Candidate[]> {
-  const parser = new Parser();
+  const parser = new Parser({ timeout: FETCH_TIMEOUT_MS });
   const all: Candidate[] = [];
 
   for (const src of sources) {
@@ -443,7 +446,7 @@ type Cover = { url: string; credit: string; creditUrl: string };
 async function fetchUnsplashCover(query: string): Promise<Cover> {
   const res = await fetch(
     `https://api.unsplash.com/photos/random?query=${encodeURIComponent(query)}&orientation=landscape`,
-    { headers: { Authorization: `Client-ID ${process.env.UNSPLASH_ACCESS_KEY}` } }
+    { headers: { Authorization: `Client-ID ${process.env.UNSPLASH_ACCESS_KEY}` }, signal: AbortSignal.timeout(FETCH_TIMEOUT_MS) }
   );
   const data = await res.json();
   return {
@@ -668,6 +671,7 @@ async function telegramSend(payload: Record<string, unknown>, label: string): Pr
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ chat_id: chatId, ...payload }),
+        signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
       });
       if (res.ok) return true;
       const retryable = res.status === 429 || res.status >= 500;
