@@ -841,8 +841,12 @@ async function main() {
   if (apiFailure && drafts + autoPublished === 0) process.exit(1);
 }
 
-main().catch(async (err) => {
-  console.error(redact(err instanceof Error ? (err.stack ?? err.message) : String(err)));
-  await sendTelegramAlert(`⚠️ Pipeline falhou: ${errMsg(err)}`);
-  process.exit(1);
-});
+main()
+  // Encerra explicitamente: uma conexão HTTP pendente (keep-alive travado) mantinha o processo
+  // vivo depois de tudo pronto e o job ficava preso (run de 08/10).
+  .then(() => process.exit(0))
+  .catch(async (err) => {
+    console.error(redact(err instanceof Error ? (err.stack ?? err.message) : String(err)));
+    await sendTelegramAlert(`⚠️ Pipeline falhou: ${errMsg(err)}`);
+    process.exit(1);
+  });
