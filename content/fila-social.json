@@ -1942,5 +1942,41 @@
     ],
     "status": "pendente",
     "criado_em": "2026-10-07T18:07:09.572Z"
+  },
+  {
+    "slug": "anthropic-lanca-missao-genesis-para-acelerar-pesqu",
+    "titulo": "Anthropic lança Missão Gênesis para acelerar pesquisas científicas com Claude",
+    "resumo": "A criadora do Claude anunciou um novo compromisso de fomento que fornecerá recursos de inteligência artificial de ponta para laboratórios acelerarem descobertas em áreas críticas.",
+    "imagens": [
+      "https://promptmidia.com.br/carrossel/anthropic-lanca-missao-genesis-para-acelerar-pesqu/slide-1-capa.png",
+      "https://promptmidia.com.br/carrossel/anthropic-lanca-missao-genesis-para-acelerar-pesqu/slide-2-resumo.png",
+      "https://promptmidia.com.br/carrossel/anthropic-lanca-missao-genesis-para-acelerar-pesqu/slide-3-cta.png"
+    ],
+    "status": "pendente",
+    "criado_em": "2026-10-09T17:42:50.315Z"
+  },
+  {
+    "slug": "startup-revela-uso-dos-ineditos-gpt-5-6-e-gpt-6-as",
+    "titulo": "Startup revela uso dos inéditos GPT-5.6 e GPT-6 Astra da OpenAI para criar anúncios",
+    "resumo": "A Pollo AI integrou os modelos de próxima geração da OpenAI para permitir que criadores transformem briefings de texto em campanhas de vídeo cinematográficas.",
+    "imagens": [
+      "https://promptmidia.com.br/carrossel/startup-revela-uso-dos-ineditos-gpt-5-6-e-gpt-6-as/slide-1-capa.png",
+      "https://promptmidia.com.br/carrossel/startup-revela-uso-dos-ineditos-gpt-5-6-e-gpt-6-as/slide-2-resumo.png",
+      "https://promptmidia.com.br/carrossel/startup-revela-uso-dos-ineditos-gpt-5-6-e-gpt-6-as/slide-3-cta.png"
+    ],
+    "status": "pendente",
+    "criado_em": "2026-10-09T17:42:50.466Z"
+  },
+  {
+    "slug": "weathernext-3-google-lanca-nova-ia-que-preve-o-tem",
+    "titulo": "WeatherNext 3: Google lança nova IA que prevê o tempo com precisão inédita",
+    "resumo": "O novo modelo global da DeepMind supera sistemas tradicionais em velocidade e resolução, prometendo antecipar eventos climáticos extremos com muito mais antecedência.",
+    "imagens": [
+      "https://promptmidia.com.br/carrossel/weathernext-3-google-lanca-nova-ia-que-preve-o-tem/slide-1-capa.png",
+      "https://promptmidia.com.br/carrossel/weathernext-3-google-lanca-nova-ia-que-preve-o-tem/slide-2-resumo.png",
+      "https://promptmidia.com.br/carrossel/weathernext-3-google-lanca-nova-ia-que-preve-o-tem/slide-3-cta.png"
+    ],
+    "status": "pendente",
+    "criado_em": "2026-10-09T17:42:50.604Z"
   }
 ]
