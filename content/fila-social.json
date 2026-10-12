@@ -1978,5 +1978,89 @@
     ],
     "status": "pendente",
     "criado_em": "2026-10-09T17:42:50.604Z"
+  },
+  {
+    "slug": "a-corrida-armamentista-robotica-da-amazon-o-que-mu",
+    "titulo": "A corrida armamentista robótica da Amazon: o que muda para o trabalhador humano?",
+    "resumo": "A gigante do varejo intensifica a integração de robôs em seus centros logísticos, levantando questões sobre escala, produtividade e o futuro da força de trabalho humana.",
+    "imagens": [
+      "https://promptmidia.com.br/carrossel/a-corrida-armamentista-robotica-da-amazon-o-que-mu/slide-1-capa.png",
+      "https://promptmidia.com.br/carrossel/a-corrida-armamentista-robotica-da-amazon-o-que-mu/slide-2-resumo.png",
+      "https://promptmidia.com.br/carrossel/a-corrida-armamentista-robotica-da-amazon-o-que-mu/slide-3-cta.png"
+    ],
+    "status": "pendente",
+    "criado_em": "2026-10-12T20:35:04.270Z"
+  },
+  {
+    "slug": "anthropic-lanca-cyber-mission-a-nova-estrategia-pa",
+    "titulo": "Anthropic lança 'Cyber Mission': a nova estratégia para combater ciberameaças",
+    "resumo": "A empresa de IA estabeleceu uma força-tarefa dedicada a proteger sistemas críticos e aprimorar a defesa contra ataques cibernéticos em modelos de grande escala.",
+    "imagens": [
+      "https://promptmidia.com.br/carrossel/anthropic-lanca-cyber-mission-a-nova-estrategia-pa/slide-1-capa.png",
+      "https://promptmidia.com.br/carrossel/anthropic-lanca-cyber-mission-a-nova-estrategia-pa/slide-2-resumo.png",
+      "https://promptmidia.com.br/carrossel/anthropic-lanca-cyber-mission-a-nova-estrategia-pa/slide-3-cta.png"
+    ],
+    "status": "pendente",
+    "criado_em": "2026-10-12T20:35:04.419Z"
+  },
+  {
+    "slug": "asana-reduz-custo-de-agente-de-ia-em-76-vezes-em-t",
+    "titulo": "Asana reduz custo de agente de IA em 76 vezes em testes com a OpenAI",
+    "resumo": "Plataforma de gestão conseguiu baratear drasticamente a operação do seu agente de navegação, além de tornar a execução cinco vezes mais rápida durante testes de otimização.",
+    "imagens": [
+      "https://promptmidia.com.br/carrossel/asana-reduz-custo-de-agente-de-ia-em-76-vezes-em-t/slide-1-capa.png",
+      "https://promptmidia.com.br/carrossel/asana-reduz-custo-de-agente-de-ia-em-76-vezes-em-t/slide-2-resumo.png",
+      "https://promptmidia.com.br/carrossel/asana-reduz-custo-de-agente-de-ia-em-76-vezes-em-t/slide-3-cta.png"
+    ],
+    "status": "pendente",
+    "criado_em": "2026-10-12T20:35:04.557Z"
+  },
+  {
+    "slug": "barclays-adota-claude-em-larga-escala-para-transfo",
+    "titulo": "Barclays adota Claude em larga escala para transformar operações bancárias",
+    "resumo": "O gigante bancário britânico expandiu a parceria com a Anthropic para integrar o Claude em diversos setores, focando em eficiência operacional e suporte ao cliente.",
+    "imagens": [
+      "https://promptmidia.com.br/carrossel/barclays-adota-claude-em-larga-escala-para-transfo/slide-1-capa.png",
+      "https://promptmidia.com.br/carrossel/barclays-adota-claude-em-larga-escala-para-transfo/slide-2-resumo.png",
+      "https://promptmidia.com.br/carrossel/barclays-adota-claude-em-larga-escala-para-transfo/slide-3-cta.png"
+    ],
+    "status": "pendente",
+    "criado_em": "2026-10-12T20:35:04.688Z"
+  },
+  {
+    "slug": "lideres-do-vale-do-silicio-aderem-a-plano-de-trump",
+    "titulo": "Líderes do Vale do Silício aderem a plano de Trump para rebatizar a IA",
+    "resumo": "Empresários da tecnologia começam a adotar o termo 'superinteligência' em suas empresas para alinhar o setor às exigências do governo norte-americano.",
+    "imagens": [
+      "https://promptmidia.com.br/carrossel/lideres-do-vale-do-silicio-aderem-a-plano-de-trump/slide-1-capa.png",
+      "https://promptmidia.com.br/carrossel/lideres-do-vale-do-silicio-aderem-a-plano-de-trump/slide-2-resumo.png",
+      "https://promptmidia.com.br/carrossel/lideres-do-vale-do-silicio-aderem-a-plano-de-trump/slide-3-cta.png"
+    ],
+    "status": "pendente",
+    "criado_em": "2026-10-12T20:35:04.817Z"
+  },
+  {
+    "slug": "ucrania-ataca-data-center-de-ia-da-yandex-o-impact",
+    "titulo": "Ucrânia ataca data center de IA da Yandex: o impacto nos supercomputadores russos",
+    "resumo": "Drones ucranianos atingiram uma instalação de processamento da 'Google russa', comprometendo a infraestrutura usada para treinar modelos de Inteligência Artificial.",
+    "imagens": [
+      "https://promptmidia.com.br/carrossel/ucrania-ataca-data-center-de-ia-da-yandex-o-impact/slide-1-capa.png",
+      "https://promptmidia.com.br/carrossel/ucrania-ataca-data-center-de-ia-da-yandex-o-impact/slide-2-resumo.png",
+      "https://promptmidia.com.br/carrossel/ucrania-ataca-data-center-de-ia-da-yandex-o-impact/slide-3-cta.png"
+    ],
+    "status": "pendente",
+    "criado_em": "2026-10-12T20:35:04.945Z"
+  },
+  {
+    "slug": "vale-a-pena-rodar-ia-localmente-o-custo-beneficio",
+    "titulo": "Vale a pena rodar IA localmente? O custo-benefício do hardware de ponta",
+    "resumo": "Rodar modelos de IA no próprio computador promete privacidade, mas exige alto investimento em hardware. Uma jornada de testes quer descobrir se o custo compensa a performance.",
+    "imagens": [
+      "https://promptmidia.com.br/carrossel/vale-a-pena-rodar-ia-localmente-o-custo-beneficio/slide-1-capa.png",
+      "https://promptmidia.com.br/carrossel/vale-a-pena-rodar-ia-localmente-o-custo-beneficio/slide-2-resumo.png",
+      "https://promptmidia.com.br/carrossel/vale-a-pena-rodar-ia-localmente-o-custo-beneficio/slide-3-cta.png"
+    ],
+    "status": "pendente",
+    "criado_em": "2026-10-12T20:35:05.069Z"
   }
 ]
